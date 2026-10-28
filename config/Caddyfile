@@ -1,0 +1,9 @@
+# Encaminha os domínios locais cardap.<tenant> da porta 80 para o Next.js.
+# Os nomes precisam resolver para 127.0.0.1 no DNS local ou em /etc/hosts.
+:80 {
+  @tenant expression {host}.matches('^cardap[.][a-z0-9]+(-[a-z0-9]+)*$')
+  handle @tenant {
+    reverse_proxy 127.0.0.1:3002
+  }
+  respond "Domínio não encontrado." 404
+}
