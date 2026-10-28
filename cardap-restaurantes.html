@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Explore a prévia de restaurantes por região do Cardap.">
+<title>Restaurantes da sua região — Cardap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Libre+Baskerville:ital,wght@1,700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>/* Compiled locally with Tailwind CSS. Utility classes remain in the HTML. */
+/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
+@layer properties;
+:root, :host {
+  --color-brand: oklch(0.84 0.17 85);
+  --color-ink: oklch(0.12 0 0);
+  --color-muted: oklch(0.45 0 0);
+  --color-line: oklch(0.9 0 0);
+  --color-white: #fff;
+  --spacing: 0.25rem;
+  --container-xs: 20rem;
+  --container-md: 28rem;
+  --container-6xl: 72rem;
+  --text-xs: .75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: .875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --tracking-tight: -.025em;
+  --tracking-widest: .1em;
+  --leading-relaxed: 1.625;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+.absolute {
+  position: absolute;
+}
+.relative {
+  position: relative;
+}
+.right-0 {
+  right: 0px;
+}
+.bottom-3 {
+  bottom: calc(var(--spacing) * 3);
+}
+.m-0 {
+  margin: 0px;
+}
+.mx-auto {
+  margin-inline: auto;
+}
+.mt-1 {
+  margin-top: var(--spacing);
+}
+.mt-2 {
+  margin-top: calc(var(--spacing) * 2);
+}
+.mt-3 {
+  margin-top: calc(var(--spacing) * 3);
+}
+.mt-4 {
+  margin-top: calc(var(--spacing) * 4);
+}
+.mt-6 {
+  margin-top: calc(var(--spacing) * 6);
+}
+.mt-7 {
+  margin-top: calc(var(--spacing) * 7);
+}
+.mt-8 {
+  margin-top: calc(var(--spacing) * 8);
+}
+.mb-5 {
+  margin-bottom: calc(var(--spacing) * 5);
+}
+.mb-6 {
+  margin-bottom: calc(var(--spacing) * 6);
+}
+.mb-8 {
+  margin-bottom: calc(var(--spacing) * 8);
+}
+.mb-12 {
+  margin-bottom: calc(var(--spacing) * 12);
+}
+.block {
+  display: block;
+}
+.flex {
+  display: flex;
+}
+.grid {
+  display: grid;
+}
+.inline-flex {
+  display: inline-flex;
+}
+.h-60 {
+  height: calc(var(--spacing) * 60);
+}
+.h-72 {
+  height: calc(var(--spacing) * 72);
+}
+.min-h-5 {
+  min-height: calc(var(--spacing) * 5);
+}
+.min-h-11 {
+  min-height: calc(var(--spacing) * 11);
+}
+.min-h-12 {
+  min-height: calc(var(--spacing) * 12);
+}
+.min-h-14 {
+  min-height: calc(var(--spacing) * 14);
+}
+.min-h-80 {
+  min-height: calc(var(--spacing) * 80);
+}
+.w-60 {
+  width: calc(var(--spacing) * 60);
+}
+.w-72 {
+  width: calc(var(--spacing) * 72);
+}
+.w-full {
+  width: 100%;
+}
+.max-w-6xl {
+  max-width: var(--container-6xl);
+}
+.max-w-md {
+  max-width: var(--container-md);
+}
+.max-w-xs {
+  max-width: var(--container-xs);
+}
+.min-w-0 {
+  min-width: 0px;
+}
+.shrink-0 {
+  flex-shrink: 0;
+}
+.rotate-\[-8deg\] {
+  rotate: -8deg;
+}
+.scroll-mt-6 {
+  scroll-margin-top: calc(var(--spacing) * 6);
+}
+.list-none {
+  list-style-type: none;
+}
+.flex-wrap {
+  flex-wrap: wrap;
+}
+.items-center {
+  align-items: center;
+}
+.items-end {
+  align-items: flex-end;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.justify-center {
+  justify-content: center;
+}
+.gap-3 {
+  gap: calc(var(--spacing) * 3);
+}
+.gap-4 {
+  gap: calc(var(--spacing) * 4);
+}
+.gap-5 {
+  gap: calc(var(--spacing) * 5);
+}
+.gap-6 {
+  gap: calc(var(--spacing) * 6);
+}
+.gap-10 {
+  gap: calc(var(--spacing) * 10);
+}
+.rounded-2xl {
+  border-radius: var(--radius-2xl);
+}
+.rounded-3xl {
+  border-radius: var(--radius-3xl);
+}
+.rounded-full {
+  border-radius: calc(infinity * 1px);
+}
+.border {
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+}
+.border-0 {
+  border-style: var(--tw-border-style);
+  border-width: 0px;
+}
+.border-t {
+  border-top-style: var(--tw-border-style);
+  border-top-width: 1px;
+}
+.border-b {
+  border-bottom-style: var(--tw-border-style);
+  border-bottom-width: 1px;
+}
+.border-ink {
+  border-color: var(--color-ink);
+}
+.border-line {
+  border-color: var(--color-line);
+}
+.bg-brand {
+  background-color: var(--color-brand);
+}
+.bg-ink {
+  background-color: var(--color-ink);
+}
+.bg-transparent {
+  background-color: transparent;
+}
+.bg-white {
+  background-color: var(--color-white);
+}
+.p-0 {
+  padding: 0px;
+}
+.p-5 {
+  padding: calc(var(--spacing) * 5);
+}
+.p-6 {
+  padding: calc(var(--spacing) * 6);
+}
+.px-4 {
+  padding-inline: calc(var(--spacing) * 4);
+}
+.px-5 {
+  padding-inline: calc(var(--spacing) * 5);
+}
+.px-6 {
+  padding-inline: calc(var(--spacing) * 6);
+}
+.px-8 {
+  padding-inline: calc(var(--spacing) * 8);
+}
+.py-3 {
+  padding-block: calc(var(--spacing) * 3);
+}
+.py-4 {
+  padding-block: calc(var(--spacing) * 4);
+}
+.py-6 {
+  padding-block: calc(var(--spacing) * 6);
+}
+.py-7 {
+  padding-block: calc(var(--spacing) * 7);
+}
+.py-10 {
+  padding-block: calc(var(--spacing) * 10);
+}
+.py-12 {
+  padding-block: calc(var(--spacing) * 12);
+}
+.pt-5 {
+  padding-top: calc(var(--spacing) * 5);
+}
+.text-center {
+  text-align: center;
+}
+.text-2xl {
+  font-size: var(--text-2xl);
+  line-height: var(--tw-leading, var(--text-2xl--line-height));
+}
+.text-3xl {
+  font-size: var(--text-3xl);
+  line-height: var(--tw-leading, var(--text-3xl--line-height));
+}
+.text-5xl {
+  font-size: var(--text-5xl);
+  line-height: var(--tw-leading, var(--text-5xl--line-height));
+}
+.text-base {
+  font-size: var(--text-base);
+  line-height: var(--tw-leading, var(--text-base--line-height));
+}
+.text-lg {
+  font-size: var(--text-lg);
+  line-height: var(--tw-leading, var(--text-lg--line-height));
+}
+.text-sm {
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+}
+.text-xs {
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+}
+.text-\[10px\] {
+  font-size: 10px;
+}
+.leading-\[1\.05\] {
+  --tw-leading: 1.05;
+  line-height: 1.05;
+}
+.leading-relaxed {
+  --tw-leading: var(--leading-relaxed);
+  line-height: var(--leading-relaxed);
+}
+.font-bold {
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
+}
+.font-extrabold {
+  --tw-font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-extrabold);
+}
+.font-medium {
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+}
+.font-semibold {
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+}
+.tracking-\[0\.3em\] {
+  --tw-tracking: 0.3em;
+  letter-spacing: 0.3em;
+}
+.tracking-\[0\.25em\] {
+  --tw-tracking: 0.25em;
+  letter-spacing: 0.25em;
+}
+.tracking-tight {
+  --tw-tracking: var(--tracking-tight);
+  letter-spacing: var(--tracking-tight);
+}
+.tracking-widest {
+  --tw-tracking: var(--tracking-widest);
+  letter-spacing: var(--tracking-widest);
+}
+.text-brand {
+  color: var(--color-brand);
+}
+.text-ink {
+  color: var(--color-ink);
+}
+.text-muted {
+  color: var(--color-muted);
+}
+.text-white {
+  color: var(--color-white);
+}
+.text-white\/70 {
+  color: color-mix(in srgb, #fff 70%, transparent);
+  @supports (color: color-mix(in lab, red, red)) {
+    color: color-mix(in oklab, var(--color-white) 70%, transparent);
+  }
+}
+.uppercase {
+  text-transform: uppercase;
+}
+.shadow-sm {
+  --tw-shadow: 0 1px 3px var(--tw-shadow-color, rgb(0 0 0/.1));
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+.outline-none {
+  --tw-outline-style: none;
+  outline-style: none;
+}
+@media (hover: hover) {
+  .hover\:bg-ink:hover {
+    background-color: var(--color-ink);
+  }
+  .hover\:bg-white:hover {
+    background-color: var(--color-white);
+  }
+  .hover\:text-ink:hover {
+    color: var(--color-ink);
+  }
+  .hover\:text-white:hover {
+    color: var(--color-white);
+  }
+  .hover\:underline:hover {
+    text-decoration-line: underline;
+  }
+}
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+}
+@media (width >= 40rem) {
+  .sm\:right-3 {
+    right: calc(var(--spacing) * 3);
+  }
+  .sm\:h-80 {
+    height: calc(var(--spacing) * 80);
+  }
+  .sm\:h-96 {
+    height: calc(var(--spacing) * 96);
+  }
+  .sm\:min-h-96 {
+    min-height: calc(var(--spacing) * 96);
+  }
+  .sm\:w-80 {
+    width: calc(var(--spacing) * 80);
+  }
+  .sm\:w-96 {
+    width: calc(var(--spacing) * 96);
+  }
+  .sm\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .sm\:grid-cols-\[minmax\(0\,1fr\)_120px_auto\] {
+    grid-template-columns: minmax(0,1fr) 120px auto;
+  }
+  .sm\:gap-8 {
+    gap: calc(var(--spacing) * 8);
+  }
+  .sm\:p-8 {
+    padding: calc(var(--spacing) * 8);
+  }
+  .sm\:px-8 {
+    padding-inline: calc(var(--spacing) * 8);
+  }
+  .sm\:py-16 {
+    padding-block: calc(var(--spacing) * 16);
+  }
+  .sm\:text-3xl {
+    font-size: var(--text-3xl);
+    line-height: var(--tw-leading, var(--text-3xl--line-height));
+  }
+  .sm\:text-6xl {
+    font-size: var(--text-6xl);
+    line-height: var(--tw-leading, var(--text-6xl--line-height));
+  }
+}
+@media (width >= 64rem) {
+  .lg\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lg\:gap-14 {
+    gap: calc(var(--spacing) * 14);
+  }
+  .lg\:border-0 {
+    border-style: var(--tw-border-style);
+    border-width: 0px;
+  }
+  .lg\:py-8 {
+    padding-block: calc(var(--spacing) * 8);
+  }
+  .lg\:py-14 {
+    padding-block: calc(var(--spacing) * 14);
+  }
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-leading {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-tracking {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-inset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-ring-inset {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-offset-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --tw-ring-offset-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: #fff;
+}
+@property --tw-ring-offset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-border-style: solid;
+      --tw-leading: initial;
+      --tw-font-weight: initial;
+      --tw-tracking: initial;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
+    }
+  }
+}
+</style>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Outfit,sans-serif;color:oklch(.12 0 0);background:white}button,input,select{font:inherit}button,a,input,select{-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{cursor:pointer}a{color:inherit;text-decoration:none}button{color:inherit}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid oklch(.84 .17 85);outline-offset:4px}h1,h2,h3,p{margin:0}svg{flex-shrink:0}dialog{border:1px solid #ddd;border-radius:24px;padding:28px;max-width:min(480px,calc(100% - 32px))}dialog::backdrop{background:rgb(0 0 0/.3)}.plate{box-shadow:0 18px 40px rgb(0 0 0/.08),inset 0 0 0 18px #fff,inset 0 0 0 19px #e8e8e8,inset 0 0 0 35px #fafafa}.wordmark{font-family:'Libre Baskerville',serif;font-style:italic;font-weight:700}.hashtag{font-family:Fredoka,sans-serif}button:disabled{cursor:wait;opacity:.6}@media(prefers-reduced-motion:no-preference){a,button{transition:background .2s,color .2s,transform .2s}}
+</style>
+
+<style>
+.shell{max-width:1152px;margin:auto;padding:0 32px}.listing-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:32px 0;border-bottom:1px solid var(--color-line)}.link-icon{display:inline-flex;align-items:center;gap:8px}.back{font-size:14px}.intro{padding:48px 0 32px}.eyebrow{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--color-muted)}.intro h1{font-size:clamp(36px,5vw,60px);line-height:1.05;letter-spacing:-.025em;margin:16px 0 20px;font-weight:800}.region-pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--color-line);border-radius:999px;padding:10px 16px;font-size:14px}.region-pill svg{color:var(--color-ink)}.intro-bottom{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin-top:24px}.filters{padding:24px;border:1px solid var(--color-line);border-radius:24px}.search-row{display:flex;gap:16px}.search-field{display:flex;align-items:center;gap:12px;border:1px solid var(--color-line);border-radius:16px;padding:14px 16px;flex:1}.search-field input{width:100%;border:0;outline:none;background:transparent;min-width:0}.filter-label{display:flex;align-items:center;gap:8px;font-size:14px}.categories{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.category{display:flex;align-items:center;gap:8px;background:white;border:1px solid var(--color-line);border-radius:999px;padding:12px 16px;font-size:14px}.category[aria-pressed=true]{background:var(--color-brand);border-color:var(--color-brand)}.results-heading{display:flex;align-items:end;justify-content:space-between;gap:16px;padding:40px 0 24px}.results-heading h2{font-size:24px}.restaurants{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.restaurant{border:1px solid var(--color-line);border-radius:24px;overflow:hidden}.restaurant[hidden],#empty[hidden]{display:none}.restaurant-art{height:176px;display:flex;align-items:center;justify-content:center;background:var(--color-brand);position:relative}.restaurant:nth-child(2n) .restaurant-art{background:#fafafa}.sample{position:absolute;top:16px;right:16px;background:white;border:1px solid var(--color-line);border-radius:999px;padding:5px 10px;font-size:11px}.restaurant-copy{padding:24px}.restaurant-copy h3{font-size:22px;margin-top:8px}.restaurant-copy>p{font-size:14px;line-height:1.625}.card-bottom{border-top:1px solid var(--color-line);margin-top:24px;padding-top:16px;display:flex;gap:12px;justify-content:space-between;font-size:12px}.card-bottom>span:first-child{display:flex;align-items:center;gap:6px;min-width:0}.card-region{overflow-wrap:anywhere}.notice{margin:32px 0 48px;padding:24px;border-radius:24px;background:var(--color-ink);color:white;display:flex;align-items:center;justify-content:space-between;gap:24px}.notice p{font-size:14px;line-height:1.625;max-width:680px}.notice .hashtag{color:var(--color-brand);font-size:24px;white-space:nowrap}.listing-footer{padding:28px 0;border-top:1px solid var(--color-line);display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:12px;color:var(--color-muted)}#empty{padding:48px 24px;text-align:center;border:1px solid var(--color-line);border-radius:24px}#empty h3{margin:16px 0 8px}#empty button{margin-top:20px;background:var(--color-brand);border:0;border-radius:999px;padding:12px 20px}@media(max-width:900px){.restaurants{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:639px){.shell{padding:0 20px}.listing-header{padding:24px 0}.intro{padding-top:32px}.restaurants{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.restaurant-copy{padding:10px}.restaurant-copy h3{font-size:18px;overflow-wrap:anywhere;margin-top:4px}.restaurant-copy>p.mt-2{display:none}.card-bottom{flex-direction:column;gap:4px;margin-top:8px;padding-top:6px}.filters{padding:20px}.search-row{flex-direction:column}.filter-label{display:none}.notice,.listing-footer{align-items:flex-start;flex-direction:column}.results-heading{align-items:flex-start;flex-direction:column}.region-pill{max-width:100%;overflow-wrap:anywhere}.categories{gap:8px;margin-top:16px}.category{padding:8px 10px;font-size:12px;gap:6px}.category svg{width:16px;height:16px}.restaurant-copy .eyebrow{font-size:10px;letter-spacing:.04em}.restaurant-art{height:80px;aspect-ratio:auto}.restaurant-art>svg{width:36px;height:36px}.sample{top:8px;right:8px;font-size:10px;padding:4px 8px}}
+</style></head><body>
+<a href="#conteudo" class="sr-only focus:not-sr-only">Ir para o conteúdo</a>
+<div class="shell"><header class="listing-header"><a href="cardap.html" aria-label="Cardap — início" class="wordmark text-3xl">cardap<span class="text-brand">.</span></a><nav aria-label="Navegação do cliente" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:14px"><a href="cardap-cliente.html">Minha conta</a><a href="cardap.html#buscar" class="link-icon back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left" aria-hidden="true" focusable="false"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg> Alterar região</a></nav></header>
+<main id="conteudo"><section class="intro" aria-labelledby="page-title"><p class="eyebrow">Sua cidade. Seus sabores.</p><h1 id="page-title">Sua próxima refeição<br>está <span class="text-brand">por aqui.</span></h1><p class="text-muted">Explore sabores, descubra novos lugares e encontre o que combina com sua fome.</p><div class="intro-bottom"><span class="region-pill"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin" aria-hidden="true" focusable="false"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg><span id="region">Escolha sua região</span></span><span class="hashtag text-brand text-2xl">#PARTIUCOMER</span></div></section>
+<section class="filters" aria-label="Filtrar restaurantes"><div class="search-row"><label class="search-field" for="restaurant-search"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true" focusable="false"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg><span class="sr-only">Buscar restaurante pelo nome</span><input id="restaurant-search" type="search" placeholder="Qual restaurante você procura?" maxlength="100"></label><span class="filter-label"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sliders-horizontal" aria-hidden="true" focusable="false"><path d="M10 5H3"></path><path d="M12 19H3"></path><path d="M14 3v4"></path><path d="M16 17v4"></path><path d="M21 12h-9"></path><path d="M21 19h-5"></path><path d="M21 5h-7"></path><path d="M8 10v4"></path><path d="M8 12H3"></path></svg> Do seu jeito</span></div><div class="categories" role="group" aria-label="Categoria"><button type="button" class="category" data-category="Todos" aria-pressed="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils" aria-hidden="true" focusable="false"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg> Todos</button><button type="button" class="category" data-category="Hambúrgueres" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sandwich" aria-hidden="true" focusable="false"><path d="m2.37 11.223 8.372-6.777a2 2 0 0 1 2.516 0l8.371 6.777"></path><path d="M21 15a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-5.25"></path><path d="M3 15a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h9"></path><path d="m6.67 15 6.13 4.6a2 2 0 0 0 2.8-.4l3.15-4.2"></path><rect width="20" height="4" x="2" y="11" rx="1"></rect></svg> Hambúrgueres</button><button type="button" class="category" data-category="Pizzas" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pizza" aria-hidden="true" focusable="false"><path d="m12 14-1 1"></path><path d="m13.75 18.25-1.25 1.42"></path><path d="M17.775 5.654a15.68 15.68 0 0 0-12.121 12.12"></path><path d="M18.8 9.3a1 1 0 0 0 2.1 7.7"></path><path d="M21.964 20.732a1 1 0 0 1-1.232 1.232l-18-5a1 1 0 0 1-.695-1.232A19.68 19.68 0 0 1 15.732 2.037a1 1 0 0 1 1.232.695z"></path></svg> Pizzas</button><button type="button" class="category" data-category="Brasileira" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-soup" aria-hidden="true" focusable="false"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"></path><path d="M7 21h10"></path><path d="M19.5 12 22 6"></path><path d="M16.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.73 1.62"></path><path d="M11.25 3c.27.1.8.53.74 1.36-.05.83-.93 1.2-.98 2.02-.06.78.33 1.24.72 1.62"></path><path d="M6.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.74 1.62"></path></svg> Brasileira</button><button type="button" class="category" data-category="Cafés" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-coffee" aria-hidden="true" focusable="false"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg> Cafés</button><button type="button" class="category" data-category="Sobremesas" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ice-cream-bowl" aria-hidden="true" focusable="false"><path d="M12 17c5 0 8-2.69 8-6H4c0 3.31 3 6 8 6m-4 4h8m-4-3v3M5.14 11a3.5 3.5 0 1 1 6.71 0"></path><path d="M12.14 11a3.5 3.5 0 1 1 6.71 0"></path><path d="M15.5 6.5a3.5 3.5 0 1 0-7 0"></path></svg> Sobremesas</button></div></section>
+<section aria-labelledby="results-title"><div class="results-heading"><h2 id="results-title">Restaurantes da região</h2><p id="result-count" role="status" aria-live="polite" class="text-sm text-muted"></p></div><div class="restaurants" id="restaurants"><a class="restaurant" data-name="Quintal da Mesa" data-category="Brasileira" href="cardap-loja.html?store=Quintal+da+Mesa&category=Brasileira"><div class="restaurant-art"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-soup" aria-hidden="true" focusable="false"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"></path><path d="M7 21h10"></path><path d="M19.5 12 22 6"></path><path d="M16.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.73 1.62"></path><path d="M11.25 3c.27.1.8.53.74 1.36-.05.83-.93 1.2-.98 2.02-.06.78.33 1.24.72 1.62"></path><path d="M6.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.74 1.62"></path></svg><span class="sample">Exemplo</span></div><div class="restaurant-copy"><p class="eyebrow">Brasileira</p><h3>Quintal da Mesa</h3><p class="text-muted mt-2">Comida de casa, feita com carinho.</p><div class="card-bottom"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin" aria-hidden="true" focusable="false"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg> <span class="card-region">Região selecionada</span></span><span class="text-muted">Ilustrativo</span></div></div></a>
+<a class="restaurant" data-name="Ponto do Burger" data-category="Hambúrgueres" href="cardap-loja.html?store=Ponto+do+Burger&category=Hamb%C3%BArgueres"><div class="restaurant-art"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sandwich" aria-hidden="true" focusable="false"><path d="m2.37 11.223 8.372-6.777a2 2 0 0 1 2.516 0l8.371 6.777"></path><path d="M21 15a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-5.25"></path><path d="M3 15a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h9"></path><path d="m6.67 15 6.13 4.6a2 2 0 0 0 2.8-.4l3.15-4.2"></path><rect width="20" height="4" x="2" y="11" rx="1"></rect></svg><span class="sample">Exemplo</span></div><div class="restaurant-copy"><p class="eyebrow">Hambúrgueres</p><h3>Ponto do Burger</h3><p class="text-muted mt-2">Seu próximo hambúrguer favorito.</p><div class="card-bottom"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin" aria-hidden="true" focusable="false"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg> <span class="card-region">Região selecionada</span></span><span class="text-muted">Ilustrativo</span></div></div></a>
+<a class="restaurant" data-name="Forno & Massa" data-category="Pizzas" href="cardap-loja.html?store=Forno+%26+Massa&category=Pizzas"><div class="restaurant-art"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pizza" aria-hidden="true" focusable="false"><path d="m12 14-1 1"></path><path d="m13.75 18.25-1.25 1.42"></path><path d="M17.775 5.654a15.68 15.68 0 0 0-12.121 12.12"></path><path d="M18.8 9.3a1 1 0 0 0 2.1 7.7"></path><path d="M21.964 20.732a1 1 0 0 1-1.232 1.232l-18-5a1 1 0 0 1-.695-1.232A19.68 19.68 0 0 1 15.732 2.037a1 1 0 0 1 1.232.695z"></path></svg><span class="sample">Exemplo</span></div><div class="restaurant-copy"><p class="eyebrow">Pizzas</p><h3>Forno & Massa</h3><p class="text-muted mt-2">Uma boa pizza sempre reúne.</p><div class="card-bottom"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin" aria-hidden="true" focusable="false"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg> <span class="card-region">Região selecionada</span></span><span class="text-muted">Ilustrativo</span></div></div></a>
+<a class="restaurant" data-name="Café da Esquina" data-category="Cafés" href="cardap-loja.html?store=Caf%C3%A9+da+Esquina&category=Caf%C3%A9s"><div class="restaurant-art"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-coffee" aria-hidden="true" focusable="false"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg><span class="sample">Exemplo</span></div><div class="restaurant-copy"><p class="eyebrow">Cafés</p><h3>Café da Esquina</h3><p class="text-muted mt-2">Uma pausa com sabor de café.</p><div class="card-bottom"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin" aria-hidden="true" focusable="false"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg> <span class="card-region">Região selecionada</span></span><span class="text-muted">Ilustrativo</span></div></div></a>
+<a class="restaurant" data-name="Doce Encontro" data-category="Sobremesas" href="cardap-loja.html?store=Doce+Encontro&category=Sobremesas"><div class="restaurant-art"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ice-cream-bowl" aria-hidden="true" focusable="false"><path d="M12 17c5 0 8-2.69 8-6H4c0 3.31 3 6 8 6m-4 4h8m-4-3v3M5.14 11a3.5 3.5 0 1 1 6.71 0"></path><path d="M12.14 11a3.5 3.5 0 1 1 6.71 0"></path><path d="M15.5 6.5a3.5 3.5 0 1 0-7 0"></path></svg><span class="sample">Exemplo</span></div><div class="restaurant-copy"><p class="eyebrow">Sobremesas</p><h3>Doce Encontro</h3><p class="text-muted mt-2">Um doce motivo para ficar por perto.</p><div class="card-bottom"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin" aria-hidden="true" focusable="false"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg> <span class="card-region">Região selecionada</span></span><span class="text-muted">Ilustrativo</span></div></div></a>
+<a class="restaurant" data-name="Tempero de Casa" data-category="Brasileira" href="cardap-loja.html?store=Tempero+de+Casa&category=Brasileira"><div class="restaurant-art"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils" aria-hidden="true" focusable="false"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg><span class="sample">Exemplo</span></div><div class="restaurant-copy"><p class="eyebrow">Brasileira</p><h3>Tempero de Casa</h3><p class="text-muted mt-2">O sabor de uma boa descoberta.</p><div class="card-bottom"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin" aria-hidden="true" focusable="false"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg> <span class="card-region">Região selecionada</span></span><span class="text-muted">Ilustrativo</span></div></div></a></div><div id="empty" hidden><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true" focusable="false"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg><h3>Nenhum restaurante por aqui.</h3><p class="text-muted">Tente outro nome ou escolha uma categoria diferente.</p><button type="button" id="clear-filters">Limpar filtros</button></div></section>
+<aside class="notice"><div><p class="eyebrow" style="color:var(--color-brand);margin-bottom:8px">Uma prévia do que vem por aí</p><p>Estes restaurantes são fictícios e demonstram a listagem da região escolhida. A disponibilidade, os cardápios e os pedidos ainda não estão conectados.</p></div><span class="hashtag">Bom apetite!</span></aside></main>
+<footer class="listing-footer"><a href="cardap.html" class="wordmark text-2xl text-ink">cardap<span class="text-brand">.</span></a><p>Cardap · Sua próxima refeição começa aqui.</p><a href="cardap.html#buscar" class="link-icon">Escolher outra região <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true" focusable="false"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></a></footer></div>
+<script>
+const params = new URLSearchParams(location.search);
+const city = (params.get('city') || '').trim().slice(0,100);
+const state = (params.get('state') || '').trim().toUpperCase();
+const states = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+const hasRegion = Boolean(city && states.includes(state));
+const region = hasRegion ? city + ', ' + state : 'Escolha sua região para continuar';
+document.querySelector('#region').textContent = region;
+document.querySelectorAll('.card-region').forEach(element => {element.textContent = region;});
+if (hasRegion) document.title = 'Restaurantes em ' + region + ' — Cardap';
+const input = document.querySelector('#restaurant-search');
+const cards = [...document.querySelectorAll('.restaurant')];
+cards.forEach(card => {
+  const detailParams = new URLSearchParams({ store: card.dataset.name, category: card.dataset.category });
+  if (hasRegion) { detailParams.set('city',city); detailParams.set('state',state); }
+  card.href = 'cardap-loja.html?' + detailParams.toString();
+});
+const buttons = [...document.querySelectorAll('.category')];
+let category = 'Todos';
+const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const render = () => {
+  let count = 0;
+  cards.forEach(card => {const visible = hasRegion && (category === 'Todos' || card.dataset.category === category) && normalize(card.dataset.name).includes(normalize(input.value.trim())); card.hidden = !visible; if(visible) count++;});
+  document.querySelector('#result-count').textContent = count + (count === 1 ? ' restaurante de exemplo' : ' restaurantes de exemplo');
+  document.querySelector('#empty').hidden = count > 0;
+  if(!hasRegion) {document.querySelector('#empty h3').textContent = 'Onde bateu a fome?';document.querySelector('#empty p').textContent = 'Escolha sua cidade e estado na página inicial para ver a prévia da listagem.';document.querySelector('#clear-filters').textContent = 'Escolher região';}
+  buttons.forEach(button => button.setAttribute('aria-pressed',String(button.dataset.category === category)));
+};
+input.addEventListener('input',render);
+buttons.forEach(button => button.addEventListener('click',() => {category = button.dataset.category;render();}));
+document.querySelector('#clear-filters').addEventListener('click',() => {if(!hasRegion) {location.href = 'cardap.html#buscar';return;} category = 'Todos';input.value = '';render();});
+render();
+</script></body></html>
