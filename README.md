@@ -30,6 +30,7 @@ npm start
 | `/checkout`                        | Dados de entrega ou retirada               |
 | `/pagamento`                       | Forma de pagamento demonstrativa           |
 | `/pedido-confirmado`               | Resumo da simulação                        |
+| `/restaurantes/login`              | Login do restaurante (prévia visual)       |
 | `/cliente`                         | Conta demonstrativa, carrinhos e pedidos   |
 | `http://cardap.<tenant>/dashboard` | Administração demonstrativa do restaurante |
 
@@ -134,3 +135,7 @@ npm test
 ```
 
 Os testes verificam as páginas do consumidor, redirecionamentos antigos, busca por região, conta demonstrativa, compra simulada e painel em múltiplos domínios, incluindo isolamento do estado e validação do domínio na rota interna. O Chromium resolve os hosts de teste para o servidor local sem alterar `/etc/hosts`.
+
+http://hero-burger.localhost:3002/dashboard
+
+A opção “Para restaurantes” e o botão “Conhecer a área de parceiros” da página inicial abrem `/restaurantes/login`, localizada em `app/(tenant)/restaurantes/login/page.tsx`. O formulário possui campos de e-mail e senha, mas ainda não envia credenciais nem autentica usuários.

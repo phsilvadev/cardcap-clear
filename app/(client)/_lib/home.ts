@@ -58,10 +58,6 @@ export default function initialize() {
     query<HTMLElement>("#search-feedback").textContent = "";
   });
   const messages: Record<string, [string, string]> = {
-    partner: [
-      "Área de parceiros",
-      "O projeto Cardap possui uma área de parceiros com acesso e cadastro de estabelecimentos. Este HTML é uma prévia de design; a autenticação continua no aplicativo original.",
-    ],
     login: [
       "Entrar no Cardap",
       "Este HTML demonstra a nova identidade visual. O acesso à conta não está conectado nesta prévia.",

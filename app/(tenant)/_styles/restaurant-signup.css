@@ -1,0 +1,33 @@
+.restaurant-signup-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.restaurant-signup-field {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.restaurant-signup-field > label {
+  font-size: 14px;
+  font-weight: 600;
+}
+.restaurant-signup-full {
+  grid-column: 1 / -1;
+}
+.restaurant-signup-switch {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+.restaurant-signup-switch a {
+  color: var(--color-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 480px) {
+  .restaurant-signup-form {
+    grid-template-columns: 1fr;
+  }
+}

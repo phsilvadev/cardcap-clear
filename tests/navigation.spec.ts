@@ -184,3 +184,57 @@ test("acessa tenants em localhost sem DNS ou hosts personalizados", async ({
     await expect(page.locator("#setting-name")).toHaveValue(name);
   }
 });
+
+test("Para restaurantes abre o login e mantém o formulário acessível", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByRole("link", { name: "Para restaurantes", exact: true })
+    .click();
+  await expect(page).toHaveURL("/restaurantes/login");
+  await expect(page).toHaveTitle("Entrar no restaurante — Cardap");
+  await page.getByLabel("E-mail", { exact: true }).fill("teste@example.com");
+  await page.getByLabel("Senha", { exact: true }).fill("senha-de-exemplo");
+  await page
+    .getByRole("button", { name: "Mostrar senha", exact: true })
+    .click();
+  await expect(page.locator("#restaurant-password")).toHaveAttribute(
+    "type",
+    "text",
+  );
+  await page
+    .getByRole("button", { name: "Ocultar senha", exact: true })
+    .click();
+  await expect(page.locator("#restaurant-password")).toHaveAttribute(
+    "type",
+    "password",
+  );
+  await page
+    .getByRole("button", { name: "Entrar no restaurante", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText(
+    "Nenhuma credencial foi enviada",
+  );
+  await page.getByRole("link", { name: "Voltar ao início" }).click();
+  await page
+    .getByRole("link", { name: "Conhecer a área de parceiros" })
+    .click();
+  await expect(page).toHaveURL("/restaurantes/login");
+});
+
+test("login do restaurante se adapta ao celular", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/restaurantes/login");
+  await expect(
+    page.getByRole("heading", { name: "Bom ter você por aqui." }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await expect(
+    page.getByRole("button", { name: "Entrar no restaurante", exact: true }),
+  ).toBeVisible();
+});

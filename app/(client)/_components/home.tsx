@@ -35,13 +35,12 @@ export default function HomeContent() {
               {"Como funciona"}
             </a>
             {"\n"}
-            <button
-              type={"button"}
-              data-info={"partner"}
+            <a
+              href="/restaurantes/login"
               className={"border-0 bg-transparent p-0 hover:underline"}
             >
               {"Para restaurantes"}
-            </button>
+            </a>
             {"\n"}
             <button
               type={"button"}
@@ -397,9 +396,8 @@ export default function HomeContent() {
                 {"Conheça a área de parceiros do Cardap."}
               </p>
             </div>
-            <button
-              type={"button"}
-              data-info={"partner"}
+            <a
+              href="/restaurantes/login"
               className={
                 "min-h-12 shrink-0 rounded-full border-0 bg-brand px-6 font-semibold text-ink hover:bg-white"
               }
@@ -423,7 +421,7 @@ export default function HomeContent() {
                 <path d={"M7 7h10v10"}></path>
                 <path d={"M7 17 17 7"}></path>
               </svg>
-            </button>
+            </a>
           </section>
           {"\n"}
         </main>
