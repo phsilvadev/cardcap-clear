@@ -107,11 +107,6 @@ export default function initialize(tenant: Tenant) {
         return;
       }
       if (!Object.hasOwn(headings, view)) view = "overview";
-      query<HTMLElement>(".demo-banner").hidden =
-        view === "settings" || view === "orders";
-      query<HTMLElement>(".dashboard-heading .eyebrow").hidden =
-        view === "orders";
-      query<HTMLElement>("#view-description").hidden = view === "orders";
       queryAll<HTMLElement>(".dashboard-view").forEach(
         (section) => (section.hidden = section.id !== "view-" + view),
       );

@@ -76,7 +76,8 @@ export default function TeamSection({
       {control.error &&
         !control.formOpen &&
         !control.removing &&
-        !control.credentials && (
+        !control.credentials &&
+        !control.accessLink && (
           <p className="employees-error" role="alert">
             {control.error}
           </p>
@@ -138,6 +139,7 @@ export default function TeamSection({
               <div className="employee-copy">
                 <h4>{employee.name}</h4>
                 <p>{employee.email}</p>
+                {!employee.invited && <p>Sem acesso ao sistema</p>}
               </div>
               <span className="employee-role">
                 {employeeRoles[employee.role]}
@@ -152,9 +154,9 @@ export default function TeamSection({
                     className="button secondary"
                     disabled={!control.canManage || Boolean(control.busy)}
                     onClick={() => control.resend(employee)}
-                    aria-label={`Reenviar acesso para ${employee.name}`}
+                    aria-label={`Gerar link de acesso para ${employee.name}`}
                   >
-                    Reenviar acesso
+                    Gerar link de acesso
                   </button>
                 )}
                 <button

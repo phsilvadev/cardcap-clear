@@ -6,7 +6,7 @@ import {
   getEmployeeOwner,
   listEmployees,
   removeEmployee,
-  resendEmployeeAccess,
+  generateEmployeeAccessLink,
   toggleEmployee,
   employeeError,
 } from "@/lib/employees/service";
@@ -36,6 +36,10 @@ export function useEmployees(storeId: string | undefined, enabled: boolean) {
   const [credentials, setCredentials] = useState<EmployeeCredentials | null>(
     null,
   );
+  const [accessLink, setAccessLink] = useState<{
+    name: string;
+    link: string;
+  } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
@@ -46,6 +50,7 @@ export function useEmployees(storeId: string | undefined, enabled: boolean) {
     };
   }, []);
   useEffect(() => {
+    setAccessLink(null);
     if (!enabled) return;
     let cancelled = false;
     setLoading(true);
@@ -146,11 +151,8 @@ export function useEmployees(storeId: string | undefined, enabled: boolean) {
   const resend = (employee: Employee) => {
     if (!storeId || !canManage) return;
     return run(employee.id, async () => {
-      await resendEmployeeAccess(storeId, employee.email);
-      if (mounted.current)
-        setNotice(
-          `Solicitação de reenvio de acesso concluída para ${employee.email}.`,
-        );
+      const link = await generateEmployeeAccessLink(storeId, employee.id);
+      if (mounted.current) setAccessLink({ name: employee.name, link });
     });
   };
   const loadMore = () => {
@@ -230,6 +232,27 @@ export function useEmployees(storeId: string | undefined, enabled: boolean) {
       if (!locked.current) setRemoving(null);
     },
     resend,
+    accessLink,
+    closeAccessLink: () => {
+      setAccessLink(null);
+      setError("");
+      setNotice("");
+    },
+    copyAccessLink: async () => {
+      if (!accessLink) return;
+      try {
+        await navigator.clipboard.writeText(accessLink.link);
+        if (mounted.current) {
+          setError("");
+          setNotice("Link copiado.");
+        }
+      } catch {
+        if (mounted.current)
+          setError(
+            "Não foi possível copiar. Selecione o link e copie manualmente.",
+          );
+      }
+    },
     loadMore,
     copyCredentials,
     togglePassword: () => setShowPassword((value) => !value),

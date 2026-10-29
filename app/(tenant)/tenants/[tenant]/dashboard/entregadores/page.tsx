@@ -8,5 +8,5 @@ export default async function Page({
   params: Promise<{ tenant: string }>;
 }) {
   const tenant = await requireTenant((await params).tenant);
-  return <CouriersPage tenantSlug={tenant.slug} />;
+  return <CouriersPage tenantSlug={tenant.slug} storeId={tenant.uid} />;
 }

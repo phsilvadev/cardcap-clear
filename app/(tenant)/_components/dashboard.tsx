@@ -22,13 +22,8 @@ export default function DashboardContent({
           </p>
         </div>
       </div>
-      <p className={"demo-banner"}>
-        {
-          "Dados fictícios. Nenhum pedido real é recebido ou alterado. As mudanças deste painel ficam nesta sessão do navegador."
-        }
-      </p>
       <DashboardOverview storeId={storeId} />
-      <DashboardOrders tenantSlug={tenant.slug} />
+      <DashboardOrders tenantSlug={tenant.slug} storeId={storeId} />
       <DashboardSettings tenantSlug={tenant.slug} storeId={storeId} />
       <p
         id={"dashboard-feedback"}

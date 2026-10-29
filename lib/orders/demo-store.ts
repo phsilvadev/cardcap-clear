@@ -94,6 +94,7 @@ export function createDemoOrderStore(
   };
   const serverSnapshot = snapshot;
   let hydrated = false;
+  let teamReady = false;
   const listeners = new Set<() => void>();
   const publish = (patch: Partial<Snapshot>) => {
     snapshot = { ...snapshot, ...patch };
@@ -206,50 +207,12 @@ export function createDemoOrderStore(
     },
     setFilter: (filter: Snapshot["filter"]) => publish({ filter, search: "" }),
     setSearch: (search: string) => publish({ search }),
-    saveCourier: (
-      id: string | undefined,
-      input: Omit<DeliveryCourier, "id">,
-    ) => {
-      const name = input.name.trim();
-      const phone = input.phone.replace(/\D/g, "");
-      if (
-        name.length < 2 ||
-        name.length > 100 ||
-        !/^\d{10,11}$/.test(phone) ||
-        !["motorcycle", "bicycle", "car", "foot"].includes(input.vehicle) ||
-        typeof input.available !== "boolean"
-      ) {
-        publish({
-          message:
-            "Informe o nome, um telefone com DDD e o veículo do entregador.",
-        });
-        return false;
-      }
-      if (id && !snapshot.couriers.some((item) => item.id === id)) {
-        publish({ message: "Entregador não encontrado." });
-        return false;
-      }
-      if (
-        snapshot.couriers.some((item) => item.id !== id && item.phone === phone)
-      ) {
-        publish({ message: "Já existe um entregador com esse telefone." });
-        return false;
-      }
-      const courier = {
-        id: id ?? crypto.randomUUID(),
-        name,
-        phone,
-        vehicle: input.vehicle,
-        available: input.available,
-      };
-      return persist(
-        {
-          couriers: id
-            ? snapshot.couriers.map((item) => (item.id === id ? courier : item))
-            : [...snapshot.couriers, courier],
-        },
-        id ? "Entregador atualizado." : "Entregador cadastrado.",
-      );
+    beginCourierSync: () => {
+      teamReady = false;
+    },
+    syncCourierTeam: (couriers: DeliveryCourier[]) => {
+      teamReady = true;
+      publish({ couriers });
     },
     toggleCourier: (id: string) => {
       const courier = snapshot.couriers.find((item) => item.id === id);
@@ -263,24 +226,11 @@ export function createDemoOrderStore(
         "Disponibilidade atualizada.",
       );
     },
-    removeCourier: (id: string) => {
-      if (
-        snapshot.orders.some(
-          (order) => order.courierId === id && order.status !== "done",
-        )
-      ) {
-        publish({
-          message:
-            "Remova a atribuição dos pedidos em andamento antes de excluir o entregador.",
-        });
+    assignCourier: (orderId: string, courierId: string) => {
+      if (!teamReady) {
+        publish({ message: "Aguarde a atualização da equipe de entregas." });
         return false;
       }
-      return persist(
-        { couriers: snapshot.couriers.filter((item) => item.id !== id) },
-        "Entregador excluído.",
-      );
-    },
-    assignCourier: (orderId: string, courierId: string) => {
       const order = snapshot.orders.find((item) => item.id === orderId);
       if (!order || !["preparing", "delivery"].includes(order.status)) {
         publish({
@@ -331,6 +281,10 @@ export function createDemoOrderStore(
       )?.next;
       if (!order || !next) return;
       if (next === "delivery" && order.courierId) {
+        if (!teamReady) {
+          publish({ message: "Aguarde a atualização da equipe de entregas." });
+          return false;
+        }
         const courier = snapshot.couriers.find(
           (item) => item.id === order.courierId,
         );

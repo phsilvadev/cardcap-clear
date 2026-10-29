@@ -8,6 +8,12 @@ export function normalizeEmployee(input: EmployeeInput): EmployeeInput {
     email:
       typeof input.email === "string" ? input.email.trim().toLowerCase() : "",
     role: input.role,
+    ...(input.role === "courier"
+      ? {
+          phone: input.phone?.replace(/\D/g, "") ?? "",
+          vehicle: input.vehicle ?? "motorcycle",
+        }
+      : {}),
   };
 }
 export function validateEmployee(input: EmployeeInput): string {
@@ -23,7 +29,19 @@ export function validateEmployee(input: EmployeeInput): string {
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)
   )
     return "Informe um e-mail válido.";
-  if (!["attendant", "manager"].includes(input.role))
+  if (!["attendant", "manager", "courier"].includes(input.role))
     return "Selecione um cargo válido.";
+  if (
+    input.role === "courier" &&
+    !/^\d{10,11}$/.test(input.phone?.replace(/\D/g, "") ?? "")
+  )
+    return "Informe um telefone com DDD para o entregador.";
+  if (
+    input.role === "courier" &&
+    !["motorcycle", "bicycle", "car", "foot"].includes(
+      input.vehicle ?? "motorcycle",
+    )
+  )
+    return "Selecione um veículo válido.";
   return "";
 }

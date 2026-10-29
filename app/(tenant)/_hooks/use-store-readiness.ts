@@ -9,6 +9,19 @@ export function useStoreReadiness(storeId?: string) {
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const request = useRef(0);
+  useEffect(() => {
+    if (!open) return;
+    const body = document.body;
+    const root = document.documentElement;
+    const bodyOverflow = body.style.overflow;
+    const rootOverflow = root.style.overflow;
+    body.style.overflow = "hidden";
+    root.style.overflow = "hidden";
+    return () => {
+      body.style.overflow = bodyOverflow;
+      root.style.overflow = rootOverflow;
+    };
+  }, [open]);
   const refresh = useCallback(async () => {
     if (!storeId) return;
     const current = ++request.current;

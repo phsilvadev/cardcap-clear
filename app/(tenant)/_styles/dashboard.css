@@ -1915,7 +1915,8 @@
   gap: 8px;
   min-height: 30px;
 }
-.store-readiness-item-title h3 {
+.store-readiness-item-title h3,
+.store-readiness-item-title h4 {
   margin: 0;
   font-size: 14px;
   line-height: 1.5;
@@ -2194,5 +2195,86 @@
   }
   .plan-option {
     padding: 20px;
+  }
+}
+
+.store-readiness-pending > h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+.store-readiness-pending > h3 > span {
+  display: grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 50%;
+  background: #fff4cd;
+  font-size: 12px;
+}
+.store-readiness-missing {
+  padding-left: 16px;
+  margin: 8px 0;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.store-readiness-missing > li + li {
+  margin-top: 4px;
+}
+.store-readiness-completed {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+}
+.store-readiness-completed summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.store-readiness-completed summary:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 4px;
+}
+.store-readiness-completed[open] summary {
+  margin-bottom: 12px;
+}
+.store-readiness-completed .store-readiness-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 20px;
+}
+.store-readiness-completed .store-readiness-list > li {
+  padding: 12px 0;
+  border-bottom: 0;
+  align-items: center;
+}
+.store-readiness-completed .store-readiness-check {
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+}
+.store-readiness-completed .store-readiness-item-title {
+  min-height: 24px;
+}
+.store-readiness-completed .store-readiness-item-title h4 {
+  font-size: 12px;
+}
+.store-readiness-success {
+  padding: 16px;
+  border-radius: 12px;
+  background: #edf8ef;
+  color: #327249;
+  font-size: 14px;
+}
+#store-readiness-dialog {
+  scrollbar-width: thin;
+}
+@media (max-width: 760px) {
+  .store-readiness-completed .store-readiness-list {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

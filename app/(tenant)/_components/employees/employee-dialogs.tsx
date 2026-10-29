@@ -1,3 +1,5 @@
+import { courierVehicles } from "@/lib/employees/couriers";
+import type { CourierVehicle } from "@/lib/types";
 import Dialog from "@/app/(tenant)/_components/products/product-dialog";
 import type { useEmployees } from "@/app/(tenant)/_hooks/use-employees";
 import { employeeRoles, type EmployeeRole } from "@/lib/employees/types";
@@ -37,7 +39,7 @@ export default function EmployeeDialogs({
                 />
               </label>
               <label>
-                E-mail de acesso
+                E-mail
                 <input
                   type="email"
                   required
@@ -68,6 +70,45 @@ export default function EmployeeDialogs({
                   ))}
                 </select>
               </label>
+              {control.draft.role === "courier" && (
+                <>
+                  <label>
+                    Telefone / WhatsApp
+                    <input
+                      type="tel"
+                      required
+                      autoComplete="tel"
+                      maxLength={16}
+                      placeholder="(11) 99999-9999"
+                      value={control.draft.phone ?? ""}
+                      onChange={(event) =>
+                        control.updateDraft({ phone: event.target.value })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Veículo
+                    <select
+                      value={control.draft.vehicle ?? "motorcycle"}
+                      onChange={(event) =>
+                        control.updateDraft({
+                          vehicle: event.target.value as CourierVehicle,
+                        })
+                      }
+                    >
+                      {Object.entries(courierVehicles).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <p className="employee-help">
+                    O entregador aparecerá na equipe de entregas. Este cadastro
+                    operacional não cria uma conta de acesso.
+                  </p>
+                </>
+              )}
             </fieldset>
             <p className="employee-help">
               O cadastro usa o serviço de funcionários do Anow. A sessão do
@@ -176,6 +217,55 @@ export default function EmployeeDialogs({
                 onClick={control.clearCredentials}
               >
                 Concluir
+              </button>
+            </div>
+          </div>
+        )}
+      </Dialog>
+      <Dialog
+        id="employee-access-link"
+        title="Compartilhar acesso"
+        open={Boolean(control.accessLink)}
+        onClose={control.closeAccessLink}
+      >
+        {control.accessLink && (
+          <div className="dashboard-product-form employee-credentials">
+            <p className="employee-help">
+              Copie o link e envie diretamente para {control.accessLink.name}{" "}
+              definir uma senha. Nenhum e-mail foi enviado.
+            </p>
+            <label>
+              Link para definir a senha
+              <input
+                type="text"
+                readOnly
+                autoComplete="off"
+                value={control.accessLink.link}
+                onFocus={(event) => event.currentTarget.select()}
+              />
+            </label>
+            <p className="employee-help">
+              O link é temporário e de uso único. Compartilhe somente com esse
+              funcionário.
+            </p>
+            {control.error && <p role="alert">{control.error}</p>}
+            <p role="status">
+              {control.notice === "Link copiado." ? control.notice : ""}
+            </p>
+            <div className="dialog-actions">
+              <button
+                type="button"
+                className="button secondary"
+                onClick={control.closeAccessLink}
+              >
+                Fechar
+              </button>
+              <button
+                type="button"
+                className="button primary"
+                onClick={control.copyAccessLink}
+              >
+                Copiar link
               </button>
             </div>
           </div>

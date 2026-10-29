@@ -4,10 +4,12 @@ import OrderCard from "@/app/(tenant)/_components/orders/order-card";
 
 export default function DashboardOrders({
   tenantSlug,
+  storeId,
 }: {
   tenantSlug: string;
+  storeId?: string;
 }) {
-  const orders = useDashboardOrders(tenantSlug);
+  const orders = useDashboardOrders(tenantSlug, storeId);
   return (
     <section
       id="view-orders"
@@ -15,6 +17,18 @@ export default function DashboardOrders({
       aria-label="Pedidos"
       hidden
     >
+      {orders.teamError && (
+        <p role="alert">
+          Equipe de entregas: {orders.teamError}{" "}
+          <button
+            className="text-button"
+            type="button"
+            onClick={orders.retryTeam}
+          >
+            Tentar novamente
+          </button>
+        </p>
+      )}
       <div className="incoming-orders-heading">
         <p>
           {orders.total} pedidos · {orders.activeCount} em andamento

@@ -3,8 +3,6 @@ import {
   useCouriers,
   courierVehicles,
 } from "@/app/(tenant)/_hooks/use-couriers";
-import CourierForm from "./courier-form";
-import Dialog from "@/app/(tenant)/_components/products/product-dialog";
 const stateLabels = {
   available: "Disponível",
   delivering: "Em entrega",
@@ -12,8 +10,14 @@ const stateLabels = {
 };
 const phone = (value: string) =>
   value.replace(/^(\d{2})(\d{4,5})(\d{4})$/, "($1) $2-$3");
-export default function CouriersPage({ tenantSlug }: { tenantSlug: string }) {
-  const control = useCouriers(tenantSlug);
+export default function CouriersPage({
+  tenantSlug,
+  storeId,
+}: {
+  tenantSlug: string;
+  storeId: string;
+}) {
+  const control = useCouriers(tenantSlug, storeId);
   return (
     <>
       <div className="dashboard-heading">
@@ -22,19 +26,16 @@ export default function CouriersPage({ tenantSlug }: { tenantSlug: string }) {
           <h1>Entregadores</h1>
           <p>Organize a equipe, a disponibilidade e os pedidos atribuídos.</p>
         </div>
-        <button
+        <a
           className="button primary"
-          type="button"
-          disabled={!control.ready}
-          onClick={control.add}
+          href="/dashboard?view=settings&section=employees"
         >
-          Cadastrar entregador <span aria-hidden="true">+</span>
-        </button>
+          Gerenciar funcionários
+        </a>
       </div>
       <p className="couriers-preview-note">
-        Prévia de operação: cadastros e atribuições ficam nesta sessão do
-        navegador, separados por restaurante. Esta página não cria contas de
-        acesso para os entregadores.
+        Equipe vinculada aos funcionários ativos com cargo Entregador.
+        Disponibilidade e atribuições ficam nesta sessão do navegador.
       </p>
       <div className="couriers-summary">
         <span>
@@ -75,22 +76,28 @@ export default function CouriersPage({ tenantSlug }: { tenantSlug: string }) {
       <p className="couriers-feedback" role="status" aria-live="polite">
         {control.message}
       </p>
-      {!control.ready ? (
+      {control.error ? (
+        <p role="alert">
+          {control.error}{" "}
+          <button type="button" className="text-button" onClick={control.retry}>
+            Tentar novamente
+          </button>
+        </p>
+      ) : !control.ready ? (
         <p role="status">Carregando equipe…</p>
       ) : !control.total ? (
         <div className="couriers-empty">
           <h2>Monte sua equipe de entregas</h2>
           <p>
-            Cadastre o primeiro entregador. Depois, selecione-o nos pedidos em
-            preparo ou em entrega.
+            Em Funcionários, adicione uma pessoa com cargo Entregador. Ela
+            aparecerá aqui automaticamente enquanto estiver ativa.
           </p>
-          <button
-            type="button"
+          <a
             className="button primary"
-            onClick={control.add}
+            href="/dashboard?view=settings&section=employees"
           >
-            Cadastrar primeiro entregador
-          </button>
+            Ir para Funcionários
+          </a>
         </div>
       ) : !control.visible.length ? (
         <p className="couriers-empty">
@@ -140,55 +147,17 @@ export default function CouriersPage({ tenantSlug }: { tenantSlug: string }) {
                 >
                   {courier.available ? "Indisponibilizar" : "Disponibilizar"}
                 </button>
-                <button
-                  type="button"
+                <a
                   className="button secondary"
-                  onClick={() => control.edit(courier)}
-                  aria-label={`Editar ${courier.name}`}
+                  href="/dashboard?view=settings&section=employees"
                 >
-                  Editar
-                </button>
-                <button
-                  type="button"
-                  className="button danger"
-                  onClick={() => control.askRemove(courier)}
-                  aria-label={`Excluir ${courier.name}`}
-                >
-                  Excluir
-                </button>
+                  Gerenciar cadastro
+                </a>
               </div>
             </article>
           ))}
         </div>
       )}
-      <CourierForm control={control} />
-      <Dialog
-        id="delete-courier"
-        title="Excluir entregador?"
-        open={Boolean(control.removing)}
-        onClose={control.cancelRemove}
-      >
-        <p>
-          O cadastro de {control.removing?.name} será removido desta equipe.
-        </p>
-        {control.removeError && <p role="alert">{control.removeError}</p>}
-        <div className="dialog-actions">
-          <button
-            className="button secondary"
-            type="button"
-            onClick={control.cancelRemove}
-          >
-            Cancelar
-          </button>
-          <button
-            className="button danger"
-            type="button"
-            onClick={control.confirmRemove}
-          >
-            Confirmar exclusão
-          </button>
-        </div>
-      </Dialog>
     </>
   );
 }

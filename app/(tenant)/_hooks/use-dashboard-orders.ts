@@ -1,8 +1,10 @@
 "use client";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
-import { getDemoOrderStore, orderStages } from "@/lib/orders/demo-store";
-export function useDashboardOrders(tenantSlug: string) {
-  const store = useMemo(() => getDemoOrderStore(tenantSlug), [tenantSlug]);
+import { useEffect, useSyncExternalStore } from "react";
+import { orderStages } from "@/lib/orders/demo-store";
+import { useDeliveryTeam } from "./use-delivery-team";
+export function useDashboardOrders(tenantSlug: string, storeId?: string) {
+  const team = useDeliveryTeam(tenantSlug, storeId);
+  const { store } = team;
   const state = useSyncExternalStore(
     store.subscribe,
     store.getSnapshot,
@@ -42,7 +44,9 @@ export function useDashboardOrders(tenantSlug: string) {
     setFilter: store.setFilter,
     advance: store.advance,
     assignCourier: store.assignCourier,
-    deliveryCouriers: state.couriers.map((courier) => ({
+    teamError: team.error,
+    retryTeam: team.retry,
+    deliveryCouriers: (team.ready ? state.couriers : []).map((courier) => ({
       ...courier,
       busy: state.orders.some(
         (order) =>

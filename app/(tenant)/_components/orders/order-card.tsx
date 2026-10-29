@@ -65,7 +65,9 @@ export default function OrderCard({
               )}
           </select>
           {!couriers.length && (
-            <a href="/dashboard/entregadores">Cadastrar entregador ↗</a>
+            <a href="/dashboard?view=settings&section=employees">
+              Gerenciar equipe ↗
+            </a>
           )}
         </label>
       )}

@@ -1,6 +1,9 @@
 "use client";
 import {
   collection,
+  onSnapshot,
+  where,
+  documentId,
   doc,
   getDoc,
   getDocs,
@@ -61,7 +64,14 @@ export async function listEmployees(
   );
   const employees: Employee[] = snapshot.docs.map((item) => {
     const data = item.data();
-    const fields = { name: data.name, email: data.email, role: data.role };
+    const fields = {
+      name: data.name,
+      email: data.email,
+      role: data.role,
+      ...(data.role === "courier"
+        ? { phone: data.phone, vehicle: data.vehicle }
+        : {}),
+    };
     if (
       data.storeId !== storeId ||
       validateEmployee(fields) ||
@@ -89,6 +99,42 @@ export async function createEmployee(
   const error = validateEmployee(fields);
   if (error) throw new Error(error);
   await requireManagement(storeId);
+  const existing = await getDocs(
+    query(
+      collection(getFirebaseDb(), "tenants", storeId, "employees"),
+      where("email", "==", fields.email),
+      limit(1),
+    ),
+  );
+  if (!existing.empty)
+    throw new Error(
+      "Este e-mail já possui um cadastro na equipe. Confira a lista antes de adicionar outra pessoa.",
+    );
+  if (fields.role === "courier") {
+    const create = httpsCallable<
+      { storeId: string } & EmployeeInput,
+      { employeeId: string }
+    >(getFirebaseFunctions(), "employeeCreateCourier");
+    const { data } = await create({ storeId, ...fields });
+    if (
+      !data ||
+      typeof data.employeeId !== "string" ||
+      !data.employeeId ||
+      data.employeeId.includes("/")
+    )
+      throw new Error(
+        "Não foi possível confirmar o cadastro. Atualize a listagem antes de tentar novamente.",
+      );
+    return {
+      employee: {
+        ...fields,
+        id: data.employeeId,
+        active: true,
+        invited: false,
+      },
+      credentials: null,
+    };
+  }
   const invite = httpsCallable<
     { storeId: string } & EmployeeInput,
     { employeeId: string; tempPassword?: string }
@@ -134,13 +180,29 @@ export async function removeEmployee(storeId: string, employeeId: string) {
     doc(getFirebaseDb(), "tenants", storeId, "employees", employeeId),
   );
 }
-export async function resendEmployeeAccess(storeId: string, email: string) {
+export async function generateEmployeeAccessLink(
+  storeId: string,
+  employeeId: string,
+) {
   await requireManagement(storeId);
-  const invite = httpsCallable<{ storeId: string; email: string }, unknown>(
-    getFirebaseFunctions(),
-    "employeeResendInvite",
-  );
-  await invite({ storeId, email });
+  const generate = httpsCallable<
+    { storeId: string; employeeId: string },
+    { link: string }
+  >(getFirebaseFunctions(), "employeeAccessLink");
+  const { data } = await generate({ storeId, employeeId });
+  let url: URL;
+  try {
+    url = new URL(data.link);
+  } catch {
+    throw new Error("Não foi possível gerar um link válido.");
+  }
+  if (
+    url.protocol !== "https:" ||
+    url.searchParams.get("mode") !== "resetPassword" ||
+    !url.searchParams.get("oobCode")
+  )
+    throw new Error("Não foi possível gerar um link válido.");
+  return url.href;
 }
 export function employeeError(error: unknown): string {
   const code = (error as { code?: string })?.code;
@@ -154,6 +216,8 @@ export function employeeError(error: unknown): string {
       "Este e-mail já possui um cadastro. Confira a lista antes de tentar novamente.",
     "functions/invalid-argument":
       "Confira o nome, o e-mail e o cargo do funcionário.",
+    "functions/failed-precondition":
+      "O funcionário precisa de um vínculo de acesso válido e ativo. Confira o cadastro no serviço de funcionários.",
     "functions/not-found":
       "O serviço de funcionários não está disponível. Tente novamente mais tarde.",
     "functions/unavailable":
@@ -172,4 +236,90 @@ export function employeeError(error: unknown): string {
   return error instanceof Error
     ? error.message
     : "Não foi possível concluir a operação.";
+}
+
+// Watch every page so deactivation/removal also updates order assignment.
+export function watchCourierEmployees(
+  storeId: string,
+  receive: (employees: Employee[]) => void,
+  fail: (error: unknown) => void,
+  pending?: () => void,
+) {
+  const pages = new Map<number, { employees: Employee[]; full: boolean }>();
+  let stopped = false;
+  let stopRoot = () => {};
+  const reportError = (error: unknown) => {
+    if (!stopped) {
+      stopped = true;
+      stopRoot();
+      fail(error);
+    }
+  };
+  const watchPage = (
+    page: number,
+    cursor?: QueryDocumentSnapshot,
+  ): (() => void) => {
+    let stopChild = () => {};
+    let boundary: string | undefined;
+    const stop = onSnapshot(
+      query(
+        collection(getFirebaseDb(), "tenants", storeId, "employees"),
+        where("role", "==", "courier"),
+        orderBy(documentId()),
+        ...(cursor ? [startAfter(cursor)] : []),
+        limit(50),
+      ),
+      (snapshot) => {
+        if (stopped) return;
+        pending?.();
+        try {
+          const employees = snapshot.docs.map((item) => {
+            const data = item.data();
+            const employee = {
+              id: item.id,
+              name: data.name,
+              email: data.email,
+              role: data.role,
+              phone: data.phone,
+              vehicle: data.vehicle,
+              active: data.active,
+              invited: data.invited === true,
+            } as Employee;
+            if (
+              data.storeId !== storeId ||
+              typeof data.active !== "boolean" ||
+              validateEmployee(employee)
+            )
+              throw new Error(
+                "Não foi possível conferir a equipe de entregas.",
+              );
+            return employee;
+          });
+          pages.set(page, { employees, full: snapshot.size === 50 });
+          const next = snapshot.size === 50 ? snapshot.docs.at(-1) : undefined;
+          if (next?.id !== boundary) {
+            stopChild();
+            for (const key of pages.keys()) if (key > page) pages.delete(key);
+            boundary = next?.id;
+            if (next) stopChild = watchPage(page + 1, next);
+          }
+          const ordered = [...pages.entries()].sort(([a], [b]) => a - b);
+          if (!ordered.at(-1)?.[1].full)
+            receive(ordered.flatMap(([, value]) => value.employees));
+        } catch (error) {
+          reportError(error);
+        }
+      },
+      reportError,
+    );
+    return () => {
+      stopChild();
+      stop();
+    };
+  };
+  stopRoot = watchPage(0);
+  return () => {
+    stopped = true;
+    stopRoot();
+  };
 }
