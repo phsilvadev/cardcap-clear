@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "test": "playwright test",
+    "test:security:live": "node --env-file=.env.local scripts/test-firebase-isolation.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:menu:rules": "firebase emulators:exec --project demo-cardap-test --config firebase.emulators.json --only auth,firestore,storage \"playwright test --config playwright.rules.config.ts\""
   },
   "dependencies": {
     "firebase": "^13.1.0",

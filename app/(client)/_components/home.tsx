@@ -1,3 +1,4 @@
+import Image from "next/image";
 import PageBehavior from "@/app/(client)/_components/home-behavior";
 
 export default function HomeContent() {
@@ -139,47 +140,18 @@ export default function HomeContent() {
             </div>
 
             <div
-              className={
-                "relative flex min-h-80 items-center justify-center py-6 sm:min-h-96"
-              }
-              aria-hidden={"true"}
+              className="flex min-h-80 items-center justify-center py-6 sm:min-h-96"
+              aria-hidden="true"
             >
-              <div
-                className={
-                  "absolute h-72 w-72 rounded-full bg-brand sm:h-96 sm:w-96"
-                }
-              ></div>
-
-              <div
-                className={
-                  "plate relative flex h-60 w-60 rotate-[-8deg] items-center justify-center rounded-full bg-white sm:h-80 sm:w-80"
-                }
-              >
-                <div className={"text-center"}>
-                  <div className={"wordmark text-5xl sm:text-6xl"}>
-                    {"cardap"}
-                    <span className={"text-brand"}>{"."}</span>
-                  </div>
-                  <div
-                    className={"mt-3 text-[10px] uppercase tracking-[0.3em]"}
-                  >
-                    {"O sabor de estar perto"}
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className={
-                  "absolute bottom-3 right-0 rounded-2xl border border-line bg-white px-5 py-4 shadow-sm sm:right-3"
-                }
-              >
-                <span className={"block text-xs text-muted"}>
-                  {"Hoje o cardápio é"}
-                </span>
-                <span className={"mt-1 block text-lg font-bold"}>
-                  {"descobrir algo novo."}
-                </span>
-              </div>
+              <Image
+                src="/i01.png"
+                alt=""
+                width={1477}
+                height={1065}
+                sizes="(min-width: 1024px) 536px, (min-width: 640px) 50vw, 100vw"
+                className="home-hero-image"
+                priority
+              />
             </div>
           </section>
 

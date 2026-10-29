@@ -34,7 +34,7 @@ O `proxy.ts` (middleware do Next.js 16) protege `/dashboard`, bloqueia acesso p�
 
 No desenvolvimento, faça o cadastro ou login em `http://localhost:3002/restaurantes/login` e acesse `/dashboard` no mesmo host. Também é possível entrar diretamente no host da loja, por exemplo `http://minha-loja.localhost:3002/restaurantes/login`; a conta deve pertencer àquele slug. Cookies e a autenticação do SDK não são compartilhados entre hosts. Em produção, configure `AUTH_APP_ORIGIN` com a origem HTTPS do site para permitir o acesso pelo domínio central.
 
-O provedor de e-mail e senha precisa estar habilitado no Firebase Authentication, e as regras publicadas precisam permitir o modelo de cadastro do `main`. Nenhuma regra foi publicada por esta implementação. O formulário faz validação local e o Firebase aplica a política de senhas e as regras de acesso. Os pedidos, produtos, pagamentos e a configuração completa da loja continuam demonstrativos; o status `pending` libera apenas o painel atual e não ativa vendas.
+O provedor de e-mail e senha precisa estar habilitado no Firebase Authentication, e as regras publicadas precisam permitir o modelo de cadastro do `main`. Nenhuma regra foi publicada por esta implementação. O formulário faz validação local e o Firebase aplica a política de senhas e as regras de acesso. Os pedidos, os pagamentos e a configuração completa da loja continuam demonstrativos; o cardápio já usa produtos reais do Firestore; o status `pending` libera apenas o painel atual e não ativa vendas.
 
 ## Páginas
 
@@ -91,6 +91,10 @@ Os [Route Groups do Next.js](https://nextjs.org/docs/app/api-reference/file-conv
 
 As pastas privadas `_components`, `_lib` e `_styles` mantêm os arquivos específicos próximos às rotas, seguindo a [documentação de organização do Next.js](https://nextjs.org/docs/app/getting-started/project-structure). O código compartilhado permanece na raiz, e os imports usam o alias `@/`. A implementação das quatro etapas do checkout fica em `(client)/_lib/checkout-flow.ts`.
 
+O layout autenticado fica em `app/(tenant)/tenants/[tenant]/layout.tsx`, separado das páginas públicas de login e cadastro. Ele monta `DashboardShell`, os controles de sessão e o conteúdo recebido em `children`. Em `_components/dashboard/`, `DashboardSidebar` contém o `aside` (menu lateral), `DashboardHeader` contém o `header` (barra superior), e `DashboardFooter` contém o rodapé. O shell envolve o conteúdo da página com `main`.
+
+As seções do painel ficam em `dashboard-overview.tsx`, `dashboard-orders.tsx`, `dashboard-menu.tsx` e `dashboard-settings.tsx`; `dashboard.tsx` compõe essas seções e inicializa as interações. Os IDs e atributos usados pelo comportamento foram preservados. A função `requireTenant`, em `_lib/require-tenant.ts`, centraliza a autorização, com reutilização da consulta apenas dentro da mesma renderização do servidor. O layout e a página verificam o acesso; novas páginas protegidas também devem chamar essa função antes de carregar seus dados.
+
 O nome `(client)` identifica a área do consumidor; os componentes que executam no navegador continuam definidos pela diretiva `"use client"`. O grupo `(tenant)` organiza a administração do restaurante; o tenant é identificado dinamicamente pelo domínio. O painel exige autenticação e autorização do proprietário no servidor.
 
 As interações mantêm a implementação com APIs do DOM. Os links entre páginas realizam navegação completa para reinicializar cada tela e seus estilos. O Strict Mode está desativado enquanto essas interações forem imperativas, evitando inicializações duplicadas no desenvolvimento.
@@ -116,7 +120,7 @@ O formato local é `<tenant>.localhost`, com `localhost` no final. Navegadores m
 
 Também é aceito o padrão `cardap.<tenant>`, por exemplo `cardap.hero-burger` e `cardap.pizza-da-vila`. Não existe uma pasta nem uma configuração por restaurante. `lib/tenant.ts` extrai o identificador do host, e `proxy.ts` reescreve `/dashboard` para `/tenants/[tenant]/dashboard`, sem alterar a URL exibida. Esse mecanismo usa [Proxy do Next.js](https://nextjs.org/docs/app/api-reference/file-conventions/proxy).
 
-O dashboard recebe o identificador no servidor, mostra o nome cadastrado no Firebase e usa uma chave de `sessionStorage` por tenant. Os pedidos e produtos continuam sendo exemplos. O servidor consulta o cadastro, o nome comercial, o status e o domínio no Firebase antes de liberar o painel. `/dashboard` no domínio central abre a loja do proprietário autenticado. O acesso direto à rota interna `/tenants/...` retorna 404.
+O dashboard recebe o identificador no servidor, mostra o nome cadastrado no Firebase e usa uma chave de `sessionStorage` por tenant. Os pedidos do painel continuam sendo exemplos; os produtos do cardápio são carregados do Firestore. O servidor consulta o cadastro, o nome comercial, o status e o domínio no Firebase antes de liberar o painel. `/dashboard` no domínio central abre a loja do proprietário autenticado. O acesso direto à rota interna `/tenants/...` retorna 404.
 
 Para usar o formato alternativo `cardap.<tenant>` localmente:
 
@@ -157,3 +161,43 @@ Os testes verificam as páginas do consumidor, redirecionamentos antigos, busca 
 http://hero-burger.localhost:3002/dashboard
 
 A opção “Para restaurantes” e o botão “Conhecer a área de parceiros” da página inicial abrem `/restaurantes/login`, localizada em `app/(tenant)/restaurantes/login/page.tsx`. O formulário autentica o proprietário no Firebase, estabelece a sessão no servidor e abre `/dashboard`. O link de cadastro abre `/restaurantes/cadastro`.
+
+## Teste real de isolamento no Firebase
+
+O comando abaixo cria duas contas temporárias no projeto configurado em `.env.local`, cadastra suas lojas, testa login, sessões, URLs protegidas e acesso cruzado no Firestore. Ao final, remove somente as contas e os documentos criados pela execução. Ele não publica regras nem altera lojas existentes.
+
+Requer Firebase CLI instalado e autenticado, permissão para consultar as regras publicadas e remover os documentos temporários, além do aplicativo em execução na origem indicada. O teste cancela antes de criar contas se não conseguir confirmar a permissão de limpeza.
+
+```bash
+RUN_FIREBASE_LIVE_TESTS=1 FIREBASE_TEST_APP_ORIGIN=http://localhost:3001 npm run test:security:live
+```
+
+O relatório fica em `test-results/firebase-live-isolation.json`, fora do Git, sem senhas nem tokens. As verificações de autorização usam tokens de usuários reais; a credencial administrativa é usada apenas na consulta das regras, preparação dos dados de teste e limpeza. Esta execução cobre Firestore e as rotas do aplicativo; não valida Storage, App Check nem restrições da chave de API.
+
+## Cardápio do tenant
+
+O menu lateral **Cardápio** abre `/dashboard/cardapio`, com produtos reais do Firestore, busca por nome, filtro por categoria, paginação de 50 itens, edição de disponibilidade e exclusão com confirmação. O botão **Cadastrar produto** abre `/dashboard/cardapio/novo`. A edição fica em `/dashboard/cardapio/[productId]/editar`; ambas as páginas verificam a sessão e o tenant no servidor.
+
+O formulário segue os campos e o modelo do `anow/main`: nome, descrição, categoria, preço base em centavos, imagem JPG/PNG/WebP de até 5 MB, disponibilidade, grupos de complementos e divisão em partes. A foto é obrigatória no cadastro e opcional na edição. Categorias podem ser criadas no formulário e na listagem. Complementos e divisão mantêm os limites do projeto compartilhado: até 5 grupos, até 10 opções por grupo e até 20 opções no total, incluindo a divisão.
+
+Os serviços ficam em `lib/menu/`, os componentes em `app/(tenant)/_components/products/` e os hooks de opções e imagens em `app/(tenant)/_hooks/`. As gravações usam a identidade do proprietário e as regras do Firebase. Assim como no `main`, a loja precisa estar com status `configured` e carteira de recebimento válida. A tela informa essa exigência e bloqueia alterações enquanto o cadastro estiver pendente.
+
+As regras locais de Firestore e Storage foram preparadas para permitir a exclusão de produtos e imagens apenas pelo proprietário de uma loja configurada, preservando o bloqueio de outros tenants. Para a exclusão e a substituição de fotos funcionarem no projeto real, é necessário publicar `firestore.rules` e `storage.rules`. Como o Firebase é compartilhado com o `main`, essa publicação afeta os dois aplicativos; mantenha as regras sincronizadas antes de próximos deploys. Não é necessário publicar Functions para esta implementação.
+
+Produto e imagem são armazenados em serviços diferentes. A exclusão remove primeiro o documento; se a limpeza da imagem falhar, a tela informa que o produto foi excluído, mas a imagem não foi removida. Leituras e gravações não utilizam credenciais administrativas no navegador.
+
+Para testar o CRUD e o isolamento sem acessar o Firebase real, use os emuladores com um projeto `demo-`:
+
+```bash
+npm run test:menu:rules
+```
+
+Requer Firebase CLI e Java 21. O comando usa `firebase.emulators.json` e `playwright.rules.config.ts`, cria duas contas apenas no emulador e testa criação de categoria, cadastro com foto e personalizações, edição, disponibilidade, exclusão e bloqueios entre tenants, lojas pendentes e suspensas.
+
+## Organização das configurações
+
+Dentro da seção **Configurações**, o painel organiza oito áreas em abas: dados da loja, empresa e contato, endereço, horários, entrega e retirada, recebimentos, funcionários e permissões. A estrutura segue as configurações e o cadastro inicial do `anow/main`.
+
+Os componentes ficam em `app/(tenant)/_components/settings/`. `settings-sections.ts` define a navegação e os campos das novas prévias; `dashboard-settings.tsx` coordena as abas, incluindo navegação por teclado. O formulário original de dados da loja e seus IDs foram preservados para manter as interações existentes.
+
+Esta organização mantém as configurações em demonstração. As novas prévias usam `sessionStorage` com uma chave por tenant e por seção; salvar não modifica o Firestore nem a carteira real. Funcionários e permissões são informativos e identificam a integração ainda pendente. O acesso efetivo ao painel continua restrito ao proprietário pelo fluxo de autenticação existente.

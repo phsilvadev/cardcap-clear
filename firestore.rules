@@ -264,7 +264,11 @@ service cloud.firestore {
             || (resource != null && request.resource.data.createdAt == resource.data.createdAt
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'description', 'categoryId', 'priceCents', 'available', 'customization', 'imagePath', 'updatedAt'])))
           && request.resource.data.updatedAt == request.time;
-        allow delete: if false;
+        allow delete: if isProductOwner()
+          && resource.data.storeId == tenantId
+          && get(/databases/$(database)/documents/tenants/$(tenantId)).data.status == 'configured'
+          && get(/databases/$(database)/documents/tenants/$(tenantId)).data.asaasWalletId is string
+          && get(/databases/$(database)/documents/tenants/$(tenantId)).data.asaasWalletId.matches('^[a-zA-Z0-9_-]{10,100}$');
       }
 
       match /categories/{categoryId} {

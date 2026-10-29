@@ -192,3 +192,15 @@ test("cookie inventado não libera o dashboard", async ({ request }) => {
   expect(response.status()).toBe(307);
   expect(response.headers().location).toContain("/restaurantes/login");
 });
+
+for (const route of [
+  "/dashboard/cardapio",
+  "/dashboard/cardapio/novo",
+  "/dashboard/cardapio/produto-teste/editar",
+]) {
+  test(`protege a rota do cardápio ${route}`, async ({ request }) => {
+    const response = await request.get(route, { maxRedirects: 0 });
+    expect(response.status()).toBe(307);
+    expect(response.headers().location).toContain("/restaurantes/login");
+  });
+}

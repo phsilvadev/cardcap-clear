@@ -136,11 +136,16 @@ export default function initialize(tenant: Tenant) {
       ],
     };
     const navigate = (view: string = "overview") => {
+      if (view === "menu") {
+        window.location.assign("/dashboard/cardapio");
+        return;
+      }
       if (!Object.hasOwn(headings, view)) view = "overview";
+      query<HTMLElement>(".demo-banner").hidden = view === "settings";
       queryAll<HTMLElement>(".dashboard-view").forEach(
         (section) => (section.hidden = section.id !== "view-" + view),
       );
-      queryAll<HTMLButtonElement>("[data-view]").forEach((button) => {
+      queryAll<HTMLAnchorElement>("[data-view]").forEach((button) => {
         if (button.dataset.view === view)
           button.setAttribute("aria-current", "page");
         else button.removeAttribute("aria-current");
@@ -284,44 +289,14 @@ export default function initialize(tenant: Tenant) {
         };
         operation.append(button);
       });
-      const products = query<HTMLElement>("#products-list");
-      products.replaceChildren();
-      state.products.forEach((product) => {
-        const row = document.createElement("article");
-        row.className = "product-row";
-        const copy = document.createElement("div");
-        const title = document.createElement("h3");
-        title.textContent = product.name;
-        const price = document.createElement("p");
-        price.textContent = money(product.price);
-        copy.append(title, price);
-        const toggle = document.createElement("button");
-        toggle.type = "button";
-        toggle.className = "order-action";
-        toggle.setAttribute("aria-pressed", String(product.active));
-        toggle.setAttribute("aria-label", "Disponibilidade de " + product.name);
-        toggle.textContent = product.active ? "Disponível" : "Pausado";
-        toggle.onclick = () => {
-          product.active = !product.active;
-          if (!save()) {
-            product.active = !product.active;
-            return;
-          }
-          render();
-          feedback(
-            product.name +
-              ": " +
-              (product.active ? "disponível" : "pausado") +
-              " na demonstração.",
-          );
-        };
-        row.append(copy, toggle);
-        products.append(row);
-      });
       renderOrders();
     };
-    queryAll<HTMLButtonElement>("[data-view]").forEach(
-      (button) => (button.onclick = () => navigate(button.dataset.view)),
+    queryAll<HTMLAnchorElement>("[data-view]").forEach(
+      (button) =>
+        (button.onclick = (event) => {
+          event.preventDefault();
+          navigate(button.dataset.view);
+        }),
     );
     queryAll<HTMLButtonElement>("[data-go]").forEach(
       (button) => (button.onclick = () => navigate(button.dataset.go)),
@@ -379,7 +354,9 @@ export default function initialize(tenant: Tenant) {
       },
     );
     render();
-    navigate("overview");
+    navigate(
+      new URLSearchParams(window.location.search).get("view") ?? "overview",
+    );
   })();
 
   return () => {

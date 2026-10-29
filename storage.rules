@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /tenants/{tenantId}/products/{productId}/image {
+      function isOwner() {
+        return request.auth != null
+          && request.auth.uid == tenantId
+          && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.ownerUid == request.auth.uid;
+      }
+
+      allow get: if isOwner();
+      allow create, update: if isOwner()
+        && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.status == 'configured'
+        && request.resource.size > 0
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType in ['image/jpeg', 'image/png', 'image/webp'];
+      allow delete: if isOwner()
+        && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.status == 'configured'
+        && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.asaasWalletId is string
+        && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.asaasWalletId.matches('^[a-zA-Z0-9_-]{10,100}$');
+      allow list: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

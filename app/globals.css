@@ -675,3 +675,11 @@ button:disabled {
       transform 0.2s;
   }
 }
+
+.home-hero-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 440px;
+  object-fit: contain;
+}
