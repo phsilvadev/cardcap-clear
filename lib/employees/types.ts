@@ -1,8 +1,9 @@
-export type EmployeeRole = "attendant" | "manager" | "courier";
+export type EmployeeRole = "attendant" | "manager" | "courier" | "waiter";
 export const employeeRoles: Record<EmployeeRole, string> = {
   attendant: "Atendente",
   manager: "Gerente",
   courier: "Entregador",
+  waiter: "Garçom",
 };
 export type EmployeeInput = {
   name: string;

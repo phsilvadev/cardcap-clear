@@ -18,3 +18,54 @@ exports.employeeCreateCourier = onCall(
     timestamp: () => FieldValue.serverTimestamp(),
   }),
 );
+
+const { createCourierSessionHandler } = require("./courier-session.cjs");
+const {
+  createEnableCourierAccessHandler,
+} = require("./enable-courier-access.cjs");
+exports.courierGetSession = onCall(
+  { region: "southamerica-east1", maxInstances: 5 },
+  createCourierSessionHandler({
+    db: getFirestore(),
+    auth: getAuth(),
+    HttpsError,
+  }),
+);
+exports.employeeEnableCourierAccess = onCall(
+  { region: "southamerica-east1", maxInstances: 5 },
+  createEnableCourierAccessHandler({
+    db: getFirestore(),
+    auth: getAuth(),
+    HttpsError,
+  }),
+);
+
+const { createWaiterSessionHandler } = require("./waiter-session.cjs");
+const {
+  createEnableWaiterAccessHandler,
+} = require("./enable-waiter-access.cjs");
+const { createWaiterHandler } = require("./create-waiter.cjs");
+exports.waiterGetSession = onCall(
+  { region: "southamerica-east1", maxInstances: 5 },
+  createWaiterSessionHandler({
+    db: getFirestore(),
+    auth: getAuth(),
+    HttpsError,
+  }),
+);
+exports.employeeEnableWaiterAccess = onCall(
+  { region: "southamerica-east1", maxInstances: 5 },
+  createEnableWaiterAccessHandler({
+    db: getFirestore(),
+    auth: getAuth(),
+    HttpsError,
+  }),
+);
+exports.employeeCreateWaiter = onCall(
+  { region: "southamerica-east1", maxInstances: 5 },
+  createWaiterHandler({
+    db: getFirestore(),
+    HttpsError,
+    timestamp: () => FieldValue.serverTimestamp(),
+  }),
+);

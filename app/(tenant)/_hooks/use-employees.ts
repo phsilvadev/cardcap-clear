@@ -151,8 +151,20 @@ export function useEmployees(storeId: string | undefined, enabled: boolean) {
   const resend = (employee: Employee) => {
     if (!storeId || !canManage) return;
     return run(employee.id, async () => {
-      const link = await generateEmployeeAccessLink(storeId, employee.id);
-      if (mounted.current) setAccessLink({ name: employee.name, link });
+      const link = await generateEmployeeAccessLink(
+        storeId,
+        employee.id,
+        employee.role,
+      );
+      if (mounted.current) {
+        setAccessLink({ name: employee.name, link });
+        if (employee.role === "courier" || employee.role === "waiter")
+          setEmployees((items) =>
+            items.map((item) =>
+              item.id === employee.id ? { ...item, invited: true } : item,
+            ),
+          );
+      }
     });
   };
   const loadMore = () => {

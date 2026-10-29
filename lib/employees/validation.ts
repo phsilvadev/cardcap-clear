@@ -29,7 +29,7 @@ export function validateEmployee(input: EmployeeInput): string {
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)
   )
     return "Informe um e-mail válido.";
-  if (!["attendant", "manager", "courier"].includes(input.role))
+  if (!["attendant", "manager", "courier", "waiter"].includes(input.role))
     return "Selecione um cargo válido.";
   if (
     input.role === "courier" &&

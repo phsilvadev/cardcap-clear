@@ -104,10 +104,17 @@ export default function EmployeeDialogs({
                     </select>
                   </label>
                   <p className="employee-help">
-                    O entregador aparecerá na equipe de entregas. Este cadastro
-                    operacional não cria uma conta de acesso.
+                    O entregador aparecerá na equipe de entregas. Após
+                    cadastrar, use Liberar acesso ao app para compartilhar o
+                    link com ele.
                   </p>
                 </>
+              )}
+              {control.draft.role === "waiter" && (
+                <p className="employee-help">
+                  Após cadastrar, use Liberar acesso ao app para compartilhar o
+                  link do Cardap Garçom.
+                </p>
               )}
             </fieldset>
             <p className="employee-help">

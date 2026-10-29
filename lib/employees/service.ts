@@ -110,11 +110,16 @@ export async function createEmployee(
     throw new Error(
       "Este e-mail já possui um cadastro na equipe. Confira a lista antes de adicionar outra pessoa.",
     );
-  if (fields.role === "courier") {
+  if (fields.role === "courier" || fields.role === "waiter") {
     const create = httpsCallable<
       { storeId: string } & EmployeeInput,
       { employeeId: string }
-    >(getFirebaseFunctions(), "employeeCreateCourier");
+    >(
+      getFirebaseFunctions(),
+      fields.role === "courier"
+        ? "employeeCreateCourier"
+        : "employeeCreateWaiter",
+    );
     const { data } = await create({ storeId, ...fields });
     if (
       !data ||
@@ -183,12 +188,20 @@ export async function removeEmployee(storeId: string, employeeId: string) {
 export async function generateEmployeeAccessLink(
   storeId: string,
   employeeId: string,
+  role: EmployeeInput["role"] = "attendant",
 ) {
   await requireManagement(storeId);
   const generate = httpsCallable<
     { storeId: string; employeeId: string },
     { link: string }
-  >(getFirebaseFunctions(), "employeeAccessLink");
+  >(
+    getFirebaseFunctions(),
+    role === "courier"
+      ? "employeeEnableCourierAccess"
+      : role === "waiter"
+        ? "employeeEnableWaiterAccess"
+        : "employeeAccessLink",
+  );
   const { data } = await generate({ storeId, employeeId });
   let url: URL;
   try {

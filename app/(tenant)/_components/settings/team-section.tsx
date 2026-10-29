@@ -148,17 +148,24 @@ export default function TeamSection({
                 {employee.active ? "Ativo" : "Inativo"}
               </span>
               <div className="employee-actions">
-                {employee.invited && employee.active && (
-                  <button
-                    type="button"
-                    className="button secondary"
-                    disabled={!control.canManage || Boolean(control.busy)}
-                    onClick={() => control.resend(employee)}
-                    aria-label={`Gerar link de acesso para ${employee.name}`}
-                  >
-                    Gerar link de acesso
-                  </button>
-                )}
+                {(employee.invited ||
+                  employee.role === "courier" ||
+                  employee.role === "waiter") &&
+                  employee.active && (
+                    <button
+                      type="button"
+                      className="button secondary"
+                      disabled={!control.canManage || Boolean(control.busy)}
+                      onClick={() => control.resend(employee)}
+                      aria-label={`Gerar link de acesso para ${employee.name}`}
+                    >
+                      {(employee.role === "courier" ||
+                        employee.role === "waiter") &&
+                      !employee.invited
+                        ? "Liberar acesso ao app"
+                        : "Gerar link de acesso"}
+                    </button>
+                  )}
                 <button
                   type="button"
                   className="button secondary"
