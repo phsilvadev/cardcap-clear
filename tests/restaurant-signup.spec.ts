@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const width of [1280, 375]) {
-  test(`cadastro visual do restaurante em ${width}px, sem envio de dados`, async ({
+  test(`valida cadastro do restaurante em ${width}px, sem envio de dados`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 900 });
@@ -50,7 +50,7 @@ for (const width of [1280, 375]) {
       .getByRole("button", { name: "Cadastrar restaurante", exact: true })
       .click();
     await expect(page.getByRole("status")).toContainText(
-      "Nenhuma conta foi criada",
+      "As senhas não conferem",
     );
     expect(requests).toEqual([]);
     expect(

@@ -3,19 +3,16 @@ import PageBehavior from "@/app/(client)/_components/home-behavior";
 export default function HomeContent() {
   return (
     <>
-      {"\n"}
       <a href={"#conteudo"} className={"sr-only focus:not-sr-only"}>
         {"Ir para o conteúdo"}
       </a>
-      {"\n"}
+
       <div className={"mx-auto max-w-6xl px-5 sm:px-8"}>
-        {"\n"}
         <header
           className={
             "flex flex-wrap items-center justify-between gap-5 border-b border-line py-6 lg:border-0 lg:py-8"
           }
         >
-          {"\n"}
           <a
             href={"#"}
             aria-label={"Cardap — início"}
@@ -24,24 +21,23 @@ export default function HomeContent() {
             {"cardap"}
             <span className={"text-brand"}>{"."}</span>
           </a>
-          {"\n"}
+
           <nav
             aria-label={"Navegação principal"}
             className={"flex flex-wrap items-center gap-4 text-sm sm:gap-8"}
           >
-            {"\n"}
             <a href={"/cliente"}>{"Minha conta"}</a>
             <a href={"#como-funciona"} className={"hover:underline"}>
               {"Como funciona"}
             </a>
-            {"\n"}
+
             <a
               href="/restaurantes/login"
               className={"border-0 bg-transparent p-0 hover:underline"}
             >
               {"Para restaurantes"}
             </a>
-            {"\n"}
+
             <button
               type={"button"}
               data-info={"login"}
@@ -69,22 +65,17 @@ export default function HomeContent() {
                 <path d={"M7 17 17 7"}></path>
               </svg>
             </button>
-            {"\n"}
           </nav>
-          {"\n"}
         </header>
-        {"\n"}
+
         <main id={"conteudo"}>
-          {"\n"}
           <section
             className={
               "grid items-center gap-10 py-10 lg:grid-cols-2 lg:gap-14 lg:py-14"
             }
             aria-labelledby={"hero-title"}
           >
-            {"\n"}
             <div>
-              {"\n"}
               <p
                 className={
                   "mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-muted"
@@ -92,7 +83,7 @@ export default function HomeContent() {
               >
                 {"Sua cidade. Seus sabores."}
               </p>
-              {"\n"}
+
               <h1
                 id={"hero-title"}
                 className={
@@ -106,7 +97,7 @@ export default function HomeContent() {
                 {"está "}
                 <span className={"text-brand"}>{"por perto."}</span>
               </h1>
-              {"\n"}
+
               <p
                 className={"mt-6 max-w-md text-base leading-relaxed text-muted"}
               >
@@ -114,7 +105,7 @@ export default function HomeContent() {
                   "Descubra os restaurantes da sua região. Escolha sua cidade e dê o primeiro passo para encontrar sua próxima refeição."
                 }
               </p>
-              {"\n"}
+
               <a
                 href={"#buscar"}
                 className={
@@ -141,32 +132,29 @@ export default function HomeContent() {
                   <path d={"m19 12-7 7-7-7"}></path>
                 </svg>
               </a>
-              {"\n"}
+
               <p className={"hashtag mt-8 text-3xl text-brand"}>
                 {"#PARTIUCOMER"}
               </p>
-              {"\n"}
             </div>
-            {"\n"}
+
             <div
               className={
                 "relative flex min-h-80 items-center justify-center py-6 sm:min-h-96"
               }
               aria-hidden={"true"}
             >
-              {"\n"}
               <div
                 className={
                   "absolute h-72 w-72 rounded-full bg-brand sm:h-96 sm:w-96"
                 }
               ></div>
-              {"\n"}
+
               <div
                 className={
                   "plate relative flex h-60 w-60 rotate-[-8deg] items-center justify-center rounded-full bg-white sm:h-80 sm:w-80"
                 }
               >
-                {"\n"}
                 <div className={"text-center"}>
                   <div className={"wordmark text-5xl sm:text-6xl"}>
                     {"cardap"}
@@ -178,9 +166,8 @@ export default function HomeContent() {
                     {"O sabor de estar perto"}
                   </div>
                 </div>
-                {"\n"}
               </div>
-              {"\n"}
+
               <div
                 className={
                   "absolute bottom-3 right-0 rounded-2xl border border-line bg-white px-5 py-4 shadow-sm sm:right-3"
@@ -193,17 +180,14 @@ export default function HomeContent() {
                   {"descobrir algo novo."}
                 </span>
               </div>
-              {"\n"}
             </div>
-            {"\n"}
           </section>
-          {"\n"}
+
           <section
             id={"buscar"}
             aria-labelledby={"search-title"}
             className={"scroll-mt-6 rounded-3xl border border-line p-5 sm:p-8"}
           >
-            {"\n"}
             <div
               className={"mb-6 flex flex-wrap items-end justify-between gap-3"}
             >
@@ -226,12 +210,11 @@ export default function HomeContent() {
                 {"Escolha sua cidade e seu estado."}
               </p>
             </div>
-            {"\n"}
+
             <form
               id={"location-form"}
               className={"grid gap-4 sm:grid-cols-[minmax(0,1fr)_120px_auto]"}
             >
-              {"\n"}
               <div className={"rounded-2xl border border-line px-4 py-3"}>
                 <label
                   htmlFor={"city"}
@@ -251,7 +234,7 @@ export default function HomeContent() {
                   }
                 />
               </div>
-              {"\n"}
+
               <div className={"rounded-2xl border border-line px-4 py-3"}>
                 <label
                   htmlFor={"state"}
@@ -269,7 +252,7 @@ export default function HomeContent() {
                   <option value={""}>{"UF"}</option>
                 </select>
               </div>
-              {"\n"}
+
               <button
                 type={"submit"}
                 className={
@@ -296,30 +279,27 @@ export default function HomeContent() {
                   <circle cx={"11"} cy={"11"} r={"8"}></circle>
                 </svg>
               </button>
-              {"\n"}
             </form>
-            {"\n"}
+
             <p
               id={"search-feedback"}
               role={"status"}
               aria-live={"polite"}
               className={"mt-3 min-h-5 text-sm text-muted"}
             ></p>
-            {"\n"}
+
             <p className={"mt-1 text-xs text-muted"}>
               {
                 "Prévia visual: explore uma listagem demonstrativa de restaurantes na região escolhida."
               }
             </p>
-            {"\n"}
           </section>
-          {"\n"}
+
           <section
             id={"como-funciona"}
             aria-labelledby={"steps-title"}
             className={"py-12 sm:py-16"}
           >
-            {"\n"}
             <div
               className={"mb-8 flex flex-wrap items-end justify-between gap-3"}
             >
@@ -334,9 +314,8 @@ export default function HomeContent() {
                 }
               </p>
             </div>
-            {"\n"}
+
             <ol className={"m-0 grid list-none gap-6 p-0 sm:grid-cols-3"}>
-              {"\n"}
               <li className={"border-t border-line pt-5"}>
                 <span className={"hashtag text-3xl text-brand"}>{"01"}</span>
                 <h3 className={"mt-3 text-lg font-bold"}>
@@ -346,7 +325,7 @@ export default function HomeContent() {
                   {"Informe sua cidade e seu estado para começar."}
                 </p>
               </li>
-              {"\n"}
+
               <li className={"border-t border-line pt-5"}>
                 <span className={"hashtag text-3xl text-brand"}>{"02"}</span>
                 <h3 className={"mt-3 text-lg font-bold"}>
@@ -358,7 +337,7 @@ export default function HomeContent() {
                   }
                 </p>
               </li>
-              {"\n"}
+
               <li className={"border-t border-line pt-5"}>
                 <span className={"hashtag text-3xl text-brand"}>{"03"}</span>
                 <h3 className={"mt-3 text-lg font-bold"}>
@@ -370,11 +349,9 @@ export default function HomeContent() {
                   }
                 </p>
               </li>
-              {"\n"}
             </ol>
-            {"\n"}
           </section>
-          {"\n"}
+
           <section
             className={
               "mb-12 flex flex-wrap items-center justify-between gap-6 rounded-3xl bg-ink p-6 text-white sm:p-8"
@@ -423,9 +400,8 @@ export default function HomeContent() {
               </svg>
             </a>
           </section>
-          {"\n"}
         </main>
-        {"\n"}
+
         <footer
           className={
             "flex flex-wrap items-center justify-between gap-5 border-t border-line py-7 text-xs text-muted"
@@ -444,9 +420,8 @@ export default function HomeContent() {
             {"Sobre esta prévia"}
           </button>
         </footer>
-        {"\n"}
       </div>
-      {"\n"}
+
       <dialog
         id={"info-dialog"}
         aria-labelledby={"dialog-title"}

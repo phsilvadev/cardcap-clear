@@ -1,16 +1,31 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { loginRestaurant, authMessage } from "@/lib/auth/tenant-client";
 
 export default function RestaurantLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setStatus(
-      "O login do restaurante ainda não está conectado. Nenhuma credencial foi enviada.",
-    );
+    if (loading) return;
+    const data = new FormData(event.currentTarget);
+    setLoading(true);
+    setStatus("");
+    try {
+      await loginRestaurant(
+        String(data.get("email") ?? ""),
+        String(data.get("password") ?? ""),
+      );
+      window.location.replace("/dashboard");
+    } catch (error) {
+      setStatus(authMessage(error));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -46,11 +61,15 @@ export default function RestaurantLogin() {
         </button>
       </div>
       <p className="restaurant-login-note">
-        Prévia visual: a autenticação ainda não está integrada. Não informe sua
-        senha real.
+        Entre com a conta do proprietário para acessar seu restaurante.
       </p>
-      <button className="restaurant-login-submit" type="submit">
-        Entrar no restaurante <span aria-hidden="true">↗</span>
+      <button
+        className="restaurant-login-submit"
+        type="submit"
+        disabled={loading}
+      >
+        {loading ? "Entrando…" : "Entrar no restaurante"}{" "}
+        <span aria-hidden="true">↗</span>
       </button>
       <p className="restaurant-login-status" role="status" aria-live="polite">
         {status}

@@ -18,3 +18,15 @@ export function resolveTenant(host: string): Tenant | null {
       .join(" "),
   };
 }
+
+export function isCentralHost(host: string): boolean {
+  const hostname = host.toLowerCase().replace(/:\d+$/, "").replace(/\.$/, "");
+  if (["localhost", "127.0.0.1"].includes(hostname)) return true;
+  const origin = process.env.AUTH_APP_ORIGIN;
+  if (!origin) return false;
+  try {
+    return new URL(origin).hostname === hostname;
+  } catch {
+    return false;
+  }
+}

@@ -3,8 +3,14 @@
 import { useRestaurantSignup } from "@/app/(tenant)/_hooks/use-restaurant-signup";
 
 const RestaurantSignup = () => {
-  const { showPassword, status, togglePassword, clearStatus, handleSubmit } =
-    useRestaurantSignup();
+  const {
+    showPassword,
+    status,
+    loading,
+    togglePassword,
+    clearStatus,
+    handleSubmit,
+  } = useRestaurantSignup();
 
   return (
     <form
@@ -12,12 +18,14 @@ const RestaurantSignup = () => {
       onSubmit={handleSubmit}
       onChange={clearStatus}
       aria-label="Cadastro do restaurante"
-      noValidate
     >
       <div className="restaurant-signup-field">
         <label htmlFor="signup-owner">Seu nome</label>
         <input
           id="signup-owner"
+          required
+          minLength={3}
+          maxLength={100}
           name="ownerName"
           type="text"
           autoComplete="name"
@@ -28,6 +36,9 @@ const RestaurantSignup = () => {
         <label htmlFor="signup-store">Nome do restaurante</label>
         <input
           id="signup-store"
+          required
+          minLength={3}
+          maxLength={80}
           name="storeName"
           type="text"
           autoComplete="organization"
@@ -38,6 +49,8 @@ const RestaurantSignup = () => {
         <label htmlFor="signup-email">E-mail</label>
         <input
           id="signup-email"
+          required
+          maxLength={254}
           name="email"
           type="email"
           autoComplete="email"
@@ -49,6 +62,9 @@ const RestaurantSignup = () => {
         <div className="restaurant-password-field">
           <input
             id="signup-password"
+            required
+            minLength={8}
+            maxLength={128}
             name="password"
             type={showPassword ? "text" : "password"}
             autoComplete="new-password"
@@ -68,6 +84,7 @@ const RestaurantSignup = () => {
         <label htmlFor="signup-confirmation">Confirme a senha</label>
         <input
           id="signup-confirmation"
+          required
           name="confirmation"
           type={showPassword ? "text" : "password"}
           autoComplete="new-password"
@@ -75,14 +92,15 @@ const RestaurantSignup = () => {
         />
       </div>
       <p className="restaurant-login-note restaurant-signup-full">
-        Prévia visual: os dados não serão enviados nem salvos. Não informe uma
-        senha real.
+        Crie sua conta para iniciar a configuração do restaurante.
       </p>
       <button
         className="restaurant-login-submit restaurant-signup-full"
         type="submit"
+        disabled={loading}
       >
-        Cadastrar restaurante <span aria-hidden="true">↗</span>
+        {loading ? "Cadastrando…" : "Cadastrar restaurante"}{" "}
+        <span aria-hidden="true">↗</span>
       </button>
       <p
         className="restaurant-login-status restaurant-signup-full"
