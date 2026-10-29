@@ -53,7 +53,10 @@ export default function ProductForm({
     );
   return (
     <>
-      <form className="dashboard-product-form product-editor" onSubmit={submit}>
+      <form
+        className="dashboard-product-form product-editor mt-4"
+        onSubmit={submit}
+      >
         <fieldset className="product-form-fields" disabled={saving}>
           <section
             className="product-form-section"

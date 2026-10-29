@@ -35,6 +35,14 @@ export interface DemoOrder {
 }
 
 export type OrderStatus = "new" | "preparing" | "delivery" | "done";
+export type CourierVehicle = "motorcycle" | "bicycle" | "car" | "foot";
+export interface DeliveryCourier {
+  id: string;
+  name: string;
+  phone: string;
+  vehicle: CourierVehicle;
+  available: boolean;
+}
 export interface DashboardOrder {
   id: string;
   customer: string;
@@ -42,6 +50,8 @@ export interface DashboardOrder {
   total: number;
   status: OrderStatus;
   time: string;
+  courierId?: string;
+  courierName?: string;
 }
 
 export interface DashboardState {

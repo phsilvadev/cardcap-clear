@@ -4,7 +4,13 @@ import DashboardOverview from "@/app/(tenant)/_components/dashboard/dashboard-ov
 import DashboardOrders from "@/app/(tenant)/_components/dashboard/dashboard-orders";
 import DashboardSettings from "@/app/(tenant)/_components/dashboard/dashboard-settings";
 
-export default function DashboardContent({ tenant }: { tenant: Tenant }) {
+export default function DashboardContent({
+  tenant,
+  storeId,
+}: {
+  tenant: Tenant;
+  storeId?: string;
+}) {
   return (
     <>
       <div className={"dashboard-heading"}>
@@ -21,9 +27,9 @@ export default function DashboardContent({ tenant }: { tenant: Tenant }) {
           "Dados fictícios. Nenhum pedido real é recebido ou alterado. As mudanças deste painel ficam nesta sessão do navegador."
         }
       </p>
-      <DashboardOverview />
-      <DashboardOrders />
-      <DashboardSettings tenantSlug={tenant.slug} />
+      <DashboardOverview storeId={storeId} />
+      <DashboardOrders tenantSlug={tenant.slug} />
+      <DashboardSettings tenantSlug={tenant.slug} storeId={storeId} />
       <p
         id={"dashboard-feedback"}
         className={"flow-status"}

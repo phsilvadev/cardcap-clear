@@ -1,14 +1,18 @@
 "use client";
 import { usePathname } from "next/navigation";
 export default function DashboardHeader() {
-  const isMenu = usePathname().includes("/cardapio");
+  const pathname = usePathname();
+  const isMenu = pathname.includes("/cardapio");
+  const isCouriers = pathname.includes("/entregadores");
   return (
     <header className={"dashboard-top"}>
       <span>
         {"Restaurante / "}
-        <strong id={"breadcrumb"}>{isMenu ? "Cardápio" : "Visão geral"}</strong>
+        <strong id={"breadcrumb"}>
+          {isMenu ? "Cardápio" : isCouriers ? "Entregadores" : "Visão geral"}
+        </strong>
       </span>
-      {!isMenu && (
+      {!isMenu && !isCouriers && (
         <button
           type={"button"}
           id={"store-toggle"}

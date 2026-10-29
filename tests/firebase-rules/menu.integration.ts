@@ -1,3 +1,10 @@
+import { getStoreReadiness } from "../../lib/onboarding/service";
+import {
+  listEmployees,
+  toggleEmployee,
+  removeEmployee,
+  getEmployeeOwner,
+} from "../../lib/employees/service";
 import { test, expect } from "@playwright/test";
 import { initializeApp, deleteApp } from "firebase/app";
 import {
@@ -11,6 +18,9 @@ import {
   getDoc,
   getFirestore,
   doc,
+  setDoc,
+  updateDoc,
+  serverTimestamp,
   deleteDoc,
   terminate,
 } from "firebase/firestore";
@@ -179,6 +189,17 @@ test.describe.serial("CRUD do cardápio com regras reais nos emuladores", () => 
       },
       image,
     );
+    const readiness = await getStoreReadiness(ownerUid);
+    expect(
+      readiness.items.find((item) => item.id === "categories")?.complete,
+    ).toBe(true);
+    expect(
+      readiness.items.find((item) => item.id === "products")?.complete,
+    ).toBe(true);
+    expect(
+      readiness.items.find((item) => item.id === "activation")?.complete,
+    ).toBe(false);
+    await expect(getStoreReadiness(otherUid)).rejects.toThrow("proprietário");
     const product = await getProduct(ownerUid, productId);
     expect(product.priceCents).toBe(3990);
     expect(product.customization?.groups[0].options[0].name).toBe("Queijo");
@@ -277,5 +298,74 @@ test.describe.serial("CRUD do cardápio com regras reais nos emuladores", () => 
         ),
       ),
     ).rejects.toMatchObject({ code: "storage/object-not-found" });
+  });
+  test("funcionários: proprietário lista, ativa, desativa e remove o vínculo", async () => {
+    const reference = doc(
+      getFirebaseDb(),
+      "tenants",
+      ownerUid,
+      "employees",
+      "employee-test",
+    );
+    await setDoc(reference, {
+      storeId: ownerUid,
+      name: "Maria Silva",
+      email: "maria@example.test",
+      role: "attendant",
+      active: true,
+      createdAt: serverTimestamp(),
+    });
+    expect((await listEmployees(ownerUid)).employees[0]).toMatchObject({
+      id: "employee-test",
+      name: "Maria Silva",
+      active: true,
+    });
+    await toggleEmployee(ownerUid, "employee-test", false);
+    expect((await getDoc(reference)).data()?.active).toBe(false);
+    await toggleEmployee(ownerUid, "employee-test", true);
+    expect((await getDoc(reference)).data()?.active).toBe(true);
+    await expect(
+      getDoc(doc(otherDb, "tenants", ownerUid, "employees", "employee-test")),
+    ).rejects.toMatchObject({ code: "permission-denied" });
+    await expect(
+      updateDoc(
+        doc(otherDb, "tenants", ownerUid, "employees", "employee-test"),
+        { active: false, updatedAt: serverTimestamp() },
+      ),
+    ).rejects.toMatchObject({ code: "permission-denied" });
+    await expect(
+      deleteDoc(
+        doc(otherDb, "tenants", ownerUid, "employees", "employee-test"),
+      ),
+    ).rejects.toMatchObject({ code: "permission-denied" });
+    await expect(getEmployeeOwner(otherUid)).rejects.toThrow("proprietário");
+    await removeEmployee(ownerUid, "employee-test");
+    expect((await getDoc(reference)).exists()).toBe(false);
+  });
+  test("funcionários: cadastro pendente e cargo inválido permanecem bloqueados", async () => {
+    await seedTenant(ownerUid, "pending");
+    expect((await getEmployeeOwner(ownerUid)).canManage).toBe(false);
+    const reference = doc(
+      getFirebaseDb(),
+      "tenants",
+      ownerUid,
+      "employees",
+      "invalid-employee",
+    );
+    const fields = {
+      storeId: ownerUid,
+      name: "Maria Silva",
+      email: "maria@example.test",
+      role: "attendant",
+      active: true,
+      createdAt: serverTimestamp(),
+    };
+    await expect(setDoc(reference, fields)).rejects.toMatchObject({
+      code: "permission-denied",
+    });
+    await seedTenant(ownerUid);
+    await expect(
+      setDoc(reference, { ...fields, role: "owner" }),
+    ).rejects.toMatchObject({ code: "permission-denied" });
   });
 });

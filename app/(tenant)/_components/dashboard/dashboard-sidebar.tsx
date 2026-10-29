@@ -3,7 +3,9 @@ import { usePathname } from "next/navigation";
 import TenantSessionControls from "@/app/(tenant)/_components/tenant-session-controls";
 import type { Tenant } from "@/lib/tenant";
 export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
-  const isMenu = usePathname().includes("/cardapio");
+  const pathname = usePathname();
+  const isMenu = pathname.includes("/cardapio");
+  const isCouriers = pathname.includes("/entregadores");
   return (
     <aside className={"sidebar"}>
       <a
@@ -46,7 +48,7 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
         <a
           href="/dashboard?view=overview"
           data-view="overview"
-          aria-current={!isMenu ? "page" : undefined}
+          aria-current={!isMenu && !isCouriers ? "page" : undefined}
         >
           <svg
             xmlns={"http://www.w3.org/2000/svg"}
@@ -123,6 +125,27 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
             <path d={"M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"}></path>
           </svg>
           {"Cardápio"}
+        </a>
+        <a
+          href="/dashboard/entregadores"
+          aria-current={isCouriers ? "page" : undefined}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M1 3h14v13H1zM15 8h4l3 4v4h-7" />
+            <circle cx="5" cy="18" r="2" />
+            <circle cx="18" cy="18" r="2" />
+          </svg>
+          Entregadores
         </a>
         <a
           href="/dashboard?view=settings"

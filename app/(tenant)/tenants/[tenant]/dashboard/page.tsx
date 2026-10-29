@@ -16,5 +16,5 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { tenant: slug } = await params;
   const tenant = await requireTenant(slug);
-  return <Content tenant={tenant} />;
+  return <Content tenant={tenant} storeId={tenant.uid} />;
 }

@@ -1,10 +1,12 @@
-export default function DashboardOverview() {
+import StoreReadinessCard from "@/app/(tenant)/_components/onboarding/store-readiness-card";
+export default function DashboardOverview({ storeId }: { storeId?: string }) {
   return (
     <section
       id={"view-overview"}
       className={"dashboard-view"}
       aria-label={"Visão geral"}
     >
+      <StoreReadinessCard storeId={storeId} />
       <div className={"stats-grid"}>
         <article className={"stat-card"}>
           <p>

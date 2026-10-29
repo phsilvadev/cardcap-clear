@@ -30,6 +30,11 @@ export const settingsSections = [
     description: "Carteira Asaas para recebimento de pagamentos.",
   },
   {
+    id: "plan",
+    label: "Plano e assinatura",
+    description: "Plano selecionado, valores e benefícios.",
+  },
+  {
     id: "employees",
     label: "Funcionários",
     description: "Organização dos acessos da equipe.",
@@ -43,7 +48,7 @@ export const settingsSections = [
 export type SettingsSectionId = (typeof settingsSections)[number]["id"];
 export type PreviewSectionId = Exclude<
   SettingsSectionId,
-  "details" | "employees" | "permissions"
+  "details" | "employees" | "permissions" | "plan"
 >;
 type Field = {
   name: string;

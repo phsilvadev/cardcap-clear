@@ -1,5 +1,6 @@
 "use client";
-import { useState, type KeyboardEvent } from "react";
+import PlanSection from "@/app/(tenant)/_components/settings/plan-section";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import {
   settingsSections,
   type SettingsSectionId,
@@ -11,10 +12,19 @@ import PermissionsSection from "@/app/(tenant)/_components/settings/permissions-
 
 export default function DashboardSettings({
   tenantSlug,
+  storeId,
 }: {
   tenantSlug: string;
+  storeId?: string;
 }) {
   const [active, setActive] = useState<SettingsSectionId>("details");
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get(
+      "section",
+    );
+    const section = settingsSections.find((item) => item.id === requested);
+    if (section) setActive(section.id);
+  }, []);
   function moveFocus(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     let next: number;
     if (event.key === "ArrowDown" || event.key === "ArrowRight")
@@ -77,7 +87,15 @@ export default function DashboardSettings({
               {section.id === "details" ? (
                 <StoreDetailsSection />
               ) : section.id === "employees" ? (
-                <TeamSection />
+                <TeamSection
+                  storeId={storeId}
+                  enabled={active === "employees"}
+                />
+              ) : section.id === "plan" ? (
+                <PlanSection
+                  tenantSlug={tenantSlug}
+                  enabled={active === "plan"}
+                />
               ) : section.id === "permissions" ? (
                 <PermissionsSection />
               ) : (

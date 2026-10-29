@@ -200,4 +200,42 @@ Dentro da seção **Configurações**, o painel organiza oito áreas em abas: da
 
 Os componentes ficam em `app/(tenant)/_components/settings/`. `settings-sections.ts` define a navegação e os campos das novas prévias; `dashboard-settings.tsx` coordena as abas, incluindo navegação por teclado. O formulário original de dados da loja e seus IDs foram preservados para manter as interações existentes.
 
-Esta organização mantém as configurações em demonstração. As novas prévias usam `sessionStorage` com uma chave por tenant e por seção; salvar não modifica o Firestore nem a carteira real. Funcionários e permissões são informativos e identificam a integração ainda pendente. O acesso efetivo ao painel continua restrito ao proprietário pelo fluxo de autenticação existente.
+Esta organização mantém as configurações em demonstração. As prévias de dados, horários, entrega e recebimentos usam `sessionStorage` com uma chave por tenant e por seção; salvar essas prévias não modifica o Firestore nem a carteira real. A seção Funcionários usa os registros e serviços reais do Firebase; a seção Permissões permanece informativa. O acesso efetivo ao painel continua restrito ao proprietário pelo fluxo de autenticação existente.
+
+## Organização dos pedidos
+
+A seção Pedidos usa um quadro com quatro etapas: novos, em preparo, em entrega e concluídos. Cada coluna mostra um contador e os cards com número do pedido, cliente, itens, horário e total. A busca inclui cliente, número e itens; os filtros por etapa exibem os respectivos pedidos. O layout adapta as colunas para telas menores.
+
+O componente `dashboard-orders.tsx` usa `use-dashboard-orders.ts`; os cards ficam em `_components/orders/order-card.tsx`. O estado demonstrativo está em `lib/orders/demo-store.ts`, compartilhado com a visão geral para sincronizar os contadores, pedidos recentes e ações. As alterações continuam em `sessionStorage`, isoladas por tenant, e não recebem nem modificam pedidos reais do Firebase.
+
+## Entregadores
+
+O menu lateral abre `/dashboard/entregadores`, protegido pelo proxy e pela validação de tenant no servidor. A página permite cadastrar e editar nome, telefone, veículo e disponibilidade; buscar por nome ou telefone; filtrar por disponibilidade; e excluir com confirmação. Entregadores com pedidos em andamento não podem ser excluídos antes de remover a atribuição.
+
+Pedidos em preparo ou em entrega têm um seletor de entregador. A equipe e as atribuições usam o mesmo estado demonstrativo dos pedidos, em `lib/orders/demo-store.ts`. Um entregador indisponível ou ocupado em outra entrega não pode receber uma nova atribuição. A conclusão libera a disponibilidade operacional, e o nome fica no histórico do pedido. Os links dos pedidos atribuídos abrem a área Pedidos com a busca pelo número correspondente.
+
+A lógica da página fica em `_hooks/use-couriers.ts`, a interface em `_components/couriers/`, e a rota em `tenants/[tenant]/dashboard/entregadores/page.tsx`. Os dados ficam em `sessionStorage`, separados por tenant; não criam contas de login para entregadores nem gravações no Firebase. Configurações de taxa e prazo continuam em Configurações → Entrega e retirada.
+
+## Funcionários
+
+Configurações → Funcionários lista os registros reais de `tenants/{uid}/employees`, com busca por nome ou e-mail, filtro por situação, paginação de 50 registros, ativação/desativação e remoção com confirmação. O cadastro usa as funções já publicadas `employeeInvite` e `employeeResendInvite`, na mesma região e com o mesmo contrato do `anow/main`. A sessão do proprietário não é substituída ao cadastrar um funcionário.
+
+A interface fica em `_components/settings/team-section.tsx` e `_components/employees/employee-dialogs.tsx`; a lógica fica em `_hooks/use-employees.ts`; os tipos, validações e serviços ficam em `lib/employees/`. A listagem só carrega quando a aba é selecionada. As ações confirmam a identidade do proprietário e o status da loja antes de consultar o Firestore ou chamar as funções. Lojas pendentes podem consultar a lista, mas precisam concluir o cadastro antes de alterá-la.
+
+Os cargos disponíveis são atendente e gerente. Quando o serviço retorna uma senha temporária, as credenciais ficam apenas na memória do componente até o modal ser fechado, com senha inicialmente oculta e cópia manual opcional. Não são gravadas em `localStorage`, `sessionStorage` ou logs. Reenviar acesso depende da função existente. Remover exclui o vínculo no Firestore; não remove a conta global do Firebase Authentication.
+
+Esta implementação gerencia a equipe compartilhada com o Anow. O login de funcionários e as permissões por cargo neste painel continuam pendentes; as rotas do Cardap permanecem restritas ao proprietário. Nenhuma Function ou regra foi publicada para essa mudança, e os testes não enviam convites reais.
+
+## Checklist para preparar a loja
+
+A visão geral mostra um card na cor primária enquanto houver pendências no cadastro. Ao clicar, o proprietário abre um checklist com progresso e links para apresentação, contato, endereço, horários, entrega/retirada, carteira, categorias, produto disponível e finalização do cadastro. Os links de configurações usam `section` para abrir a aba correspondente.
+
+`lib/onboarding/readiness.ts` contém as validações; `lib/onboarding/service.ts` consulta exclusivamente o tenant autenticado; `_hooks/use-store-readiness.ts` controla carregamento, atualização e modal. O checklist lê o cadastro salvo, as categorias e os produtos disponíveis; também verifica categoria, preço e existência da foto no Storage. Se um produto estiver incompleto, procura outro disponível antes de considerar essa etapa pendente.
+
+Prévias em `sessionStorage` não concluem o checklist. O Wallet ID é tratado como identificador informado, sem afirmar validação de titularidade no Asaas. A ativação é uma etapa separada, concluída somente quando o status salvo é `active`. O card não altera status nem publica a loja. Quando todas as etapas e a ativação estão concluídas, o aviso deixa de aparecer.
+
+## Plano e assinatura
+
+Configurações → Plano e assinatura apresenta três planos fictícios: Essencial, Profissional e Completo, com valores mensais/anuais e benefícios de exemplo. O catálogo fica em `lib/plans/catalog.ts`; a lógica da prévia está em `_hooks/use-plan-preview.ts`; a interface fica em `_components/settings/plan-section.tsx`.
+
+A seleção é salva em `sessionStorage` por tenant. Não cria assinatura, não gera cobrança, não concede permissões e não aplica limites reais aos produtos ou funcionários. O plano Profissional mensal aparece como exemplo inicial. Valores e benefícios precisam ser substituídos pelo catálogo comercial antes de integrar uma contratação real.

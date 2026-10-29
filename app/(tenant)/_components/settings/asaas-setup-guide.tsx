@@ -1,3 +1,5 @@
+import AsaasVideoTutorial from "./asaas-video-tutorial";
+
 const steps = [
   {
     title: "Crie sua conta no Asaas",
@@ -29,6 +31,7 @@ export default function AsaasSetupGuide() {
         </p>
       </div>
       <div className="asaas-guide-actions">
+        <AsaasVideoTutorial />
         <a
           className="flow-button"
           href="https://www.asaas.com/"

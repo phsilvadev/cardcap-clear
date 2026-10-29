@@ -12,7 +12,7 @@ export default async function Page({
   return (
     <>
       <BackToMenu />
-      <div className="dashboard-heading">
+      <div className="dashboard-heading ">
         <div>
           <p className="eyebrow">Cardápio</p>
           <h1>Cadastrar produto</h1>

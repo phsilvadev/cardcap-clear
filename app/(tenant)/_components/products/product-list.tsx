@@ -15,6 +15,7 @@ import { formatProductPrice } from "@/lib/menu/product-validation";
 import { useProductImage } from "@/app/(tenant)/_hooks/use-product-image";
 import ProductDialog from "./product-dialog";
 import CategoryCreate from "./category-create";
+import ProductCardSkeleton from "./product-card-skeleton";
 
 function ProductPhoto({ product }: { product: MenuProduct }) {
   const image = useProductImage(product.imagePath);
@@ -210,7 +211,7 @@ export default function ProductList({ storeId }: { storeId: string }) {
             </select>
           </label>
         </div>
-        <p role="status" className="menu-status">
+        <p role="status" className={loading ? "sr-only" : "menu-status"}>
           {loading ? "Carregando produtos…" : notice}
         </p>
         {error && (
@@ -242,8 +243,9 @@ export default function ProductList({ storeId }: { storeId: string }) {
             Nenhum produto encontrado nos itens carregados.
           </p>
         )}
-        <div className="menu-product-list">
-          {visible.map((product) => (
+        <div className="menu-product-list" aria-busy={loading || moreLoading}>
+          {loading && <ProductCardSkeleton />}
+          {(loading ? [] : visible).map((product) => (
             <article className="menu-product-row" key={product.id}>
               <ProductPhoto product={product} />
               <div className="menu-product-copy">
@@ -290,8 +292,9 @@ export default function ProductList({ storeId }: { storeId: string }) {
               </div>
             </article>
           ))}
+          {!loading && moreLoading && <ProductCardSkeleton />}
         </div>
-        {hasMore && (
+        {!loading && hasMore && (
           <button
             className="button secondary"
             disabled={moreLoading}

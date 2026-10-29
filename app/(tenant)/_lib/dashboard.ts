@@ -1,10 +1,13 @@
 import type { Tenant } from "@/lib/tenant";
 import type { DashboardState, DashboardOrder, OrderStatus } from "@/lib/types";
+import { getDemoOrderStore } from "@/lib/orders/demo-store";
 import { query, queryAll } from "@/lib/dom";
 export default function initialize(tenant: Tenant) {
   const controller = new AbortController();
   (() => {
     const key = `cardap-demo-dashboard:${tenant.slug}`;
+    const orderStore = getDemoOrderStore(tenant.slug);
+    orderStore.hydrate();
     const initial: DashboardState = {
       open: true,
       settings: {
@@ -12,48 +15,7 @@ export default function initialize(tenant: Tenant) {
         phone: "(11) 99999-0000",
         description: "Comida de casa, feita com carinho.",
       },
-      orders: [
-        {
-          id: "1048",
-          customer: "Mariana Costa",
-          items: "2 × Prato da casa",
-          total: 5980,
-          status: "new",
-          time: "Há 3 min",
-        },
-        {
-          id: "1047",
-          customer: "Pedro Alves",
-          items: "1 × Executivo de frango · 1 × Água mineral",
-          total: 3180,
-          status: "preparing",
-          time: "Há 12 min",
-        },
-        {
-          id: "1046",
-          customer: "Ana Souza",
-          items: "2 × Opção vegetariana",
-          total: 4980,
-          status: "delivery",
-          time: "Há 24 min",
-        },
-        {
-          id: "1045",
-          customer: "Lucas Lima",
-          items: "1 × Prato da casa",
-          total: 2990,
-          status: "done",
-          time: "Há 40 min",
-        },
-        {
-          id: "1044",
-          customer: "Carla Santos",
-          items: "2 × Executivo de frango",
-          total: 5380,
-          status: "done",
-          time: "Há 55 min",
-        },
-      ],
+      orders: orderStore.getSnapshot().orders,
       products: [
         { name: "Prato da casa", price: 2990, active: true },
         { name: "Executivo de frango", price: 2690, active: true },
@@ -85,9 +47,6 @@ export default function initialize(tenant: Tenant) {
       ) {
         state.open = saved.open;
         state.settings = saved.settings;
-        state.orders.forEach(
-          (order, i) => (order.status = saved.orders[i].status),
-        );
         state.products.forEach(
           (product, i) =>
             (product.active =
@@ -106,7 +65,14 @@ export default function initialize(tenant: Tenant) {
       (query<HTMLElement>("#dashboard-feedback").textContent = message);
     const save = () => {
       try {
-        sessionStorage.setItem(key, JSON.stringify(state));
+        sessionStorage.setItem(
+          key,
+          JSON.stringify({
+            ...state,
+            orders: orderStore.getSnapshot().orders,
+            couriers: orderStore.getSnapshot().couriers,
+          }),
+        );
         return true;
       } catch {
         feedback("Não foi possível salvar as alterações nesta sessão.");
@@ -121,7 +87,7 @@ export default function initialize(tenant: Tenant) {
       ],
       orders: [
         "Pedidos",
-        "Cada pedido, de perto.",
+        "Pedidos",
         "Organize o preparo e acompanhe as entregas.",
       ],
       menu: [
@@ -141,7 +107,11 @@ export default function initialize(tenant: Tenant) {
         return;
       }
       if (!Object.hasOwn(headings, view)) view = "overview";
-      query<HTMLElement>(".demo-banner").hidden = view === "settings";
+      query<HTMLElement>(".demo-banner").hidden =
+        view === "settings" || view === "orders";
+      query<HTMLElement>(".dashboard-heading .eyebrow").hidden =
+        view === "orders";
+      query<HTMLElement>("#view-description").hidden = view === "orders";
       queryAll<HTMLElement>(".dashboard-view").forEach(
         (section) => (section.hidden = section.id !== "view-" + view),
       );
@@ -199,20 +169,7 @@ export default function initialize(tenant: Tenant) {
           actionLabels[order.status] + " #" + order.id,
         );
         button.onclick = () => {
-          const previous = order.status;
-          order.status = next[previous]!;
-          if (!save()) {
-            order.status = previous;
-            return;
-          }
-          render();
-          feedback(
-            "Pedido demonstrativo #" +
-              order.id +
-              ": " +
-              labels[order.status] +
-              ".",
-          );
+          orderStore.advance(order.id);
         };
         side.append(button);
       }
@@ -220,20 +177,6 @@ export default function initialize(tenant: Tenant) {
       return article;
     };
     const renderOrders = () => {
-      const searchTerm = query<HTMLInputElement>("#order-query")
-        .value.trim()
-        .toLocaleLowerCase("pt-BR");
-      const filter = query<HTMLSelectElement>("#order-filter").value;
-      const matches = state.orders.filter(
-        (order) =>
-          (filter === "all" || order.status === filter) &&
-          ("#" + order.id + " " + order.customer)
-            .toLocaleLowerCase("pt-BR")
-            .includes(searchTerm),
-      );
-      const list = query<HTMLElement>("#orders-list");
-      list.replaceChildren(...matches.map(orderCard));
-      query<HTMLElement>("#no-orders").hidden = matches.length > 0;
       query<HTMLElement>("#recent-orders").replaceChildren(
         ...state.orders.slice(0, 3).map(orderCard),
       );
@@ -282,8 +225,7 @@ export default function initialize(tenant: Tenant) {
         );
         button.append(copy, count);
         button.onclick = () => {
-          query<HTMLSelectElement>("#order-filter").value = status;
-          query<HTMLInputElement>("#order-query").value = "";
+          orderStore.setFilter(status as OrderStatus);
           renderOrders();
           navigate("orders");
         };
@@ -300,14 +242,6 @@ export default function initialize(tenant: Tenant) {
     );
     queryAll<HTMLButtonElement>("[data-go]").forEach(
       (button) => (button.onclick = () => navigate(button.dataset.go)),
-    );
-    query<HTMLInputElement>("#order-query").addEventListener(
-      "input",
-      renderOrders,
-    );
-    query<HTMLSelectElement>("#order-filter").addEventListener(
-      "change",
-      renderOrders,
     );
     query<HTMLButtonElement>("#store-toggle").onclick = () => {
       state.open = !state.open;
@@ -353,6 +287,15 @@ export default function initialize(tenant: Tenant) {
         feedback("Dados da loja salvos nesta sessão de demonstração.");
       },
     );
+    const unsubscribeOrders = orderStore.subscribe(() => {
+      state.orders = orderStore.getSnapshot().orders;
+      render();
+      if (query<HTMLElement>("#view-orders").hidden)
+        feedback(orderStore.getSnapshot().message);
+    });
+    controller.signal.addEventListener("abort", unsubscribeOrders, {
+      once: true,
+    });
     render();
     navigate(
       new URLSearchParams(window.location.search).get("view") ?? "overview",
