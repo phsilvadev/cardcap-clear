@@ -17,7 +17,11 @@ import type {
 } from "@/lib/employees/types";
 
 const empty: EmployeeInput = { name: "", email: "", role: "attendant" };
-export function useEmployees(storeId: string | undefined, enabled: boolean) {
+export function useEmployees(
+  storeId: string | undefined,
+  enabled: boolean,
+  role?: EmployeeInput["role"],
+) {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -62,7 +66,10 @@ export function useEmployees(storeId: string | undefined, enabled: boolean) {
       );
       return;
     }
-    Promise.all([getEmployeeOwner(storeId), listEmployees(storeId)])
+    Promise.all([
+      getEmployeeOwner(storeId),
+      listEmployees(storeId, undefined, role),
+    ])
       .then(([owner, page]) => {
         if (cancelled) return;
         setCanManage(owner.canManage);
@@ -79,7 +86,7 @@ export function useEmployees(storeId: string | undefined, enabled: boolean) {
     return () => {
       cancelled = true;
     };
-  }, [storeId, enabled, attempt]);
+  }, [storeId, enabled, attempt, role]);
   const run = async (id: string, action: () => Promise<void>) => {
     if (locked.current || !storeId) return;
     locked.current = true;
@@ -170,7 +177,7 @@ export function useEmployees(storeId: string | undefined, enabled: boolean) {
   const loadMore = () => {
     if (!storeId) return;
     return run("more", async () => {
-      const page = await listEmployees(storeId, cursor.current);
+      const page = await listEmployees(storeId, cursor.current, role);
       if (mounted.current) {
         setEmployees((items) => [
           ...items,

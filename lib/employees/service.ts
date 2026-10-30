@@ -52,12 +52,15 @@ async function requireManagement(storeId: string) {
 export async function listEmployees(
   storeId: string,
   cursor?: QueryDocumentSnapshot,
+  role?: EmployeeInput["role"],
 ) {
   await getEmployeeOwner(storeId);
   const snapshot = await getDocs(
     query(
       collection(getFirebaseDb(), "tenants", storeId, "employees"),
-      orderBy("createdAt", "desc"),
+      ...(role
+        ? [where("role", "==", role), orderBy(documentId())]
+        : [orderBy("createdAt", "desc")]),
       ...(cursor ? [startAfter(cursor)] : []),
       limit(50),
     ),
