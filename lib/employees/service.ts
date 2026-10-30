@@ -86,6 +86,10 @@ export async function listEmployees(
       id: item.id,
       active: data.active,
       invited: data.invited === true,
+      salonPermissions: {
+        receivePayments: data.salonPermissions?.receivePayments === true,
+        discounts: data.salonPermissions?.discounts === true,
+      },
     };
   });
   return {
@@ -300,6 +304,11 @@ export function watchCourierEmployees(
               vehicle: data.vehicle,
               active: data.active,
               invited: data.invited === true,
+              salonPermissions: {
+                receivePayments:
+                  data.salonPermissions?.receivePayments === true,
+                discounts: data.salonPermissions?.discounts === true,
+              },
             } as Employee;
             if (
               data.storeId !== storeId ||

@@ -241,7 +241,7 @@ export default function HomeContent({
 
             <p className={"mt-1 text-xs text-muted"}>
               {
-                "Prévia visual: explore uma listagem demonstrativa de restaurantes na região escolhida."
+                "Encontre restaurantes disponíveis na região escolhida e conheça seus cardápios."
               }
             </p>
           </section>

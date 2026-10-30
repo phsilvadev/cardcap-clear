@@ -45,6 +45,9 @@ export interface DeliveryCourier {
   available: boolean;
 }
 export interface DashboardOrder {
+  source?: "salon";
+  tableName?: string;
+  notes?: string;
   id: string;
   customer: string;
   items: string;

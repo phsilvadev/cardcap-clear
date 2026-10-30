@@ -1,5 +1,6 @@
 "use client";
 
+import { initializeWebAppCheck } from "./app-check";
 import {
   getApp,
   getApps,
@@ -44,9 +45,11 @@ export function getFirebaseApp(): FirebaseApp {
     );
   }
 
-  return getApps().some((app) => app.name === "[DEFAULT]")
+  const app = getApps().some((app) => app.name === "[DEFAULT]")
     ? getApp()
     : initializeApp(firebaseOptions);
+  initializeWebAppCheck(app);
+  return app;
 }
 
 export const getFirebaseAuth = () => getAuth(getFirebaseApp());

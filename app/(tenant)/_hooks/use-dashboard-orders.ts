@@ -33,6 +33,11 @@ export function useDashboardOrders(tenantSlug: string, storeId?: string) {
   );
   const stages = orderStages.map((stage) => ({
     ...stage,
+    label:
+      stage.id === "delivery" &&
+      cloud.orders.some((order) => order.source === "salon")
+        ? "Prontos / em entrega"
+        : stage.label,
     count: cloud.orders.filter((order) => order.status === stage.id).length,
     orders: matching.filter((order) => order.status === stage.id),
   }));

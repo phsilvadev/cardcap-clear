@@ -1,12 +1,19 @@
 "use client";
+import { useStoreSettings } from "../settings/store-settings-provider";
 import { useStoreOperations } from "./operations-provider";
 import { usePathname } from "next/navigation";
 import TenantSessionControls from "@/app/(tenant)/_components/tenant-session-controls";
 import type { Tenant } from "@/lib/tenant";
 export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
   const pathname = usePathname();
+  const { data: profile } = useStoreSettings();
+  const storeName =
+    typeof profile?.name === "string" ? profile.name : tenant.name;
   const { operations } = useStoreOperations();
+  const isSalon = pathname.includes("/salao");
   const isWaiters = pathname.includes("/garcons");
+  const isHelp = pathname.endsWith("/dashboard/ajuda");
+  const isApps = pathname.includes("/aplicativos");
   const isOrders = pathname.includes("/pedidos");
   const isMenu = pathname.includes("/cardapio");
   const isCouriers = pathname.includes("/entregadores");
@@ -44,7 +51,7 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
           <path d={"M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"}></path>
         </svg>
         <div>
-          <strong className={"store-name"}>{tenant.name}</strong>
+          <strong className={"store-name"}>{storeName}</strong>
           <p>{"Área do restaurante"}</p>
         </div>
       </div>
@@ -53,7 +60,13 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
           href="/dashboard?view=overview"
           data-view="overview"
           aria-current={
-            !isMenu && !isCouriers && !isWaiters && !isOrders
+            !isMenu &&
+            !isCouriers &&
+            !isWaiters &&
+            !isSalon &&
+            !isOrders &&
+            !isApps &&
+            !isHelp
               ? "page"
               : undefined
           }
@@ -135,6 +148,27 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
         </a>
         {operations.salon && (
           <a
+            href="/dashboard/salao"
+            aria-current={isSalon ? "page" : undefined}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 10h18M5 10v10M19 10v10M7 4h10v6M9 15h6" />
+            </svg>
+            Salão
+          </a>
+        )}
+        {operations.salon && (
+          <a
             href="/dashboard/garcons"
             aria-current={isWaiters ? "page" : undefined}
           >
@@ -207,7 +241,55 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
         </a>
       </nav>
       <div className="sidebar-footer">
-        <a className={"public-store"} id={"public-store"} href={"/loja"}>
+        <a
+          className="public-store sidebar-help-link"
+          href="/dashboard/ajuda"
+          aria-current={isHelp ? "page" : undefined}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" />
+          </svg>
+          Ajuda e suporte
+        </a>
+        <a
+          className="public-store sidebar-apps-link"
+          href="/dashboard/aplicativos"
+          aria-current={isApps ? "page" : undefined}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" />
+            <path d="M14 17.5h7M17.5 14v7" />
+          </svg>
+          Aplicativos Cardap
+        </a>
+        <a
+          className={"public-store"}
+          id={"public-store"}
+          href={`/loja?store=${encodeURIComponent(tenant.slug)}&preview=1`}
+        >
           <svg
             xmlns={"http://www.w3.org/2000/svg"}
             width={"20"}

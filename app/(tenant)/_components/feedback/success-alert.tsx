@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useId } from "react";
 
 export default function SuccessAlert({
   open,
@@ -13,6 +13,7 @@ export default function SuccessAlert({
   description: string;
   onClose: () => void;
 }) {
+  const id = useId();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const dialog = ref.current;
@@ -31,8 +32,8 @@ export default function SuccessAlert({
       ref={ref}
       className="success-alert"
       role="alertdialog"
-      aria-labelledby="operation-success-title"
-      aria-describedby="operation-success-description"
+      aria-labelledby={`${id}-title`}
+      aria-describedby={`${id}-description`}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -56,8 +57,8 @@ export default function SuccessAlert({
           <path d="m8 12 3 3 5-6" />
         </svg>
       </div>
-      <h2 id="operation-success-title">{title}</h2>
-      <p id="operation-success-description">{description}</p>
+      <h2 id={`${id}-title`}>{title}</h2>
+      <p id={`${id}-description`}>{description}</p>
       <button
         type="button"
         className="button primary"

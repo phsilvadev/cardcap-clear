@@ -69,7 +69,8 @@ export default function OperationsProvider({
   }, [storeId]);
   const disabled =
     ready &&
-    ((pathname.includes("/garcons") && !operations.salon) ||
+    (((pathname.includes("/garcons") || pathname.includes("/salao")) &&
+      !operations.salon) ||
       (pathname.includes("/entregadores") && !operations.ownDelivery));
   useEffect(() => {
     if (disabled) router.replace("/dashboard?view=settings&section=operations");

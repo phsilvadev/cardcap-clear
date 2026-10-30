@@ -24,24 +24,100 @@ export function TeamHeading({
     </header>
   );
 }
+type TeamMetric = {
+  label: string;
+  value: number;
+  description: string;
+  icon: "team" | "check" | "key" | "truck" | "route";
+  tone: "brand" | "green" | "amber" | "blue";
+  selected: boolean;
+  onClick: () => void;
+};
+function MetricIcon({ icon }: { icon: TeamMetric["icon"] }) {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {icon === "team" ? (
+        <>
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M22 21v-2a4 4 0 0 0-3-3.87" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </>
+      ) : icon === "check" ? (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="m8 12 3 3 5-6" />
+        </>
+      ) : icon === "key" ? (
+        <>
+          <circle cx="8" cy="15" r="5" />
+          <path d="m11.5 11.5 8-8L22 6l-2 2-2-2-3 3" />
+        </>
+      ) : icon === "truck" ? (
+        <>
+          <path d="M1 3h14v13H1zM15 8h4l3 4v4h-7" />
+          <circle cx="5" cy="18" r="2" />
+          <circle cx="18" cy="18" r="2" />
+        </>
+      ) : (
+        <>
+          <circle cx="6" cy="5" r="2" />
+          <circle cx="18" cy="19" r="2" />
+          <path d="M8 5h9a4 4 0 0 1 0 8H7a3 3 0 0 0 0 6h9" />
+        </>
+      )}
+    </svg>
+  );
+}
 export function TeamSummary({
   items,
   loading,
 }: {
-  items: { label: string; value: number }[];
+  items: TeamMetric[];
   loading: boolean;
 }) {
   return (
     <div
       className="team-summary"
-      aria-label="Resumo da equipe"
+      role="group"
+      aria-label="Indicadores e filtros da equipe"
       aria-busy={loading}
     >
       {items.map((item) => (
-        <div key={item.label}>
-          <strong>{loading ? "—" : item.value}</strong>
-          <span>{item.label}</span>
-        </div>
+        <button
+          className="team-metric"
+          data-tone={item.tone}
+          type="button"
+          key={item.label}
+          disabled={loading}
+          title={item.description}
+          aria-pressed={item.selected}
+          onClick={item.onClick}
+        >
+          <span className="team-metric-top">
+            <span className="team-metric-label">{item.label}</span>
+            <span className="team-metric-icon">
+              <MetricIcon icon={item.icon} />
+            </span>
+          </span>
+          {loading ? (
+            <span
+              className="team-metric-loading"
+              aria-label="Carregando indicador"
+            />
+          ) : (
+            <strong className="team-metric-value">{item.value}</strong>
+          )}
+        </button>
       ))}
     </div>
   );

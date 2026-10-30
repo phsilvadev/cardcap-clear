@@ -17,12 +17,41 @@ export default function WaitersPage({ storeId }: { storeId: string }) {
         eyebrow="Equipe do salão"
         description="Acompanhe os funcionários e os acessos ao app do garçom."
       />
+      <a href="/dashboard/salao" className="button">
+        Abrir salão e contas
+      </a>
       <TeamSummary
         loading={team.loading}
         items={[
-          { label: "Garçons carregados", value: team.total },
-          { label: "Ativos", value: team.active },
-          { label: "Acesso pendente", value: team.pending },
+          {
+            label: "Garçons",
+            value: team.total,
+            description: team.hasMore
+              ? "Na equipe carregada até agora"
+              : "Cadastrados na equipe do salão",
+            icon: "team",
+            tone: "brand",
+            selected: team.filter === "all",
+            onClick: () => team.setFilter("all"),
+          },
+          {
+            label: "Ativos",
+            value: team.active,
+            description: "Cadastro ativo no restaurante",
+            icon: "check",
+            tone: "green",
+            selected: team.filter === "active",
+            onClick: () => team.setFilter("active"),
+          },
+          {
+            label: "Acesso pendente",
+            value: team.pending,
+            description: "Aguardando liberação do aplicativo",
+            icon: "key",
+            tone: "amber",
+            selected: team.filter === "pending",
+            onClick: () => team.setFilter("pending"),
+          },
         ]}
       />
       <section className="team-directory" aria-label="Equipe do salão">

@@ -2,6 +2,7 @@ import type { StoreOperations } from "@/lib/operations";
 import { cookies } from "next/headers";
 
 export const SESSION_COOKIE = "cardap_session";
+export const APP_CHECK_SESSION_COOKIE = "cardap_app_check";
 export type TenantSession = {
   uid: string;
   slug: string;
@@ -13,6 +14,7 @@ export type TenantSession = {
 // Every check goes to Firebase. No trust is placed in client-provided claims.
 export async function verifyTenantSession(
   token: string,
+  appCheckToken?: string,
 ): Promise<TenantSession | null> {
   if (!token || token.length > 4096) return null;
   const key = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
@@ -23,7 +25,10 @@ export async function verifyTenantSession(
       `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(key)}`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(appCheckToken ? { "X-Firebase-AppCheck": appCheckToken } : {}),
+        },
         body: JSON.stringify({ idToken: token }),
         cache: "no-store",
         signal: AbortSignal.timeout(10000),
@@ -48,7 +53,10 @@ export async function verifyTenantSession(
     const base = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(project)}/databases/(default)/documents`;
     const read = async (path: string) => {
       const response = await fetch(`${base}/${path}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...(appCheckToken ? { "X-Firebase-AppCheck": appCheckToken } : {}),
+        },
         cache: "no-store",
         signal: AbortSignal.timeout(10000),
       });
@@ -85,7 +93,9 @@ export async function verifyTenantSession(
 }
 
 export async function getTenantSession() {
+  const jar = await cookies();
   return verifyTenantSession(
-    (await cookies()).get(SESSION_COOKIE)?.value ?? "",
+    jar.get(SESSION_COOKIE)?.value ?? "",
+    jar.get(APP_CHECK_SESSION_COOKIE)?.value,
   );
 }

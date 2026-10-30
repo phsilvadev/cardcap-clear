@@ -1,5 +1,7 @@
 "use client";
 
+import BotProtectionNotice from "./bot-protection-notice";
+
 import { useRestaurantSignup } from "@/app/(tenant)/_hooks/use-restaurant-signup";
 
 const RestaurantSignup = () => {
@@ -94,6 +96,7 @@ const RestaurantSignup = () => {
       <p className="restaurant-login-note restaurant-signup-full">
         Crie sua conta para iniciar a configuração do restaurante.
       </p>
+      <BotProtectionNotice className="restaurant-signup-full" />
       <button
         className="restaurant-login-submit restaurant-signup-full"
         type="submit"

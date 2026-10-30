@@ -45,7 +45,6 @@ export default function initialize(tenant: Tenant) {
         Array.isArray(saved.products) &&
         saved.products.length === initial.products.length
       ) {
-        state.open = saved.open;
         state.settings = saved.settings;
         state.products.forEach(
           (product, i) =>
@@ -63,22 +62,6 @@ export default function initialize(tenant: Tenant) {
       }).format(cents / 100);
     const feedback = (message: string) =>
       (query<HTMLElement>("#dashboard-feedback").textContent = message);
-    const save = () => {
-      try {
-        sessionStorage.setItem(
-          key,
-          JSON.stringify({
-            ...state,
-            orders: orderStore.getSnapshot().orders,
-            couriers: orderStore.getSnapshot().couriers,
-          }),
-        );
-        return true;
-      } catch {
-        feedback("Não foi possível salvar as alterações nesta sessão.");
-        return false;
-      }
-    };
     const headings: Record<string, [string, string, string]> = {
       overview: [
         "Visão geral",
@@ -98,7 +81,7 @@ export default function initialize(tenant: Tenant) {
       settings: [
         "Configurações",
         "Do seu jeito.",
-        "Atualize os dados do restaurante nesta demonstração.",
+        "Atualize os dados e as preferências do seu restaurante.",
       ],
     };
     const navigate = (view: string = "overview") => {
@@ -185,16 +168,6 @@ export default function initialize(tenant: Tenant) {
       );
     };
     const render = () => {
-      queryAll<HTMLElement>(".store-name").forEach(
-        (node) => (node.textContent = state.settings.name),
-      );
-      query<HTMLElement>("#store-status").textContent = state.open
-        ? "Recebendo pedidos"
-        : "Recebimento pausado";
-      query<HTMLButtonElement>("#store-toggle").setAttribute(
-        "aria-checked",
-        String(state.open),
-      );
       const validOrders = state.orders.filter(
         (order) => order.status !== "cancelled",
       );
@@ -250,50 +223,6 @@ export default function initialize(tenant: Tenant) {
     );
     queryAll<HTMLButtonElement>("[data-go]").forEach(
       (button) => (button.onclick = () => navigate(button.dataset.go)),
-    );
-    query<HTMLButtonElement>("#store-toggle").onclick = () => {
-      state.open = !state.open;
-      if (!save()) {
-        state.open = !state.open;
-        return;
-      }
-      render();
-      feedback(
-        state.open
-          ? "Recebimento de pedidos ativado na demonstração."
-          : "Recebimento pausado na demonstração.",
-      );
-    };
-    query<HTMLInputElement>("#setting-name").value = state.settings.name;
-    query<HTMLInputElement>("#setting-phone").value = state.settings.phone;
-    query<HTMLTextAreaElement>("#setting-description").value =
-      state.settings.description;
-    query<HTMLFormElement>("#settings-form").addEventListener(
-      "submit",
-      (event) => {
-        event.preventDefault();
-        const name = query<HTMLInputElement>("#setting-name").value.trim();
-        const phone = query<HTMLInputElement>("#setting-phone").value.trim();
-        const description = query<HTMLTextAreaElement>(
-          "#setting-description",
-        ).value.trim();
-        if (
-          name.length < 2 ||
-          !/^\d{10,11}$/.test(phone.replace(/\D/g, "")) ||
-          !description
-        ) {
-          feedback("Confira o nome, o telefone com DDD e a descrição.");
-          return;
-        }
-        const previous = state.settings;
-        state.settings = { name, phone, description };
-        if (!save()) {
-          state.settings = previous;
-          return;
-        }
-        render();
-        feedback("Dados da loja salvos nesta sessão de demonstração.");
-      },
     );
     const unsubscribeOrders = orderStore.subscribe(() => {
       state.orders = orderStore.getSnapshot().orders;

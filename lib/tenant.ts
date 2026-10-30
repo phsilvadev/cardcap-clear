@@ -5,7 +5,15 @@ export interface Tenant {
 
 export function resolveTenant(host: string): Tenant | null {
   const hostname = host.toLowerCase().replace(/:\d+$/, "").replace(/\.$/, "");
+  const base = process.env.AUTH_TENANT_DOMAIN?.toLowerCase();
+  const productionSlug =
+    base && hostname.endsWith(`.${base}`)
+      ? hostname.slice(0, -(base.length + 1))
+      : null;
   const match =
+    (productionSlug && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(productionSlug)
+      ? [hostname, productionSlug]
+      : null) ??
     /^([a-z0-9]+(?:-[a-z0-9]+)*)\.localhost$/.exec(hostname) ??
     /^cardap\.([a-z0-9]+(?:-[a-z0-9]+)*)$/.exec(hostname);
   if (!match || match[1].length > 63) return null;

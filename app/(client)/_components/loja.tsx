@@ -1,278 +1,254 @@
-import PageBehavior from "@/app/(client)/_components/loja-behavior";
-
-export default function LojaContent() {
+"use client";
+import { useEffect, useState } from "react";
+import { usePublicStore } from "../_hooks/use-public-store";
+import {
+  categoryLabels,
+  formatMoney,
+  normalizeSearch,
+} from "@/lib/storefront/types";
+import {
+  CatalogHeader,
+  CatalogLogo,
+  CatalogStatus,
+  CatalogSkeleton,
+  CatalogMessage,
+  CatalogFooter,
+} from "./catalog-shared";
+export default function LojaContent({
+  slug,
+  preview,
+  city,
+  state,
+}: {
+  slug: string;
+  preview: boolean;
+  city: string;
+  state: string;
+}) {
+  const catalog = usePublicStore(slug, preview);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
+  const store = catalog.data?.store;
+  const region = new URLSearchParams();
+  if (city && state) {
+    region.set("city", city);
+    region.set("state", state);
+  } else if (store) {
+    region.set("city", store.city);
+    region.set("state", store.state);
+  }
+  const backHref =
+    "/restaurantes" + (region.size ? "?" + region.toString() : "");
+  useEffect(() => {
+    if (store?.name) document.title = `${store.name} — Cardap`;
+  }, [store?.name]);
+  const products =
+    catalog.data?.products.filter(
+      (product) =>
+        (!category || product.categoryId === category) &&
+        normalizeSearch(`${product.name} ${product.description}`).includes(
+          normalizeSearch(search),
+        ),
+    ) ?? [];
   return (
-    <>
-      {"\n"}
-      <a className={"sr-only focus:not-sr-only"} href={"#conteudo"}>
-        {"Ir para o conteúdo"}
-      </a>
-      <div className={"shell"}>
-        {"\n"}
-        <header className={"listing-header"}>
-          <a
-            href={"/"}
-            className={"wordmark text-3xl"}
-            aria-label={"Cardap — início"}
-          >
-            {"cardap"}
-            <span className={"text-brand"}>{"."}</span>
-          </a>
-          <nav
-            aria-label={"Navegação do cliente"}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "16px",
-              flexWrap: "wrap",
-              fontSize: "14px",
-            }}
-          >
-            <a href={"/cliente"}>{"Minha conta"}</a>
-            <a id={"back"} href={"/restaurantes"} className={"link-icon back"}>
-              <svg
-                xmlns={"http://www.w3.org/2000/svg"}
-                width={"20"}
-                height={"20"}
-                viewBox={"0 0 24 24"}
-                fill={"none"}
-                stroke={"currentColor"}
-                strokeWidth={"2"}
-                strokeLinecap={"round"}
-                strokeLinejoin={"round"}
-                className={"lucide lucide-arrow-left"}
-                aria-hidden={"true"}
-                focusable={"false"}
-              >
-                <path d={"m12 19-7-7 7-7"}></path>
-                <path d={"M19 12H5"}></path>
-              </svg>
-              {" Restaurantes"}
-            </a>
-          </nav>
-        </header>
-        {"\n"}
-        <main id={"conteudo"}>
-          <section className={"store-hero"} aria-labelledby={"store-name"}>
-            <div className={"store-cover"} aria-hidden={"true"}>
-              <span className={"hashtag"}>{"#PARTIUCOMER"}</span>
-              <svg
-                xmlns={"http://www.w3.org/2000/svg"}
-                width={"64"}
-                height={"64"}
-                viewBox={"0 0 24 24"}
-                fill={"none"}
-                stroke={"currentColor"}
-                strokeWidth={"2"}
-                strokeLinecap={"round"}
-                strokeLinejoin={"round"}
-                className={"lucide lucide-utensils"}
-                aria-hidden={"true"}
-                focusable={"false"}
-              >
-                <path d={"M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"}></path>
-                <path d={"M7 2v20"}></path>
-                <path
-                  d={"M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"}
-                ></path>
-              </svg>
-            </div>
-            <div className={"store-summary"}>
-              <p id={"store-category"} className={"eyebrow"}>
-                {"Restaurante"}
-              </p>
-              <h1 id={"store-name"}>{"Conheça a loja"}</h1>
-              <p id={"store-description"}>
-                {"Descubra os sabores desta loja e explore o cardápio."}
-              </p>
-              <div className={"store-meta"}>
-                <span>
-                  <svg
-                    xmlns={"http://www.w3.org/2000/svg"}
-                    width={"20"}
-                    height={"20"}
-                    viewBox={"0 0 24 24"}
-                    fill={"none"}
-                    stroke={"currentColor"}
-                    strokeWidth={"2"}
-                    strokeLinecap={"round"}
-                    strokeLinejoin={"round"}
-                    className={"lucide lucide-map-pin"}
-                    aria-hidden={"true"}
-                    focusable={"false"}
-                  >
-                    <path
-                      d={
-                        "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
-                      }
-                    ></path>
-                    <circle cx={"12"} cy={"10"} r={"3"}></circle>
-                  </svg>
-                  <span id={"store-region"}>{"Região não informada"}</span>
-                </span>
-                <span className={"demo-label"}>{"Loja demonstrativa"}</span>
-                <button type={"button"} id={"info-button"}>
-                  <svg
-                    xmlns={"http://www.w3.org/2000/svg"}
-                    width={"16"}
-                    height={"16"}
-                    viewBox={"0 0 24 24"}
-                    fill={"none"}
-                    stroke={"currentColor"}
-                    strokeWidth={"2"}
-                    strokeLinecap={"round"}
-                    strokeLinejoin={"round"}
-                    className={"lucide lucide-info"}
-                    aria-hidden={"true"}
-                    focusable={"false"}
-                  >
-                    <circle cx={"12"} cy={"12"} r={"10"}></circle>
-                    <path d={"M12 16v-4"}></path>
-                    <path d={"M12 8h.01"}></path>
-                  </svg>
-                  {" Informações da loja"}
-                </button>
-              </div>
-            </div>
-          </section>
-          {"\n"}
-          <div className={"menu-layout"}>
-            <section aria-labelledby={"menu-title"}>
-              <p className={"eyebrow"}>{"Escolha seu próximo sabor"}</p>
-              <h2 className={"menu-heading"} id={"menu-title"}>
-                {"Cardápio da loja"}
-              </h2>
-              <label htmlFor={"menu-search"} className={"search-field"}>
-                <svg
-                  xmlns={"http://www.w3.org/2000/svg"}
-                  width={"20"}
-                  height={"20"}
-                  viewBox={"0 0 24 24"}
-                  fill={"none"}
-                  stroke={"currentColor"}
-                  strokeWidth={"2"}
-                  strokeLinecap={"round"}
-                  strokeLinejoin={"round"}
-                  className={"lucide lucide-search"}
-                  aria-hidden={"true"}
-                  focusable={"false"}
-                >
-                  <path d={"m21 21-4.34-4.34"}></path>
-                  <circle cx={"11"} cy={"11"} r={"8"}></circle>
-                </svg>
-                <span className={"sr-only"}>{"Buscar no cardápio"}</span>
-                <input
-                  type={"search"}
-                  id={"menu-search"}
-                  maxLength={100}
-                  placeholder={"O que você quer comer?"}
-                />
-              </label>
-              <div
-                className={"categories"}
-                role={"group"}
-                aria-label={"Categorias do cardápio"}
-              >
-                <button
-                  className={"category"}
-                  type={"button"}
-                  data-menu={"Todos"}
-                  aria-pressed={"true"}
-                >
-                  {"Todos"}
-                </button>
-                <button
-                  className={"category"}
-                  id={"main-category"}
-                  type={"button"}
-                  data-menu={"Especialidades"}
-                  aria-pressed={"false"}
-                >
-                  {"Especialidades"}
-                </button>
-                <button
-                  className={"category"}
-                  type={"button"}
-                  data-menu={"Bebidas"}
-                  aria-pressed={"false"}
-                >
-                  {"Bebidas"}
-                </button>
-              </div>
-              <p
-                id={"menu-count"}
-                role={"status"}
-                aria-live={"polite"}
-                className={"text-sm text-muted mt-4"}
-              ></p>
-              <div id={"menu-products"}></div>
-              <p id={"menu-empty"} hidden={true}>
-                {"Nenhum item encontrado. Experimente outro nome ou categoria."}
-              </p>
-            </section>
-            {"\n"}
-            <aside className={"about-store"}>
-              <h2>{"Um sabor por perto."}</h2>
-              <p>
-                {
-                  "Uma nova descoberta começa pelo cardápio. Explore as opções desta prévia e encontre sua próxima refeição."
-                }
-              </p>
-              <p>
-                {
-                  "Produtos e preços são ilustrativos. Pedidos, horários e entrega ainda não estão disponíveis."
-                }
-              </p>
-              <span className={"hashtag"}>{"Bom apetite!"}</span>
-            </aside>
+    <div className="shell public-catalog">
+      <CatalogHeader backHref={backHref} backLabel="Restaurantes" />
+      <main id="conteudo">
+        {catalog.loading ? (
+          <div className="catalog-store-loading">
+            <CatalogSkeleton products />
           </div>
-        </main>
-        {"\n"}
-        <footer className={"listing-footer"}>
-          <a href={"/"} className={"wordmark text-2xl text-ink"}>
-            {"cardap"}
-            <span className={"text-brand"}>{"."}</span>
-          </a>
-          <p>{"Cardap · Sua próxima refeição começa aqui."}</p>
-          <a id={"footer-back"} href={"/restaurantes"} className={"link-icon"}>
-            <svg
-              xmlns={"http://www.w3.org/2000/svg"}
-              width={"16"}
-              height={"16"}
-              viewBox={"0 0 24 24"}
-              fill={"none"}
-              stroke={"currentColor"}
-              strokeWidth={"2"}
-              strokeLinecap={"round"}
-              strokeLinejoin={"round"}
-              className={"lucide lucide-arrow-left"}
-              aria-hidden={"true"}
-              focusable={"false"}
-            >
-              <path d={"m12 19-7-7 7-7"}></path>
-              <path d={"M19 12H5"}></path>
-            </svg>
-            {" Voltar aos restaurantes"}
-          </a>
-        </footer>
-      </div>
-      {"\n"}
-      <dialog id={"store-info"} aria-labelledby={"info-title"}>
-        <div className={"dialog-top"}>
-          <h2 id={"info-title"}>{"Informações da loja"}</h2>
-          <form method={"dialog"}>
-            <button type={"submit"}>{"Fechar"}</button>
-          </form>
-        </div>
-        <p id={"info-description"}></p>
-        <p>
-          {
-            "Esta é uma loja fictícia. Endereço, horários de funcionamento, prazo e taxa de entrega não estão disponíveis nesta prévia."
-          }
-        </p>
-      </dialog>
-      {"\n"}
-      <PageBehavior />
-    </>
+        ) : !store ? (
+          <CatalogMessage
+            headingLevel={1}
+            title={slug ? "Loja indisponível" : "Escolha um restaurante"}
+            action={slug ? catalog.reload : undefined}
+          >
+            {catalog.error || (
+              <a href={backHref}>
+                Veja os restaurantes disponíveis na sua região.
+              </a>
+            )}
+          </CatalogMessage>
+        ) : (
+          <>
+            {catalog.data?.preview && (
+              <p className="catalog-preview" role="status">
+                Prévia da sua loja. Ela ficará visível aos clientes após a
+                liberação da plataforma.
+              </p>
+            )}
+            <section className="store-hero" aria-labelledby="store-name">
+              <div className="store-cover">
+                <span className="hashtag">#PARTIUCOMER</span>
+                <CatalogLogo url={store.logoUrl} name={store.name} />
+              </div>
+              <div className="store-summary">
+                <p className="eyebrow">
+                  {categoryLabels[store.category] ||
+                    store.category ||
+                    "Restaurante"}
+                </p>
+                <h1 id="store-name">{store.name}</h1>
+                <p>{store.description}</p>
+                <div className="store-meta">
+                  <CatalogStatus
+                    receiving={store.receivingOrders}
+                    unknown={!!catalog.error}
+                  />
+                  <span>
+                    {store.city}, {store.state}
+                  </span>
+                  {store.acceptsDelivery && (
+                    <span>
+                      {store.deliveryTime || "Entrega disponível"}
+                      {store.deliveryFeeCents !== null
+                        ? ` · ${store.deliveryFeeCents === 0 ? "Entrega grátis" : formatMoney(store.deliveryFeeCents)}`
+                        : ""}
+                    </span>
+                  )}
+                  {store.acceptsPickup && <span>Retirada na loja</span>}
+                </div>
+              </div>
+            </section>
+            {catalog.error && (
+              <CatalogMessage
+                title="Não foi possível atualizar a loja"
+                action={catalog.reload}
+              >
+                {catalog.error}
+              </CatalogMessage>
+            )}
+            {!store.receivingOrders && !catalog.data?.preview && (
+              <p className="catalog-paused">
+                O recebimento de pedidos está pausado. Você pode continuar
+                consultando o cardápio.
+              </p>
+            )}
+            <div className="catalog-menu-layout">
+              <section aria-labelledby="menu-title">
+                <div className="results-heading">
+                  <h2 id="menu-title">Cardápio</h2>
+                </div>
+                <label className="search-field">
+                  <span className="sr-only">Buscar produto</span>
+                  <input
+                    type="search"
+                    placeholder="O que você quer comer?"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                  />
+                </label>
+                {!!catalog.data?.categories.length && (
+                  <div className="categories">
+                    <button
+                      className="category"
+                      aria-pressed={!category}
+                      onClick={() => setCategory("")}
+                    >
+                      Todos
+                    </button>
+                    {catalog.data.categories.map((item) => (
+                      <button
+                        className="category"
+                        key={item.id}
+                        aria-pressed={category === item.id}
+                        onClick={() => setCategory(item.id)}
+                      >
+                        {item.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="catalog-products">
+                  {products.map((product) => (
+                    <article className="catalog-product" key={product.id}>
+                      {product.imageUrl && (
+                        <img
+                          className="catalog-product-image"
+                          src={product.imageUrl}
+                          alt={product.name}
+                          loading="lazy"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
+                      )}
+                      <div className="catalog-product-copy">
+                        <h3>{product.name}</h3>
+                        <p>{product.description}</p>
+                        <strong>{formatMoney(product.priceCents)}</strong>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                {!products.length && (
+                  <CatalogMessage title="Nenhum produto encontrado">
+                    {search || category
+                      ? "Tente outra busca ou categoria."
+                      : "Os produtos disponíveis aparecerão aqui quando forem cadastrados."}
+                  </CatalogMessage>
+                )}
+                {catalog.data?.nextProductCursor && (
+                  <div className="catalog-load-more">
+                    <button
+                      className="catalog-button"
+                      type="button"
+                      onClick={catalog.loadMore}
+                      disabled={catalog.loadingMore}
+                    >
+                      {catalog.loadingMore
+                        ? "Carregando…"
+                        : "Ver mais produtos"}
+                    </button>
+                  </div>
+                )}
+              </section>
+              <aside className="about-store catalog-about">
+                <h2>Sobre a loja</h2>
+                <dl>
+                  <div>
+                    <dt>Endereço</dt>
+                    <dd>
+                      {[store.street, store.number].filter(Boolean).join(", ")}
+                      <br />
+                      {[store.district, `${store.city}, ${store.state}`]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Horários</dt>
+                    <dd>
+                      {store.openingDay && store.closingDay
+                        ? `${store.openingDay}${store.openingDay !== store.closingDay ? ` a ${store.closingDay}` : ""}`
+                        : "Horários não informados"}
+                      {store.openingTime && store.closingTime && (
+                        <>
+                          <br />
+                          {store.openingTime} às {store.closingTime}
+                        </>
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Atendimento</dt>
+                    <dd>
+                      {[
+                        store.acceptsDelivery ? "Entrega" : null,
+                        store.acceptsPickup ? "Retirada na loja" : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" e ") || "Modalidades não informadas"}
+                    </dd>
+                  </div>
+                </dl>
+              </aside>
+            </div>
+          </>
+        )}
+      </main>
+      <CatalogFooter />
+    </div>
   );
 }

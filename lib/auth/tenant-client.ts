@@ -5,20 +5,76 @@ import {
   signOut,
   type User,
 } from "firebase/auth";
+import { httpsCallable } from "firebase/functions";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
-import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
+import {
+  getFirebaseApp,
+  getFirebaseAuth,
+  getFirebaseDb,
+  getFirebaseFunctions,
+} from "@/lib/firebase/client";
+
+import { webAppCheckHeaders } from "@/lib/firebase/app-check";
 
 export async function establishSession(user: User) {
+  const appCheckHeaders = await webAppCheckHeaders(getFirebaseApp(), true);
   const response = await fetch("/api/auth/session", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...appCheckHeaders },
     body: JSON.stringify({ idToken: await user.getIdToken(true) }),
   });
+  if (response.status === 401 || response.status === 503)
+    throw new Error(
+      "Não foi possível validar a proteção contra robôs. Atualize a página e tente novamente.",
+    );
   if (!response.ok)
     throw new Error(
       "Conta sem acesso a este restaurante. Confira o cadastro e o endereço da loja.",
     );
+  return (await response.json()) as { destination: string; storeId: string };
+}
+
+export async function openTenantDashboard(
+  user: User,
+  path: "/dashboard" | "/dashboard/pedidos" = "/dashboard",
+  session?: { destination: string; storeId: string },
+) {
+  const access = session ?? (await establishSession(user));
+  const destination = new URL(access.destination, window.location.origin);
+  if (destination.origin === window.location.origin) {
+    window.location.replace(path);
+    return;
+  }
+  if (window.cardapPrinter && !window.cardapPrinter.supportsTenantNavigation)
+    throw new Error(
+      "Atualize o Cardap Impressão para acessar o subdomínio do restaurante.",
+    );
+  const { data } = await httpsCallable<
+    { action: string; sourceOrigin: string },
+    { code: string; destinationOrigin: string }
+  >(
+    getFirebaseFunctions(),
+    "tenantLoginTransfer",
+  )({ action: "create", sourceOrigin: window.location.origin });
+  if (
+    data.destinationOrigin !== destination.origin ||
+    !/^[a-f0-9]{64}$/.test(data.code)
+  )
+    throw new Error("Conta sem acesso ao domínio deste restaurante.");
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = `${destination.origin}/api/auth/transfer`;
+  form.hidden = true;
+  for (const [name, value] of Object.entries({ code: data.code, path })) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.append(input);
+  }
+  document.body.append(form);
+  form.submit();
 }
 
 async function ensureDomain(uid: string) {
@@ -67,6 +123,7 @@ export async function registerRestaurant(input: {
   password: string;
 }) {
   const auth = getFirebaseAuth();
+  await webAppCheckHeaders(getFirebaseApp());
   const email = input.email.trim().toLowerCase();
   // An existing identity is reused only after checking its password.
   let user: User;
@@ -93,24 +150,38 @@ export async function registerRestaurant(input: {
       });
   });
   await ensureDomain(user.uid);
-  await establishSession(user);
+  return { user, session: await establishSession(user) };
 }
 
 export async function loginRestaurant(email: string, password: string) {
+  await webAppCheckHeaders(getFirebaseApp());
   const { user } = await signInWithEmailAndPassword(
     getFirebaseAuth(),
     email.trim(),
     password,
   );
   await ensureDomain(user.uid);
-  await establishSession(user);
+  return { user, session: await establishSession(user) };
 }
 
 export async function logoutRestaurant() {
   const response = await fetch("/api/auth/session", { method: "DELETE" });
   if (!response.ok)
     throw new Error("Não foi possível encerrar a sessão. Tente novamente.");
+  const destination =
+    response.status === 200
+      ? ((await response.json()) as { logoutOrigin: string })
+      : null;
   await signOut(getFirebaseAuth());
+  if (destination?.logoutOrigin) {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = `${destination.logoutOrigin}/api/auth/logout-transfer`;
+    form.hidden = true;
+    document.body.append(form);
+    form.submit();
+    return;
+  }
   window.location.replace("/restaurantes/login");
 }
 
@@ -137,7 +208,9 @@ export function authMessage(error: unknown) {
   }
   return error instanceof Error &&
     [
+      "Atualize o Cardap",
       "Conta sem acesso",
+      "Não foi possível validar a proteção",
       "Cadastro do restaurante",
       "Não foi possível reservar",
     ].some((prefix) => error.message.startsWith(prefix))

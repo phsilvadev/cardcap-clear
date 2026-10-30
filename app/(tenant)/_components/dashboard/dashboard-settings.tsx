@@ -1,4 +1,5 @@
 "use client";
+import IntegrationsSection from "../settings/integrations-section";
 import OperationsSection from "../settings/operations-section";
 import PlanSection from "@/app/(tenant)/_components/settings/plan-section";
 import { useEffect, useState, type KeyboardEvent } from "react";
@@ -7,7 +8,7 @@ import {
   type SettingsSectionId,
 } from "@/app/(tenant)/_components/settings/settings-sections";
 import StoreDetailsSection from "@/app/(tenant)/_components/settings/store-details-section";
-import SettingsPreviewForm from "@/app/(tenant)/_components/settings/settings-preview-form";
+import StoreSettingsForm from "@/app/(tenant)/_components/settings/store-settings-form";
 import TeamSection from "@/app/(tenant)/_components/settings/team-section";
 import PermissionsSection from "@/app/(tenant)/_components/settings/permissions-section";
 
@@ -87,8 +88,10 @@ export default function DashboardSettings({
               </div>
               {section.id === "operations" ? (
                 <OperationsSection storeId={storeId} />
+              ) : section.id === "integrations" ? (
+                <IntegrationsSection />
               ) : section.id === "details" ? (
-                <StoreDetailsSection />
+                <StoreDetailsSection storeId={storeId} />
               ) : section.id === "employees" ? (
                 <TeamSection
                   storeId={storeId}
@@ -102,10 +105,7 @@ export default function DashboardSettings({
               ) : section.id === "permissions" ? (
                 <PermissionsSection />
               ) : (
-                <SettingsPreviewForm
-                  section={section.id}
-                  tenantSlug={tenantSlug}
-                />
+                <StoreSettingsForm section={section.id} />
               )}
             </div>
           ))}

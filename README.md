@@ -4,7 +4,7 @@ Projeto Next.js com App Router, React e TypeScript em modo estrito, migrado das 
 
 ## Executar
 
-Requer Node.js 20.9 ou superior.
+Requer Node.js 22 ou superior (validação de App Check no servidor).
 
 ```bash
 npm install
@@ -138,6 +138,8 @@ Para usar o formato alternativo `cardap.<tenant>` localmente:
 
 3. Acesse `http://cardap.hero-burger:3002/dashboard`.
 
+4. Acesse `http://cardap.hero-burger:3002/dashboard`.
+
 Para usar exatamente `http://cardap.hero-burger/dashboard`, sem a porta, é necessário um proxy na porta HTTP 80. A configuração [config/Caddyfile](config/Caddyfile) encaminha dinamicamente os hosts `cardap.<tenant>` para `127.0.0.1:3002`, conforme a [documentação do Caddy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy). Com o Caddy instalado e permissão para escutar na porta 80:
 
 ```bash
@@ -239,3 +241,16 @@ Prévias em `sessionStorage` não concluem o checklist. O Wallet ID é tratado c
 Configurações → Plano e assinatura apresenta três planos fictícios: Essencial, Profissional e Completo, com valores mensais/anuais e benefícios de exemplo. O catálogo fica em `lib/plans/catalog.ts`; a lógica da prévia está em `_hooks/use-plan-preview.ts`; a interface fica em `_components/settings/plan-section.tsx`.
 
 A seleção é salva em `sessionStorage` por tenant. Não cria assinatura, não gera cobrança, não concede permissões e não aplica limites reais aos produtos ou funcionários. O plano Profissional mensal aparece como exemplo inicial. Valores e benefícios precisam ser substituídos pelo catálogo comercial antes de integrar uma contratação real.
+
+# PRA FAZER - graçon
+
+O fluxo pode ser:
+
+1. Garçom solicita a conta: a mesa fica como “Conta solicitada”.
+2. Na plataforma web, aparece na seção Salão → Contas a fechar, com mesa, itens e total.
+3. Caixa confere a conta: aplica desconto autorizado, divide valores e registra os pagamentos.
+4. Após quitar o total, o caixa encerra a conta. A mesa fica “Aguardando limpeza”.
+5. Garçom confirma que está pronta: a mesa volta para “Disponível”.
+   Assim, ficam separadas duas coisas: conta paga e mesa pronta para outro cliente.
+
+No app do garçom, “Solicitar conta ao caixa” apenas avisa e muda o status. Quem pode confirmar pagamento deve ser definido pelas permissões: caixa, gerente ou proprietário. Essa integração ainda precisa ser implementada; o botão do app não confirma pagamento sozinho.

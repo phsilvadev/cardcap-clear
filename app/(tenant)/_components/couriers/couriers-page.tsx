@@ -36,9 +36,33 @@ export default function CouriersPage({
       <TeamSummary
         loading={!control.ready && !control.error}
         items={[
-          { label: "Entregadores ativos", value: control.total },
-          { label: "Disponíveis", value: control.available },
-          { label: "Em entrega", value: control.delivering },
+          {
+            label: "Entregadores",
+            value: control.total,
+            description: "Funcionários ativos na equipe",
+            icon: "truck",
+            tone: "brand",
+            selected: control.filter === "all",
+            onClick: () => control.setFilter("all"),
+          },
+          {
+            label: "Disponíveis",
+            value: control.available,
+            description: "Disponíveis para novas entregas",
+            icon: "check",
+            tone: "green",
+            selected: control.filter === "available",
+            onClick: () => control.setFilter("available"),
+          },
+          {
+            label: "Em entrega",
+            value: control.delivering,
+            description: "Com pedidos a caminho do cliente",
+            icon: "route",
+            tone: "blue",
+            selected: control.filter === "delivering",
+            onClick: () => control.setFilter("delivering"),
+          },
         ]}
       />
       <section className="team-directory" aria-label="Equipe de entregas">

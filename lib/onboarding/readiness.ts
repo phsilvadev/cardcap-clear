@@ -1,3 +1,4 @@
+import { sectionIssues } from "@/firebase/employee-access/store-profile-schema.cjs";
 export type ReadinessItem = {
   id: string;
   title: string;
@@ -99,15 +100,9 @@ export function evaluateStoreReadiness(
   section(
     "company",
     "Responsável e contato",
-    [
-      [length(data.ownerName, 3, 100), "nome do responsável"],
-      [matches(data.phone, /^\d{10,11}$/), "telefone com DDD"],
-      [
-        length(data.contactEmail, 5, 254) &&
-          matches(data.contactEmail, /^[^\s@]+@[^\s@]+\.[^\s@]+$/),
-        "e-mail de contato",
-      ],
-    ],
+    sectionIssues("company", data).map(
+      (issue) => [false, issue] as [boolean, string],
+    ),
     "company",
   );
   section(
@@ -200,7 +195,9 @@ export function evaluateStoreReadiness(
     id: "setup",
     title: "Cadastro finalizado",
     complete: setup,
-    missing: setup ? [] : ["concluir e salvar a configuração da loja no Anow"],
+    missing: setup
+      ? []
+      : ["salvar as informações obrigatórias nas configurações da loja"],
     href: "/dashboard?view=settings",
     action: "Revisar cadastro",
   });

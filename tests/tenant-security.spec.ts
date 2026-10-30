@@ -137,6 +137,32 @@ test.describe("validação da sessão no servidor", () => {
     expect(logout.status).toBe(204);
     expect(logout.headers.get("set-cookie")).toContain("Max-Age=0");
   });
+  test("login com subdomínio habilitado preserva porta e cookie restrito ao host", async () => {
+    const previous = process.env.AUTH_TENANT_SUBDOMAIN_LOGIN;
+    try {
+      process.env.AUTH_TENANT_SUBDOMAIN_LOGIN = "true";
+      mock();
+      const response = await POST(
+        new NextRequest("http://localhost:3001/api/auth/session", {
+          method: "POST",
+          headers: {
+            host: "localhost:3001",
+            origin: "http://localhost:3001",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ idToken: token() }),
+        }),
+      );
+      expect((await response.json()).destination).toBe(
+        "http://minha-loja.localhost:3001/dashboard",
+      );
+      expect(response.headers.get("set-cookie")).not.toContain("Domain=");
+    } finally {
+      if (previous === undefined)
+        delete process.env.AUTH_TENANT_SUBDOMAIN_LOGIN;
+      else process.env.AUTH_TENANT_SUBDOMAIN_LOGIN = previous;
+    }
+  });
   test("não cria sessão no domínio de outro restaurante", async () => {
     mock();
     const response = await POST(

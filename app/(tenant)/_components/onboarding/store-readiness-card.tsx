@@ -117,8 +117,8 @@ export default function StoreReadinessCard({ storeId }: { storeId?: string }) {
         onClose={control.close}
       >
         <p className="store-readiness-note">
-          Etapas conferidas no cadastro salvo da loja. Prévias locais não
-          concluem o cadastro.
+          O checklist acompanha os dados salvos da loja. A ativação depende da
+          liberação da plataforma.
         </p>
         {control.loading ? (
           <div className="store-readiness-loading" role="status">

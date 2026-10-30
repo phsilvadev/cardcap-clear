@@ -17,7 +17,12 @@ export default async function Page() {
   if (session) {
     const host = (await headers()).get("host") ?? "";
     const tenant = resolveTenant(host);
-    if (tenant?.slug === session.slug || (!tenant && isCentralHost(host))) {
+    if (
+      tenant?.slug === session.slug ||
+      (!tenant &&
+        isCentralHost(host) &&
+        process.env.AUTH_TENANT_SUBDOMAIN_LOGIN !== "true")
+    ) {
       redirect("/dashboard");
     }
   }

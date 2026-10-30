@@ -103,3 +103,90 @@ exports.tenantOrderCreated = onDocumentCreated(
       await tenantOrders.autoAccept(event.params.storeId, event.params.orderId);
   },
 );
+
+const { createLoginTransfer } = require("./login-transfer.cjs");
+exports.tenantLoginTransfer = onCall(
+  { region: "southamerica-east1", maxInstances: 5 },
+  createLoginTransfer({ db: getFirestore(), auth: getAuth(), HttpsError }),
+);
+
+const { getStorage } = require("firebase-admin/storage");
+const { createStoreLogoHandler } = require("./store-logo.cjs");
+exports.tenantSaveLogo = onCall(
+  {
+    region: "southamerica-east1",
+    maxInstances: 3,
+    concurrency: 10,
+    memory: "256MiB",
+  },
+  createStoreLogoHandler({
+    db: getFirestore(),
+    bucket: getStorage().bucket(),
+    HttpsError,
+    timestamp: () => FieldValue.serverTimestamp(),
+  }),
+);
+
+const { createStoreProfileHandler } = require("./store-profile.cjs");
+exports.tenantSaveProfile = onCall(
+  { region: "southamerica-east1", maxInstances: 5 },
+  createStoreProfileHandler({
+    db: getFirestore(),
+    HttpsError,
+    timestamp: () => FieldValue.serverTimestamp(),
+  }),
+);
+
+const {
+  createReceivingHandler,
+  createStorefrontHandler,
+} = require("./storefront.cjs");
+exports.tenantSetReceivingOrders = onCall(
+  { region: "southamerica-east1", maxInstances: 5 },
+  createReceivingHandler({
+    db: getFirestore(),
+    HttpsError,
+    timestamp: () => FieldValue.serverTimestamp(),
+  }),
+);
+const publicImageCache = new Map();
+exports.publicStorefront = onCall(
+  { region: "southamerica-east1", maxInstances: 5, concurrency: 20 },
+  createStorefrontHandler({
+    db: getFirestore(),
+    HttpsError,
+    imageUrl: async (path) => {
+      const cached = publicImageCache.get(path);
+      if (cached && cached.expires > Date.now()) return cached.url;
+      try {
+        const bucket = getStorage().bucket();
+        const [metadata] = await bucket.file(path).getMetadata();
+        const token =
+          metadata.metadata?.firebaseStorageDownloadTokens?.split(",")[0];
+        const url = token
+          ? `https://firebasestorage.googleapis.com/v0/b/${encodeURIComponent(bucket.name)}/o/${encodeURIComponent(path)}?alt=media&token=${encodeURIComponent(token)}`
+          : null;
+        if (publicImageCache.size >= 1000) publicImageCache.clear();
+        publicImageCache.set(path, { url, expires: Date.now() + 60000 });
+        return url;
+      } catch (error) {
+        if (error.code === 404) return null;
+        throw new HttpsError(
+          "unavailable",
+          "Não foi possível carregar as imagens. Tente novamente.",
+        );
+      }
+    },
+  }),
+);
+
+const { createSalon } = require("./salon.cjs");
+exports.salonOperations = onCall(
+  { region: "southamerica-east1", maxInstances: 5, timeoutSeconds: 60 },
+  createSalon({
+    db: getFirestore(),
+    auth: getAuth(),
+    HttpsError,
+    timestamp: () => FieldValue.serverTimestamp(),
+  }).handler,
+);

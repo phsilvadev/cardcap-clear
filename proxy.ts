@@ -1,6 +1,11 @@
+import { tenantDashboardUrl } from "@/lib/auth/tenant-url";
 import { NextResponse, type NextRequest } from "next/server";
 import { resolveTenant, isCentralHost } from "@/lib/tenant";
-import { SESSION_COOKIE, verifyTenantSession } from "@/lib/auth/session";
+import {
+  APP_CHECK_SESSION_COOKIE,
+  SESSION_COOKIE,
+  verifyTenantSession,
+} from "@/lib/auth/session";
 
 export async function proxy(request: NextRequest) {
   if (
@@ -15,11 +20,13 @@ export async function proxy(request: NextRequest) {
     return new NextResponse("Domínio não encontrado.", { status: 404 });
   const session = await verifyTenantSession(
     request.cookies.get(SESSION_COOKIE)?.value ?? "",
+    request.cookies.get(APP_CHECK_SESSION_COOKIE)?.value,
   );
   if (!session) {
     const login = new URL("/restaurantes/login", request.url);
     const response = NextResponse.redirect(login);
     response.cookies.delete(SESSION_COOKIE);
+    response.cookies.delete(APP_CHECK_SESSION_COOKIE);
     response.headers.set("Cache-Control", "no-store");
     return response;
   }
@@ -43,6 +50,18 @@ export async function proxy(request: NextRequest) {
     );
     response.headers.set("Cache-Control", "private, no-store");
     return response;
+  }
+  if (!tenant && process.env.AUTH_TENANT_SUBDOMAIN_LOGIN === "true") {
+    const canonical = new URL(
+      tenantDashboardUrl(request.nextUrl.origin, session.slug),
+    );
+    if (canonical.origin !== request.nextUrl.origin) {
+      const response = NextResponse.redirect(
+        new URL("/restaurantes/login", request.url),
+      );
+      response.headers.set("Cache-Control", "private, no-store");
+      return response;
+    }
   }
   const destination = new URL(request.url);
   destination.pathname = `/tenants/${session.slug}${request.nextUrl.pathname}`;

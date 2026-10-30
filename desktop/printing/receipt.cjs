@@ -43,7 +43,9 @@ function receiptHtml(input, width = 80) {
 }
 function trustedUrl(value) {
   const url = new URL(value);
-  const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+  const local =
+    ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) ||
+    /^[a-z0-9]+(?:-[a-z0-9]+)*\.localhost$/.test(url.hostname);
   if (
     url.username ||
     url.password ||

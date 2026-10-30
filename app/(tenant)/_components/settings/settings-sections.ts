@@ -35,6 +35,11 @@ export const settingsSections = [
     description: "Carteira Asaas para recebimento de pagamentos.",
   },
   {
+    id: "integrations",
+    label: "Integrações",
+    description: "Conecte o WhatsApp do seu restaurante.",
+  },
+  {
     id: "plan",
     label: "Plano e assinatura",
     description: "Plano selecionado, valores e benefícios.",
@@ -53,7 +58,12 @@ export const settingsSections = [
 export type SettingsSectionId = (typeof settingsSections)[number]["id"];
 export type PreviewSectionId = Exclude<
   SettingsSectionId,
-  "details" | "employees" | "permissions" | "plan" | "operations"
+  | "details"
+  | "employees"
+  | "permissions"
+  | "plan"
+  | "operations"
+  | "integrations"
 >;
 type Field = {
   name: string;
@@ -84,6 +94,14 @@ export const previewFields: Record<PreviewSectionId, Field[]> = {
       maxLength: 100,
       required: true,
     },
+    {
+      name: "phone",
+      label: "Telefone com DDD",
+      type: "tel",
+      maxLength: 16,
+      required: true,
+      placeholder: "(11) 99999-9999",
+    },
     { name: "legalName", label: "Razão social", maxLength: 120 },
     {
       name: "cnpj",
@@ -101,6 +119,7 @@ export const previewFields: Record<PreviewSectionId, Field[]> = {
     {
       name: "contactEmail",
       label: "E-mail de contato",
+      required: true,
       type: "email",
       maxLength: 254,
     },

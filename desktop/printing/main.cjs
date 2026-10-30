@@ -1,5 +1,14 @@
-const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  Menu,
+  ipcMain,
+  dialog,
+  shell,
+} = require("electron");
 const path = require("node:path");
+const { allowedSupportLink } = require("./support-link.cjs");
+const { allowedPanelUrl } = require("./panel-origin.cjs");
 const fs = require("node:fs");
 const { randomUUID } = require("node:crypto");
 const os = require("node:os");
@@ -38,7 +47,7 @@ function authorizePanel(event) {
     !panel ||
     event.sender !== panel.webContents ||
     event.senderFrame !== panel.webContents.mainFrame ||
-    new URL(event.senderFrame.url).origin !== trustedUrl(config.url).origin
+    !allowedPanelUrl(event.senderFrame.url, config.url)
   )
     throw new Error("Acesso negado.");
 }
@@ -146,12 +155,10 @@ function createPanel() {
   );
   panel.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   panel.webContents.on("will-navigate", (event, url) => {
-    if (new URL(url).origin !== trustedUrl(config.url).origin)
-      event.preventDefault();
+    if (!allowedPanelUrl(url, config.url)) event.preventDefault();
   });
   panel.webContents.on("will-redirect", (event, url) => {
-    if (new URL(url).origin !== trustedUrl(config.url).origin)
-      event.preventDefault();
+    if (!allowedPanelUrl(url, config.url)) event.preventDefault();
   });
   panel.webContents.session.setPermissionRequestHandler(
     (_contents, _permission, callback) => callback(false),
@@ -379,6 +386,12 @@ else {
     ipcMain.handle("printer:disconnect", (event) => {
       authorizePanel(event);
       consumer.disconnect();
+    });
+    ipcMain.handle("printer:support", async (event, url) => {
+      authorizePanel(event);
+      if (!allowedSupportLink(url))
+        throw new Error("Canal de suporte inválido.");
+      await shell.openExternal(url);
     });
     ipcMain.handle("printer:configure", (event) => {
       authorizePanel(event);

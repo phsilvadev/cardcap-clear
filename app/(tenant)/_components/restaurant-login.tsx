@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import BotProtectionNotice from "./bot-protection-notice";
 import { getFirebaseAuth } from "@/lib/firebase/client";
 import {
   loginRestaurant,
   establishSession,
+  openTenantDashboard,
   authMessage,
 } from "@/lib/auth/tenant-client";
 
@@ -15,7 +17,6 @@ export default function RestaurantLogin() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!window.cardapPrinter) return;
     let cancelled = false;
     const restore = async () => {
       try {
@@ -23,8 +24,13 @@ export default function RestaurantLogin() {
         await auth.authStateReady();
         if (cancelled) return;
         if (auth.currentUser) {
-          await establishSession(auth.currentUser);
-          if (!cancelled) window.location.replace("/dashboard/pedidos");
+          const session = await establishSession(auth.currentUser);
+          if (!cancelled)
+            await openTenantDashboard(
+              auth.currentUser,
+              window.cardapPrinter ? "/dashboard/pedidos" : "/dashboard",
+              session,
+            );
           return;
         }
       } catch {
@@ -46,11 +52,15 @@ export default function RestaurantLogin() {
     setLoading(true);
     setStatus("");
     try {
-      await loginRestaurant(
+      const access = await loginRestaurant(
         String(data.get("email") ?? ""),
         String(data.get("password") ?? ""),
       );
-      window.location.replace("/dashboard");
+      await openTenantDashboard(
+        access.user,
+        window.cardapPrinter ? "/dashboard/pedidos" : "/dashboard",
+        access.session,
+      );
     } catch (error) {
       setStatus(authMessage(error));
     } finally {
@@ -93,6 +103,7 @@ export default function RestaurantLogin() {
       <p className="restaurant-login-note">
         Entre com a conta do proprietário para acessar seu restaurante.
       </p>
+      <BotProtectionNotice />
       <button
         className="restaurant-login-submit"
         type="submit"

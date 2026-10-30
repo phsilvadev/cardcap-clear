@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { registerRestaurant, authMessage } from "@/lib/auth/tenant-client";
+import {
+  registerRestaurant,
+  authMessage,
+  openTenantDashboard,
+} from "@/lib/auth/tenant-client";
 
 export const useRestaurantSignup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,8 +43,13 @@ export const useRestaurantSignup = () => {
     setLoading(true);
     setStatus("");
     try {
-      await registerRestaurant({ ownerName, storeName, email, password });
-      window.location.replace("/dashboard");
+      const access = await registerRestaurant({
+        ownerName,
+        storeName,
+        email,
+        password,
+      });
+      await openTenantDashboard(access.user, "/dashboard", access.session);
     } catch (error) {
       setStatus(authMessage(error));
     } finally {

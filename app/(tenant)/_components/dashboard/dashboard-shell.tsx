@@ -1,3 +1,4 @@
+import StoreSettingsProvider from "../settings/store-settings-provider";
 import TenantOrdersProvider from "../orders/tenant-orders-provider";
 import OperationsProvider from "./operations-provider";
 import type { StoreOperations } from "@/lib/operations";
@@ -16,21 +17,23 @@ export default function DashboardShell({
 }) {
   return (
     <OperationsProvider storeId={tenant.uid} initial={tenant.operations}>
-      <TenantOrdersProvider storeId={tenant.uid} slug={tenant.slug}>
-        <a href="#dashboard-main" className="sr-only focus:not-sr-only">
-          Ir para o conteúdo
-        </a>
-        <div className="dashboard">
-          <DashboardSidebar tenant={tenant} />
-          <div className="dashboard-app">
-            <DashboardHeader />
-            <main id="dashboard-main" tabIndex={-1}>
-              {children}
-            </main>
-            <DashboardFooter />
+      <StoreSettingsProvider storeId={tenant.uid}>
+        <TenantOrdersProvider storeId={tenant.uid} slug={tenant.slug}>
+          <a href="#dashboard-main" className="sr-only focus:not-sr-only">
+            Ir para o conteúdo
+          </a>
+          <div className="dashboard">
+            <DashboardSidebar tenant={tenant} />
+            <div className="dashboard-app">
+              <DashboardHeader />
+              <main id="dashboard-main" tabIndex={-1}>
+                {children}
+              </main>
+              <DashboardFooter />
+            </div>
           </div>
-        </div>
-      </TenantOrdersProvider>
+        </TenantOrdersProvider>
+      </StoreSettingsProvider>
     </OperationsProvider>
   );
 }

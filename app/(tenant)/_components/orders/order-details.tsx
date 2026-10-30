@@ -20,7 +20,25 @@ export default function OrderDetails({
   onAssign: (orderId: string, courierId: string) => void;
   ownDelivery: boolean;
 }) {
-  const stage = orderStages.find((item) => item.id === order.status)!;
+  const stages =
+    order.source === "salon"
+      ? orderStages.map((item) => ({
+          ...item,
+          label:
+            item.id === "delivery"
+              ? "Pronto para servir"
+              : item.id === "done"
+                ? "Servido"
+                : item.label,
+          action:
+            item.id === "preparing"
+              ? "Marcar como pronto"
+              : item.id === "delivery"
+                ? "Marcar como servido"
+                : item.action,
+        }))
+      : orderStages;
+  const stage = stages.find((item) => item.id === order.status)!;
   const [cancelling, setCancelling] = useState(false);
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
@@ -55,7 +73,7 @@ export default function OrderDetails({
           className="order-details-progress"
           aria-label="Etapas do atendimento"
         >
-          {orderStages
+          {stages
             .filter((item) => item.id !== "cancelled")
             .map((item, index) => (
               <li
@@ -70,7 +88,7 @@ export default function OrderDetails({
         </ol>
       )}
       <section className="order-details-section">
-        <h3>Cliente</h3>
+        <h3>{order.source === "salon" ? "Atendimento no salão" : "Cliente"}</h3>
         <strong className="order-details-customer">{order.customer}</strong>
       </section>
       <section className="order-details-section">
@@ -85,53 +103,63 @@ export default function OrderDetails({
           <strong>{formatProductPrice(order.total)}</strong>
         </div>
       </section>
-      {ownDelivery && ["preparing", "delivery"].includes(order.status) && (
-        <section className="order-details-section">
-          <label
-            className="search-label"
-            htmlFor={`detail-courier-${order.id}`}
-          >
-            Entregador
-            <select
-              id={`detail-courier-${order.id}`}
-              disabled={busy}
-              value={order.courierId ?? ""}
-              onChange={(event) => onAssign(order.id, event.target.value)}
+      {order.source !== "salon" &&
+        ownDelivery &&
+        ["preparing", "delivery"].includes(order.status) && (
+          <section className="order-details-section">
+            <label
+              className="search-label"
+              htmlFor={`detail-courier-${order.id}`}
             >
-              <option value="">Sem entregador atribuído</option>
-              {couriers.map((courier) => (
-                <option
-                  key={courier.id}
-                  value={courier.id}
-                  disabled={
-                    (!courier.available || courier.busy) &&
-                    courier.id !== order.courierId
-                  }
-                >
-                  {courier.name}
-                  {!courier.available
-                    ? " · Indisponível"
-                    : courier.busy && courier.id !== order.courierId
-                      ? " · Em entrega"
-                      : ""}
-                </option>
-              ))}
-              {order.courierId &&
-                !couriers.some((courier) => courier.id === order.courierId) && (
-                  <option value={order.courierId}>
-                    {order.courierName ?? "Entregador não encontrado"}
+              Entregador
+              <select
+                id={`detail-courier-${order.id}`}
+                disabled={busy}
+                value={order.courierId ?? ""}
+                onChange={(event) => onAssign(order.id, event.target.value)}
+              >
+                <option value="">Sem entregador atribuído</option>
+                {couriers.map((courier) => (
+                  <option
+                    key={courier.id}
+                    value={courier.id}
+                    disabled={
+                      (!courier.available || courier.busy) &&
+                      courier.id !== order.courierId
+                    }
+                  >
+                    {courier.name}
+                    {!courier.available
+                      ? " · Indisponível"
+                      : courier.busy && courier.id !== order.courierId
+                        ? " · Em entrega"
+                        : ""}
                   </option>
-                )}
-            </select>
-          </label>
-          {!couriers.length && (
-            <a
-              className="text-button"
-              href="/dashboard?view=settings&section=employees"
-            >
-              Gerenciar equipe ↗
-            </a>
-          )}
+                ))}
+                {order.courierId &&
+                  !couriers.some(
+                    (courier) => courier.id === order.courierId,
+                  ) && (
+                    <option value={order.courierId}>
+                      {order.courierName ?? "Entregador não encontrado"}
+                    </option>
+                  )}
+              </select>
+            </label>
+            {!couriers.length && (
+              <a
+                className="text-button"
+                href="/dashboard?view=settings&section=employees"
+              >
+                Gerenciar equipe ↗
+              </a>
+            )}
+          </section>
+        )}
+      {order.notes && (
+        <section className="order-details-section">
+          <h3>Observações</h3>
+          <p>{order.notes}</p>
         </section>
       )}
       {order.status === "cancelled" && (

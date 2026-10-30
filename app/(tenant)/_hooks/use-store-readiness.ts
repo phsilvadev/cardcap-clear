@@ -1,5 +1,13 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  collection,
+  query,
+  limit,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
+import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase/client";
 import { getStoreReadiness } from "@/lib/onboarding/service";
 export function useStoreReadiness(storeId?: string) {
   const [data, setData] = useState<Awaited<
@@ -46,6 +54,51 @@ export function useStoreReadiness(storeId?: string) {
       request.current++;
     };
   }, [refresh]);
+  useEffect(() => {
+    const update = () => {
+      void refresh();
+    };
+    window.addEventListener("cardap:store-updated", update);
+    window.addEventListener("focus", update);
+    return () => {
+      window.removeEventListener("cardap:store-updated", update);
+      window.removeEventListener("focus", update);
+    };
+  }, [refresh]);
+  useEffect(() => {
+    if (!storeId) return;
+    let stopped = false;
+    const unsubscribers: (() => void)[] = [];
+    let timer: ReturnType<typeof setTimeout>;
+    const changed = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (!stopped) void refresh();
+      }, 150);
+    };
+    void getFirebaseAuth()
+      .authStateReady()
+      .then(() => {
+        if (stopped || getFirebaseAuth().currentUser?.uid !== storeId) return;
+        const db = getFirebaseDb();
+        for (const source of [
+          query(collection(db, "tenants", storeId, "categories"), limit(1)),
+          query(
+            collection(db, "tenants", storeId, "products"),
+            where("available", "==", true),
+            limit(1),
+          ),
+        ]) {
+          unsubscribers.push(onSnapshot(source, changed, () => {}));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+      unsubscribers.forEach((unsubscribe) => unsubscribe());
+    };
+  }, [storeId, refresh]);
   const awaitingActivation = Boolean(
     data &&
     data.items.every((item) => item.complete || item.id === "activation") &&
@@ -58,7 +111,10 @@ export function useStoreReadiness(storeId?: string) {
     error,
     open,
     refresh,
-    show: () => setOpen(true),
+    show: () => {
+      setOpen(true);
+      void refresh();
+    },
     close: () => setOpen(false),
   };
 }

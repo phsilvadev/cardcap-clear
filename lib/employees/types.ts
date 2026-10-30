@@ -16,6 +16,7 @@ export type Employee = EmployeeInput & {
   id: string;
   active: boolean;
   invited: boolean;
+  salonPermissions?: { receivePayments: boolean; discounts: boolean };
 };
 export type EmployeeCredentials = {
   name: string;

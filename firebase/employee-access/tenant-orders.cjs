@@ -58,6 +58,13 @@ function createTenantOrders({
             timeZone: "America/Sao_Paulo",
           })
         : "Horário não informado",
+      ...(order.source === "salon"
+        ? {
+            source: "salon",
+            tableName: order.tableName,
+            notes: order.notes || "",
+          }
+        : {}),
       ...(order.courierId
         ? { courierId: order.courierId, courierName: order.courierName || "" }
         : {}),
@@ -271,8 +278,32 @@ function createTenantOrders({
             "failed-precondition",
             "O pedido mudou. Atualize antes de continuar.",
           );
+        let updateSalon = () => {};
+        if (order.source === "salon" && input.target === "cancelled") {
+          if (!validId(order.tabId))
+            fail("failed-precondition", "Comanda inválida.");
+          const tabRef = db.doc(`tenants/${storeId}/salonTabs/${order.tabId}`);
+          const tab = (await tx.get(tabRef)).data();
+          if (!tab || tab.status !== "open" || tab.paidCents !== 0)
+            fail(
+              "failed-precondition",
+              "Esta comanda não permite cancelar itens. Confira a conta no salão.",
+            );
+          const lines = tab.lines.filter(
+            (line) => line.orderId !== input.orderId,
+          );
+          const subtotalCents = lines.reduce(
+            (sum, line) => sum + line.priceCents * line.quantity,
+            0,
+          );
+          updateSalon = () => tx.update(tabRef, { lines, subtotalCents });
+        }
+        updateSalon();
         tx.update(ref, {
           status: input.target,
+          ...(order.source === "salon" && input.target === "done"
+            ? { servedBy: storeId, servedAt: timestamp() }
+            : {}),
           updatedAt: timestamp(),
           ...(input.target === "cancelled"
             ? { cancellationReason: input.reason.trim() }
@@ -306,6 +337,7 @@ function createTenantOrders({
         const order = orderDoc.data();
         if (
           !order ||
+          order.source === "salon" ||
           order.storeId !== storeId ||
           !["preparing", "delivery"].includes(order.status)
         )

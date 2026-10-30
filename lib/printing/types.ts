@@ -17,6 +17,8 @@ export type PrinterStatus = {
 declare global {
   interface Window {
     cardapPrinter?: {
+      supportsTenantNavigation: boolean;
+      openSupport?: (url: string) => Promise<void>;
       ready: () => Promise<void>;
       status: () => Promise<PrinterStatus>;
       connect: (session: { storeId: string; idToken: string }) => Promise<void>;
