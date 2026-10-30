@@ -7,6 +7,7 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
   const pathname = usePathname();
   const { operations } = useStoreOperations();
   const isWaiters = pathname.includes("/garcons");
+  const isOrders = pathname.includes("/pedidos");
   const isMenu = pathname.includes("/cardapio");
   const isCouriers = pathname.includes("/entregadores");
   return (
@@ -52,7 +53,9 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
           href="/dashboard?view=overview"
           data-view="overview"
           aria-current={
-            !isMenu && !isCouriers && !isWaiters ? "page" : undefined
+            !isMenu && !isCouriers && !isWaiters && !isOrders
+              ? "page"
+              : undefined
           }
         >
           <svg
@@ -77,9 +80,8 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
           {"Visão geral"}
         </a>
         <a
-          href="/dashboard?view=orders"
-          data-view="orders"
-          aria-current={undefined}
+          href="/dashboard/pedidos"
+          aria-current={isOrders ? "page" : undefined}
         >
           <svg
             xmlns={"http://www.w3.org/2000/svg"}

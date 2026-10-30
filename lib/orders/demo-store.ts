@@ -29,6 +29,7 @@ export const orderStages: {
     next: "done",
   },
   { id: "done", label: "Concluídos", description: "Atendimento finalizado" },
+  { id: "cancelled", label: "Cancelados", description: "Pedidos cancelados" },
 ];
 const initialOrders: DashboardOrder[] = [
   {
@@ -72,7 +73,15 @@ const initialOrders: DashboardOrder[] = [
     time: "Há 55 min",
   },
 ];
+export type OrderPrintJob = {
+  id: string;
+  orderId: string;
+  state: "pending" | "submitted" | "failed";
+  retry?: boolean;
+};
 type Snapshot = {
+  autoAccept: boolean;
+  printJobs: OrderPrintJob[];
   orders: DashboardOrder[];
   couriers: DeliveryCourier[];
   filter: "all" | OrderStatus;
@@ -86,6 +95,8 @@ export function createDemoOrderStore(
 ) {
   const key = `cardap-demo-dashboard:${slug}`;
   let snapshot: Snapshot = {
+    autoAccept: false,
+    printJobs: [],
     orders: initialOrders.map((order) => ({ ...order })),
     couriers: [],
     filter: "all",
@@ -94,6 +105,7 @@ export function createDemoOrderStore(
   };
   const serverSnapshot = snapshot;
   let hydrated = false;
+  let remote: { advance: (id: string) => void } | undefined;
   let teamReady = false;
   const listeners = new Set<() => void>();
   const publish = (patch: Partial<Snapshot>) => {
@@ -107,10 +119,14 @@ export function createDemoOrderStore(
       : {};
   };
   const persist = (
-    patch: Partial<Pick<Snapshot, "orders" | "couriers">>,
+    patch: Partial<
+      Pick<Snapshot, "orders" | "couriers" | "autoAccept" | "printJobs">
+    >,
     message: string,
   ) => {
     const next = {
+      autoAccept: snapshot.autoAccept,
+      printJobs: snapshot.printJobs,
       orders: snapshot.orders,
       couriers: snapshot.couriers,
       ...patch,
@@ -128,6 +144,11 @@ export function createDemoOrderStore(
     return true;
   };
   return {
+    connectRemoteOrders: (adapter: { advance: (id: string) => void }) => {
+      remote = adapter;
+      publish({ orders: [], printJobs: [], autoAccept: false });
+    },
+    syncServerOrders: (orders: DashboardOrder[]) => publish({ orders }),
     getSnapshot: () => snapshot,
     getServerSnapshot: () => serverSnapshot,
     subscribe: (listener: () => void) => {
@@ -141,6 +162,23 @@ export function createDemoOrderStore(
       hydrated = true;
       try {
         const saved = readSaved();
+        publish({
+          autoAccept: saved.autoAccept === true,
+          printJobs: Array.isArray(saved.printJobs)
+            ? saved.printJobs
+                .filter((job): job is OrderPrintJob =>
+                  Boolean(
+                    job &&
+                    typeof job === "object" &&
+                    typeof job.id === "string" &&
+                    job.id.length <= 200 &&
+                    initialOrders.some((order) => order.id === job.orderId) &&
+                    ["pending", "submitted", "failed"].includes(job.state),
+                  ),
+                )
+                .slice(-500)
+            : [],
+        });
         if (Array.isArray(saved.couriers)) {
           const couriers = saved.couriers.filter(
             (item): item is DeliveryCourier => {
@@ -168,12 +206,13 @@ export function createDemoOrderStore(
             ),
           });
         }
-        if (Array.isArray(saved.orders)) {
+        if (!remote && Array.isArray(saved.orders)) {
           const savedOrders = saved.orders as {
             id?: unknown;
             status?: unknown;
             courierId?: unknown;
             courierName?: unknown;
+            cancellationReason?: unknown;
           }[];
           publish({
             orders: initialOrders.map((order) => {
@@ -190,6 +229,14 @@ export function createDemoOrderStore(
                 previous.courierName.length <= 100
                   ? { courierName: previous.courierName }
                   : {}),
+                ...(typeof previous?.cancellationReason === "string"
+                  ? {
+                      cancellationReason: previous.cancellationReason.slice(
+                        0,
+                        300,
+                      ),
+                    }
+                  : {}),
                 status: orderStages.some(
                   (stage) => stage.id === previous?.status,
                 )
@@ -205,6 +252,32 @@ export function createDemoOrderStore(
         });
       }
     },
+    setAutoAccept: (autoAccept: boolean) =>
+      persist(
+        { autoAccept },
+        autoAccept
+          ? "Aceite automático ativado neste computador."
+          : "Aceite automático desativado.",
+      ),
+    setPrintState: (id: string, state: OrderPrintJob["state"]) =>
+      persist(
+        {
+          printJobs: snapshot.printJobs.map((job) =>
+            job.id === id
+              ? {
+                  ...job,
+                  state,
+                  ...(state === "pending" ? { retry: true } : {}),
+                }
+              : job,
+          ),
+        },
+        state === "submitted"
+          ? "Comanda enviada à impressora."
+          : state === "failed"
+            ? "Não foi possível enviar a comanda. Confira a impressora."
+            : "Comanda na fila de impressão.",
+      ),
     setFilter: (filter: Snapshot["filter"]) => publish({ filter, search: "" }),
     setSearch: (search: string) => publish({ search }),
     beginCourierSync: () => {
@@ -274,7 +347,32 @@ export function createDemoOrderStore(
           : `Entregador removido do pedido #${orderId}.`,
       );
     },
+    cancel: (id: string, reason: string) => {
+      const order = snapshot.orders.find((item) => item.id === id);
+      const cancellationReason = reason.trim();
+      if (
+        !order ||
+        ["done", "cancelled"].includes(order.status) ||
+        cancellationReason.length < 3 ||
+        cancellationReason.length > 300
+      )
+        return false;
+      return persist(
+        {
+          orders: snapshot.orders.map((item) =>
+            item.id === id
+              ? { ...item, status: "cancelled", cancellationReason }
+              : item,
+          ),
+        },
+        `Pedido #${id} cancelado.`,
+      );
+    },
     advance: (id: string) => {
+      if (remote) {
+        remote.advance(id);
+        return;
+      }
       const order = snapshot.orders.find((item) => item.id === id);
       const next = orderStages.find(
         (stage) => stage.id === order?.status,
@@ -308,7 +406,21 @@ export function createDemoOrderStore(
         item.id === id ? { ...item, status: next } : item,
       );
       persist(
-        { orders },
+        {
+          orders,
+          ...(order.status === "new"
+            ? {
+                printJobs: [
+                  ...snapshot.printJobs.filter((job) => job.orderId !== id),
+                  {
+                    id: `${slug}:${id}:accepted`,
+                    orderId: id,
+                    state: "pending" as const,
+                  },
+                ],
+              }
+            : {}),
+        },
         `Pedido #${id}: ${orderStages.find((stage) => stage.id === next)!.label.toLocaleLowerCase("pt-BR")}.`,
       );
     },

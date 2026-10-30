@@ -78,7 +78,7 @@ test("filtrar não altera os pedidos e limpa a busca anterior", () => {
   expect(store.getSnapshot().search).toBe("");
   expect(store.getSnapshot().orders).toHaveLength(5);
 });
-test("quadro de pedidos mantém cards legíveis em desktop e celular", async ({
+test("central de pedidos mantém lista e detalhes legíveis em desktop e celular", async ({
   page,
 }) => {
   const markup = renderToStaticMarkup(
@@ -86,7 +86,8 @@ test("quadro de pedidos mantém cards legíveis em desktop e celular", async ({
   );
   const css =
     fs.readFileSync("app/globals.css", "utf8") +
-    fs.readFileSync("app/(tenant)/_styles/dashboard.css", "utf8");
+    fs.readFileSync("app/(tenant)/_styles/dashboard.css", "utf8") +
+    fs.readFileSync("app/(tenant)/_styles/products.css", "utf8");
   for (const width of [1600, 375]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.setContent(
@@ -95,11 +96,16 @@ test("quadro de pedidos mantém cards legíveis em desktop e celular", async ({
     await page.locator("#view-orders").evaluate((element) => {
       element.removeAttribute("hidden");
     });
-    await expect(page.locator(".incoming-orders-column")).toHaveCount(4);
-    await expect(page.locator(".incoming-order-card")).toHaveCount(5);
+    await expect(
+      page.getByRole("complementary", { name: "Lista de pedidos" }),
+    ).toBeVisible();
+    await expect(page.locator(".orders-inbox-item")).toHaveCount(0);
+    await expect(
+      page.getByRole("heading", { name: "Selecione um pedido" }),
+    ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Aceitar pedido #1048" }),
-    ).toBeVisible();
+    ).toHaveCount(0);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -178,8 +184,6 @@ test("ações da visão geral mantêm etapas, contadores e filtro sincronizados"
   await expect(
     page.locator("#recent-orders .order-card").first(),
   ).toContainText("Concluído");
-  await page.getByRole("button", { name: /Em preparo.*Na cozinha/ }).click();
-  await expect(page.locator("#view-orders")).toBeVisible();
   expect(
     await page.evaluate(
       () =>
@@ -188,4 +192,68 @@ test("ações da visão geral mantêm etapas, contadores e filtro sincronizados"
         ).orders.find((order: { id: string }) => order.id === "1048").status,
     ),
   ).toBe("done");
+  await page.route("**/dashboard/pedidos?status=preparing", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "text/html",
+      body: "<h1>Pedidos</h1>",
+    }),
+  );
+  await page.getByRole("button", { name: /Em preparo.*Na cozinha/ }).click();
+  await expect(page).toHaveURL(/\/dashboard\/pedidos\?status=preparing$/);
+});
+
+test("cancelamento exige motivo, preserva o pedido e impede novo avanço", () => {
+  const memory = storage();
+  const store = createDemoOrderStore("cancel-test", () => memory);
+  store.hydrate();
+  expect(store.cancel("1048", " ")).toBe(false);
+  expect(store.cancel("1045", "Cliente desistiu")).toBe(false);
+  expect(store.cancel("1048", "Item indisponível")).toBe(true);
+  store.advance("1048");
+  expect(
+    store.getSnapshot().orders.find((order) => order.id === "1048"),
+  ).toMatchObject({
+    status: "cancelled",
+    cancellationReason: "Item indisponível",
+  });
+  expect(store.getSnapshot().orders).toHaveLength(5);
+  const reloaded = createDemoOrderStore("cancel-test", () => memory);
+  reloaded.hydrate();
+  expect(
+    reloaded.getSnapshot().orders.find((order) => order.id === "1048"),
+  ).toMatchObject({
+    status: "cancelled",
+    cancellationReason: "Item indisponível",
+  });
+});
+
+test("aceite cria uma única comanda e restaura fila e preferência", () => {
+  const memory = storage();
+  const store = createDemoOrderStore("print-test", () => memory);
+  store.hydrate();
+  store.setAutoAccept(true);
+  store.advance("1048");
+  store.advance("1048");
+  expect(store.getSnapshot().printJobs).toEqual([
+    { id: "print-test:1048:accepted", orderId: "1048", state: "pending" },
+  ]);
+  const reloaded = createDemoOrderStore("print-test", () => memory);
+  reloaded.hydrate();
+  expect(reloaded.getSnapshot().autoAccept).toBe(true);
+  expect(reloaded.getSnapshot().printJobs).toHaveLength(1);
+  reloaded.setPrintState("print-test:1048:accepted", "submitted");
+  expect(reloaded.getSnapshot().printJobs[0].state).toBe("submitted");
+});
+test("falha ao salvar aceite não avança pedido nem cria comanda", () => {
+  const store = createDemoOrderStore("print-failed", () => ({
+    getItem: () => null,
+    setItem: () => {
+      throw new Error("blocked");
+    },
+  }));
+  store.hydrate();
+  store.advance("1048");
+  expect(store.getSnapshot().orders[0].status).toBe("new");
+  expect(store.getSnapshot().printJobs).toHaveLength(0);
 });

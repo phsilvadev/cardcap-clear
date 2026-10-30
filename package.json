@@ -11,7 +11,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "test:menu:rules": "firebase emulators:exec --project demo-cardap-test --config firebase.emulators.json --only auth,firestore,storage \"playwright test --config playwright.rules.config.ts\""
+    "test:menu:rules": "firebase emulators:exec --project demo-cardap-test --config firebase.emulators.json --only auth,firestore,storage \"playwright test --config playwright.rules.config.ts\"",
+    "desktop:install": "npm --prefix desktop/printing install",
+    "desktop:start": "npm --prefix desktop/printing start",
+    "desktop:pack": "npm --prefix desktop/printing run pack"
   },
   "dependencies": {
     "firebase": "^13.1.0",

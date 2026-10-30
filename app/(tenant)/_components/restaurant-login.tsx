@@ -1,13 +1,43 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { loginRestaurant, authMessage } from "@/lib/auth/tenant-client";
+import { useEffect, useState, type FormEvent } from "react";
+import { getFirebaseAuth } from "@/lib/firebase/client";
+import {
+  loginRestaurant,
+  establishSession,
+  authMessage,
+} from "@/lib/auth/tenant-client";
 
 export default function RestaurantLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState("");
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!window.cardapPrinter) return;
+    let cancelled = false;
+    const restore = async () => {
+      try {
+        const auth = getFirebaseAuth();
+        await auth.authStateReady();
+        if (cancelled) return;
+        if (auth.currentUser) {
+          await establishSession(auth.currentUser);
+          if (!cancelled) window.location.replace("/dashboard/pedidos");
+          return;
+        }
+      } catch {
+        if (!cancelled)
+          setStatus("Não foi possível restaurar sua sessão. Entre novamente.");
+      }
+      if (!cancelled) void window.cardapPrinter?.ready?.().catch(() => {});
+    };
+    void restore();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

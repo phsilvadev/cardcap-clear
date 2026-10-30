@@ -126,7 +126,7 @@ export default function CouriersPage({
                   courier.assigned.map((order) => (
                     <a
                       key={order.id}
-                      href={`/dashboard?view=orders&pedido=${encodeURIComponent(order.id)}`}
+                      href={`/dashboard/pedidos?pedido=${encodeURIComponent(order.id)}`}
                     >
                       #{order.id} · {order.customer}
                     </a>

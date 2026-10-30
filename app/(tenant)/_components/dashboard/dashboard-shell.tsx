@@ -1,3 +1,4 @@
+import TenantOrdersProvider from "../orders/tenant-orders-provider";
 import OperationsProvider from "./operations-provider";
 import type { StoreOperations } from "@/lib/operations";
 import type { ReactNode } from "react";
@@ -15,19 +16,21 @@ export default function DashboardShell({
 }) {
   return (
     <OperationsProvider storeId={tenant.uid} initial={tenant.operations}>
-      <a href="#dashboard-main" className="sr-only focus:not-sr-only">
-        Ir para o conteúdo
-      </a>
-      <div className="dashboard">
-        <DashboardSidebar tenant={tenant} />
-        <div className="dashboard-app">
-          <DashboardHeader />
-          <main id="dashboard-main" tabIndex={-1}>
-            {children}
-          </main>
-          <DashboardFooter />
+      <TenantOrdersProvider storeId={tenant.uid} slug={tenant.slug}>
+        <a href="#dashboard-main" className="sr-only focus:not-sr-only">
+          Ir para o conteúdo
+        </a>
+        <div className="dashboard">
+          <DashboardSidebar tenant={tenant} />
+          <div className="dashboard-app">
+            <DashboardHeader />
+            <main id="dashboard-main" tabIndex={-1}>
+              {children}
+            </main>
+            <DashboardFooter />
+          </div>
         </div>
-      </div>
+      </TenantOrdersProvider>
     </OperationsProvider>
   );
 }

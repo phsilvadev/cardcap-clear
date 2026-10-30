@@ -14,7 +14,9 @@ export function useCouriers(tenantSlug: string, storeId: string) {
   const [filter, setFilter] = useState("all");
   const rows = (team.ready ? state.couriers : []).map((courier) => {
     const assigned = state.orders.filter(
-      (order) => order.courierId === courier.id && order.status !== "done",
+      (order) =>
+        order.courierId === courier.id &&
+        !["done", "cancelled"].includes(order.status),
     );
     const status: "delivering" | "available" | "unavailable" = assigned.some(
       (order) => order.status === "delivery",

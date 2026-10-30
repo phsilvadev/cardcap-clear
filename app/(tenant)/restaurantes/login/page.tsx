@@ -1,3 +1,4 @@
+import BrowserHomeLink from "@/app/(tenant)/_components/browser-home-link";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -30,7 +31,7 @@ export default async function Page() {
         <a className="wordmark text-3xl" href="/" aria-label="Cardap — início">
           cardap<span className="text-brand">.</span>
         </a>
-        <a href="/">Voltar ao início</a>
+        <BrowserHomeLink />
       </header>
       <main id="login-restaurante" className="restaurant-login-main">
         <section

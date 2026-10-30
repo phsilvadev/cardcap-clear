@@ -102,6 +102,13 @@ export default function initialize(tenant: Tenant) {
       ],
     };
     const navigate = (view: string = "overview") => {
+      if (view === "orders") {
+        const filter = orderStore.getSnapshot().filter;
+        window.location.assign(
+          `/dashboard/pedidos${filter !== "all" ? `?status=${filter}` : ""}`,
+        );
+        return;
+      }
       if (view === "menu") {
         window.location.assign("/dashboard/cardapio");
         return;
@@ -126,6 +133,7 @@ export default function initialize(tenant: Tenant) {
       preparing: "Em preparo",
       delivery: "Em entrega",
       done: "Concluído",
+      cancelled: "Cancelado",
     };
     const next: Partial<Record<OrderStatus, OrderStatus>> = {
       new: "preparing",
@@ -187,16 +195,21 @@ export default function initialize(tenant: Tenant) {
         "aria-checked",
         String(state.open),
       );
-      const total = state.orders.reduce((sum, order) => sum + order.total, 0);
+      const validOrders = state.orders.filter(
+        (order) => order.status !== "cancelled",
+      );
+      const total = validOrders.reduce((sum, order) => sum + order.total, 0);
       query<HTMLElement>("#stat-orders").textContent = String(
         state.orders.length,
       );
       query<HTMLElement>("#stat-active").textContent = String(
-        state.orders.filter((order) => order.status !== "done").length,
+        state.orders.filter(
+          (order) => !["done", "cancelled"].includes(order.status),
+        ).length,
       );
       query<HTMLElement>("#stat-sales").textContent = money(total);
       query<HTMLElement>("#stat-average").textContent = money(
-        Math.round(total / state.orders.length),
+        validOrders.length ? Math.round(total / validOrders.length) : 0,
       );
       const operation = query<HTMLElement>("#operation-rows");
       operation.replaceChildren();
@@ -285,7 +298,7 @@ export default function initialize(tenant: Tenant) {
     const unsubscribeOrders = orderStore.subscribe(() => {
       state.orders = orderStore.getSnapshot().orders;
       render();
-      if (query<HTMLElement>("#view-orders").hidden)
+      if (document.getElementById("view-orders")?.hidden !== false)
         feedback(orderStore.getSnapshot().message);
     });
     controller.signal.addEventListener("abort", unsubscribeOrders, {

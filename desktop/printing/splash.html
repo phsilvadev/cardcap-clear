@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'unsafe-inline'"
+    />
+    <title>Cardap Impressão</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #fff;
+        color: #111;
+        font: 14px system-ui;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        text-align: center;
+      }
+      .brand {
+        font:
+          bold italic 52px Georgia,
+          serif;
+        letter-spacing: -2px;
+      }
+      .brand span {
+        color: #ffbf00;
+      }
+      .subtitle {
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #666;
+        margin: 10px 0 28px;
+      }
+      .spinner {
+        margin: 0 auto 18px;
+        width: 26px;
+        height: 26px;
+        border: 3px solid #eee;
+        border-top-color: #ffbf00;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      p {
+        color: #666;
+        font-size: 13px;
+        line-height: 1.6;
+        max-width: 330px;
+      }
+      button {
+        font: 600 12px system-ui;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        border-radius: 999px;
+        background: #fff;
+        padding: 10px 14px;
+        margin: 5px;
+      }
+      button.primary {
+        background: #ffbf00;
+        border-color: #ffbf00;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .spinner {
+          animation-duration: 2s;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="brand">cardap<span>.</span></div>
+      <div class="subtitle">Impressão</div>
+      <div id="spinner" class="spinner" aria-hidden="true"></div>
+      <p id="status" role="status" aria-live="polite">
+        Preparando seu painel e verificando a sessão…
+      </p>
+      <div id="actions" hidden>
+        <button id="retry" class="primary" type="button">
+          Tentar novamente</button
+        ><button id="configure" type="button">Configurar conexão</button
+        ><button id="quit" type="button">Fechar aplicativo</button>
+      </div>
+    </main>
+    <script src="splash.js"></script>
+  </body>
+</html>

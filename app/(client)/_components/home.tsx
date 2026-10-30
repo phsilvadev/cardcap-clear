@@ -1,7 +1,12 @@
 import Image from "next/image";
+import HomeAccountLink from "./home-account-link";
 import PageBehavior from "@/app/(client)/_components/home-behavior";
 
-export default function HomeContent() {
+export default function HomeContent({
+  restaurant,
+}: {
+  restaurant?: { name: string; href: string };
+}) {
   return (
     <>
       <a href={"#conteudo"} className={"sr-only focus:not-sr-only"}>
@@ -39,33 +44,7 @@ export default function HomeContent() {
               {"Para restaurantes"}
             </a>
 
-            <button
-              type={"button"}
-              data-info={"login"}
-              className={
-                "rounded-full border border-ink bg-ink px-5 py-3 text-white hover:bg-white hover:text-ink"
-              }
-            >
-              {"Entrar "}
-              <svg
-                xmlns={"http://www.w3.org/2000/svg"}
-                width={"20"}
-                height={"20"}
-                viewBox={"0 0 24 24"}
-                fill={"none"}
-                stroke={"currentColor"}
-                strokeWidth={"2"}
-                strokeLinecap={"round"}
-                strokeLinejoin={"round"}
-                className={"lucide lucide-arrow-up-right"}
-                aria-hidden={"true"}
-                focusable={"false"}
-                style={{ display: "inline-block", verticalAlign: "middle" }}
-              >
-                <path d={"M7 7h10v10"}></path>
-                <path d={"M7 17 17 7"}></path>
-              </svg>
-            </button>
+            <HomeAccountLink restaurant={restaurant} />
           </nav>
         </header>
 

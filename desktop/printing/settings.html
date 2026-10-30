@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'unsafe-inline'"
+    />
+    <title>Configurar impressão</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font: 14px system-ui;
+        margin: 0;
+        padding: 30px;
+        color: #111;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      p {
+        color: #666;
+        line-height: 1.6;
+      }
+      label {
+        display: grid;
+        gap: 8px;
+        margin: 20px 0;
+      }
+      input,
+      select {
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font: inherit;
+        width: 100%;
+      }
+      button {
+        border: 0;
+        border-radius: 30px;
+        background: #ffbf00;
+        font: 600 14px system-ui;
+        padding: 13px 24px;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.5;
+      }
+      #feedback {
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Cardap Impressão</h1>
+    <p>
+      Escolha a impressora instalada neste computador. O painel precisa
+      permanecer aberto para aceitar e imprimir os pedidos.
+    </p>
+    <form id="settings">
+      <label
+        >Endereço do painel<input
+          id="url"
+          type="url"
+          required
+          placeholder="https://seu-painel/dashboard/pedidos" /></label
+      ><label>Impressora<select id="printer" required></select></label
+      ><label
+        >Largura do papel<select id="width">
+          <option value="80">80 mm</option>
+          <option value="58">58 mm</option>
+        </select></label
+      ><button id="save" type="submit">Salvar e abrir painel</button>
+      <button
+        id="close"
+        type="button"
+        style="background: #f0f0f0; margin-left: 8px"
+      >
+        Fechar
+      </button>
+    </form>
+    <p id="feedback" role="status"></p>
+    <script src="settings.js"></script>
+  </body>
+</html>

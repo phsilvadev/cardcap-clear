@@ -1,4 +1,5 @@
 "use client";
+import SuccessAlert from "../feedback/success-alert";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { httpsCallable } from "firebase/functions";
 import { getFirebaseFunctions } from "@/lib/firebase/client";
@@ -86,7 +87,12 @@ export default function OperationsSection({ storeId }: { storeId?: string }) {
         Desabilitar uma seção mantém os cadastros e os acessos existentes.
       </p>
       {(error || loadError) && <p role="alert">{error || loadError}</p>}
-      {message && <p role="status">{message}</p>}
+      <SuccessAlert
+        open={Boolean(message)}
+        title="Operação salva!"
+        description="O menu da loja foi atualizado com as opções escolhidas."
+        onClose={() => setMessage("")}
+      />
       <button
         className="button primary"
         type="submit"

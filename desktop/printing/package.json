@@ -1,0 +1,47 @@
+{
+  "name": "cardap-impressao",
+  "version": "0.2.1",
+  "private": true,
+  "description": "Impress\u00e3o autom\u00e1tica de comandas do Cardap",
+  "author": "Cardap",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test *.test.cjs",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "45.1.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.cardap.impressao",
+    "productName": "Cardap Impress\u00e3o",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "*.cjs",
+      "*.html",
+      "*.js",
+      "!*.test.cjs"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Office"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ]
+    }
+  }
+}
