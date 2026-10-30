@@ -69,3 +69,13 @@ exports.employeeCreateWaiter = onCall(
     timestamp: () => FieldValue.serverTimestamp(),
   }),
 );
+
+const { createOperationsHandler } = require("./operations.cjs");
+exports.tenantSetOperations = onCall(
+  { region: "southamerica-east1", maxInstances: 5 },
+  createOperationsHandler({
+    db: getFirestore(),
+    HttpsError,
+    timestamp: () => FieldValue.serverTimestamp(),
+  }),
+);

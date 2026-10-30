@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 export default function DashboardHeader() {
   const pathname = usePathname();
+  const isWaiters = pathname.includes("/garcons");
   const isMenu = pathname.includes("/cardapio");
   const isCouriers = pathname.includes("/entregadores");
   return (
@@ -9,10 +10,16 @@ export default function DashboardHeader() {
       <span>
         {"Restaurante / "}
         <strong id={"breadcrumb"}>
-          {isMenu ? "Cardápio" : isCouriers ? "Entregadores" : "Visão geral"}
+          {isMenu
+            ? "Cardápio"
+            : isCouriers
+              ? "Entregadores"
+              : isWaiters
+                ? "Garçons"
+                : "Visão geral"}
         </strong>
       </span>
-      {!isMenu && !isCouriers && (
+      {!isMenu && !isCouriers && !isWaiters && (
         <button
           type={"button"}
           id={"store-toggle"}

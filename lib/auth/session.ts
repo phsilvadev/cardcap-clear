@@ -1,3 +1,4 @@
+import type { StoreOperations } from "@/lib/operations";
 import { cookies } from "next/headers";
 
 export const SESSION_COOKIE = "cardap_session";
@@ -6,6 +7,7 @@ export type TenantSession = {
   slug: string;
   name: string;
   status: string;
+  operations: StoreOperations;
 };
 
 // Every check goes to Firebase. No trust is placed in client-provided claims.
@@ -64,7 +66,19 @@ export async function verifyTenantSession(
       return null;
     const domain = await read(`tenantDomains/${encodeURIComponent(slug)}`);
     if (domain?.tenantId?.stringValue !== user.localId) return null;
-    return { uid: user.localId, slug, name: tenant.name.stringValue, status };
+    return {
+      uid: user.localId,
+      slug,
+      name: tenant.name.stringValue,
+      status,
+      operations: {
+        salon:
+          tenant.operations?.mapValue?.fields?.salon?.booleanValue === true,
+        ownDelivery:
+          tenant.operations?.mapValue?.fields?.ownDelivery?.booleanValue ===
+          true,
+      },
+    };
   } catch {
     return null;
   }

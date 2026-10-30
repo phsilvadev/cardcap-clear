@@ -33,6 +33,7 @@ test.describe("validação da sessão no servidor", () => {
       disabled?: boolean;
       rejectIdentity?: boolean;
       validSince?: string;
+      operations?: Record<string, unknown>;
     } = {},
   ) {
     let calls = 0;
@@ -54,6 +55,7 @@ test.describe("validação da sessão no servidor", () => {
       if (calls === 2)
         return Response.json({
           fields: {
+            operations: { mapValue: { fields: options.operations ?? {} } },
             ownerUid: { stringValue: options.owner ?? "owner" },
             slug: { stringValue: "minha-loja" },
             name: { stringValue: "Minha Loja" },
@@ -72,6 +74,19 @@ test.describe("validação da sessão no servidor", () => {
       slug: "minha-loja",
       name: "Minha Loja",
       status: "pending",
+      operations: { salon: false, ownDelivery: false },
+    });
+  });
+  test("carrega apenas opções booleanas habilitadas na loja", async () => {
+    mock({
+      operations: {
+        salon: { booleanValue: true },
+        ownDelivery: { stringValue: "true" },
+      },
+    });
+    expect((await verifyTenantSession(token()))?.operations).toEqual({
+      salon: true,
+      ownDelivery: false,
     });
   });
   for (const [name, options] of [

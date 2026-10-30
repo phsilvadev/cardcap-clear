@@ -1,4 +1,5 @@
 "use client";
+import OperationsSection from "../settings/operations-section";
 import PlanSection from "@/app/(tenant)/_components/settings/plan-section";
 import { useEffect, useState, type KeyboardEvent } from "react";
 import {
@@ -84,7 +85,9 @@ export default function DashboardSettings({
                 <h2>{section.label}</h2>
                 <p>{section.description}</p>
               </div>
-              {section.id === "details" ? (
+              {section.id === "operations" ? (
+                <OperationsSection storeId={storeId} />
+              ) : section.id === "details" ? (
                 <StoreDetailsSection />
               ) : section.id === "employees" ? (
                 <TeamSection

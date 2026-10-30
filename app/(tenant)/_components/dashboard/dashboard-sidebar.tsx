@@ -1,9 +1,12 @@
 "use client";
+import { useStoreOperations } from "./operations-provider";
 import { usePathname } from "next/navigation";
 import TenantSessionControls from "@/app/(tenant)/_components/tenant-session-controls";
 import type { Tenant } from "@/lib/tenant";
 export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
   const pathname = usePathname();
+  const { operations } = useStoreOperations();
+  const isWaiters = pathname.includes("/garcons");
   const isMenu = pathname.includes("/cardapio");
   const isCouriers = pathname.includes("/entregadores");
   return (
@@ -48,7 +51,9 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
         <a
           href="/dashboard?view=overview"
           data-view="overview"
-          aria-current={!isMenu && !isCouriers ? "page" : undefined}
+          aria-current={
+            !isMenu && !isCouriers && !isWaiters ? "page" : undefined
+          }
         >
           <svg
             xmlns={"http://www.w3.org/2000/svg"}
@@ -126,27 +131,50 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
           </svg>
           {"Cardápio"}
         </a>
-        <a
-          href="/dashboard/entregadores"
-          aria-current={isCouriers ? "page" : undefined}
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
+        {operations.salon && (
+          <a
+            href="/dashboard/garcons"
+            aria-current={isWaiters ? "page" : undefined}
           >
-            <path d="M1 3h14v13H1zM15 8h4l3 4v4h-7" />
-            <circle cx="5" cy="18" r="2" />
-            <circle cx="18" cy="18" r="2" />
-          </svg>
-          Entregadores
-        </a>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 17h18M5 17a7 7 0 0 1 14 0M12 8V6M10 6h4M5 21h14" />
+            </svg>
+            Garçons
+          </a>
+        )}
+        {operations.ownDelivery && (
+          <a
+            href="/dashboard/entregadores"
+            aria-current={isCouriers ? "page" : undefined}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M1 3h14v13H1zM15 8h4l3 4v4h-7" />
+              <circle cx="5" cy="18" r="2" />
+              <circle cx="18" cy="18" r="2" />
+            </svg>
+            Entregadores
+          </a>
+        )}
         <a
           href="/dashboard?view=settings"
           data-view="settings"

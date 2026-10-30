@@ -29,6 +29,21 @@ export async function proxy(request: NextRequest) {
       status: 403,
     });
   }
+  const path = request.nextUrl.pathname;
+  if (
+    ((path === "/dashboard/garcons" ||
+      path.startsWith("/dashboard/garcons/")) &&
+      !session.operations.salon) ||
+    ((path === "/dashboard/entregadores" ||
+      path.startsWith("/dashboard/entregadores/")) &&
+      !session.operations.ownDelivery)
+  ) {
+    const response = NextResponse.redirect(
+      new URL("/dashboard?view=settings&section=operations", request.url),
+    );
+    response.headers.set("Cache-Control", "private, no-store");
+    return response;
+  }
   const destination = new URL(request.url);
   destination.pathname = `/tenants/${session.slug}${request.nextUrl.pathname}`;
   const response = NextResponse.rewrite(destination);

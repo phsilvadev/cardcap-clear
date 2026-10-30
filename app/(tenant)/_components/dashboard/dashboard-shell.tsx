@@ -1,3 +1,5 @@
+import OperationsProvider from "./operations-provider";
+import type { StoreOperations } from "@/lib/operations";
 import type { ReactNode } from "react";
 import type { Tenant } from "@/lib/tenant";
 import DashboardSidebar from "./dashboard-sidebar";
@@ -8,11 +10,11 @@ export default function DashboardShell({
   tenant,
   children,
 }: {
-  tenant: Tenant;
+  tenant: Tenant & { uid: string; operations: StoreOperations };
   children: ReactNode;
 }) {
   return (
-    <>
+    <OperationsProvider storeId={tenant.uid} initial={tenant.operations}>
       <a href="#dashboard-main" className="sr-only focus:not-sr-only">
         Ir para o conteúdo
       </a>
@@ -26,6 +28,6 @@ export default function DashboardShell({
           <DashboardFooter />
         </div>
       </div>
-    </>
+    </OperationsProvider>
   );
 }

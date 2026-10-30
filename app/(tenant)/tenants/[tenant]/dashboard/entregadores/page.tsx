@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { requireTenant } from "@/app/(tenant)/_lib/require-tenant";
 import CouriersPage from "@/app/(tenant)/_components/couriers/couriers-page";
@@ -8,5 +9,7 @@ export default async function Page({
   params: Promise<{ tenant: string }>;
 }) {
   const tenant = await requireTenant((await params).tenant);
+  if (!tenant.operations.ownDelivery)
+    redirect("/dashboard?view=settings&section=operations");
   return <CouriersPage tenantSlug={tenant.slug} storeId={tenant.uid} />;
 }

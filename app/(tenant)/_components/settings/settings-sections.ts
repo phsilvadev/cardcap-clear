@@ -1,5 +1,10 @@
 export const settingsSections = [
   {
+    id: "operations",
+    label: "Operação da loja",
+    description: "Habilite os recursos usados pela equipe do restaurante.",
+  },
+  {
     id: "details",
     label: "Dados da loja",
     description: "Nome e apresentação do restaurante.",
@@ -48,7 +53,7 @@ export const settingsSections = [
 export type SettingsSectionId = (typeof settingsSections)[number]["id"];
 export type PreviewSectionId = Exclude<
   SettingsSectionId,
-  "details" | "employees" | "permissions" | "plan"
+  "details" | "employees" | "permissions" | "plan" | "operations"
 >;
 type Field = {
   name: string;
