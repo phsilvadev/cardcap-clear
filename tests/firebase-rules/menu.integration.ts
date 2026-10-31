@@ -30,6 +30,7 @@ import {
   getBytes,
   ref,
   deleteObject,
+  uploadBytes,
 } from "firebase/storage";
 import {
   getFirebaseApp,
@@ -39,6 +40,7 @@ import {
 } from "../../lib/firebase/client";
 import {
   createCategory,
+  getMenuOwner,
   listCategories,
   saveProduct,
   getProduct,
@@ -69,7 +71,11 @@ const image = new File(
   "produto.png",
   { type: "image/png" },
 );
-async function seedTenant(uid: string, status = "configured") {
+async function seedTenant(
+  uid: string,
+  status = "configured",
+  walletId = "test_wallet_only",
+) {
   const response = await fetch(
     `http://127.0.0.1:8180/v1/projects/${projectId}/databases/(default)/documents/tenants/${uid}`,
     {
@@ -83,7 +89,7 @@ async function seedTenant(uid: string, status = "configured") {
           ownerUid: { stringValue: uid },
           name: { stringValue: "Loja de teste" },
           status: { stringValue: status },
-          asaasWalletId: { stringValue: "test_wallet_only" },
+          asaasWalletId: { stringValue: walletId },
         },
       }),
     },
@@ -232,6 +238,144 @@ test.describe.serial("CRUD do cardápio com regras reais nos emuladores", () => 
     expect(updated.imagePath).toBe(product.imagePath);
     expect(updated.customization).toEqual(product.customization);
   });
+  test("loja ativa mantém o gerenciamento de produtos, categorias e imagens", async () => {
+    await seedTenant(ownerUid, "active");
+    try {
+      expect((await getMenuOwner(ownerUid)).canManage).toBe(true);
+      const category = await createCategory(
+        ownerUid,
+        "Categoria da loja ativa",
+      );
+      const input = {
+        name: "Produto da loja ativa",
+        description: "Teste de regressão após ativação",
+        categoryId: category.id,
+        priceCents: 2500,
+        available: true,
+      };
+      const id = await saveProduct(ownerUid, undefined, input, image);
+      await saveProduct(ownerUid, id, { ...input, priceCents: 2800 }, null);
+      await saveProduct(ownerUid, id, { ...input, priceCents: 2800 }, image);
+      await setProductAvailability(ownerUid, id, false);
+      const product = await getProduct(ownerUid, id);
+      expect(product.priceCents).toBe(2800);
+      expect(product.available).toBe(false);
+      expect(
+        (await getBytes(ref(getFirebaseStorage(), product.imagePath)))
+          .byteLength,
+      ).toBeGreaterThan(0);
+      const foreignProduct = doc(otherDb, "tenants", ownerUid, "products", id);
+      await expect(
+        updateDoc(foreignProduct, {
+          priceCents: 1,
+          updatedAt: serverTimestamp(),
+        }),
+      ).rejects.toMatchObject({ code: "permission-denied" });
+      await expect(deleteDoc(foreignProduct)).rejects.toMatchObject({
+        code: "permission-denied",
+      });
+      await expect(
+        uploadBytes(ref(otherStorage, product.imagePath), image, {
+          contentType: image.type,
+        }),
+      ).rejects.toMatchObject({ code: "storage/unauthorized" });
+      await expect(
+        deleteObject(ref(otherStorage, product.imagePath)),
+      ).rejects.toMatchObject({ code: "storage/unauthorized" });
+      expect(await removeProduct(ownerUid, id)).toBe("Produto excluído.");
+      expect(
+        (
+          await getDoc(
+            doc(getFirebaseDb(), "tenants", ownerUid, "products", id),
+          )
+        ).exists(),
+      ).toBe(false);
+      await expect(
+        getBytes(ref(getFirebaseStorage(), product.imagePath)),
+      ).rejects.toMatchObject({ code: "storage/object-not-found" });
+    } finally {
+      await seedTenant(ownerUid);
+    }
+  });
+  test("loja ativa sem carteira válida continua bloqueada", async () => {
+    await seedTenant(ownerUid, "active", "");
+    try {
+      expect((await getMenuOwner(ownerUid)).canManage).toBe(false);
+      await expect(createCategory(ownerUid, "Sem carteira")).rejects.toThrow();
+      await expect(
+        updateDoc(
+          doc(getFirebaseDb(), "tenants", ownerUid, "products", productId),
+          { available: true, updatedAt: serverTimestamp() },
+        ),
+      ).rejects.toMatchObject({ code: "permission-denied" });
+      await expect(
+        deleteDoc(
+          doc(getFirebaseDb(), "tenants", ownerUid, "products", productId),
+        ),
+      ).rejects.toMatchObject({ code: "permission-denied" });
+      await expect(
+        deleteObject(
+          ref(
+            getFirebaseStorage(),
+            `tenants/${ownerUid}/products/${productId}/image`,
+          ),
+        ),
+      ).rejects.toMatchObject({ code: "storage/unauthorized" });
+    } finally {
+      await seedTenant(ownerUid);
+    }
+  });
+  for (const status of ["pending", "suspended"]) {
+    test(`loja ${status} não altera cardápio nem envia imagens`, async () => {
+      await seedTenant(ownerUid, status);
+      try {
+        if (status === "pending")
+          expect((await getMenuOwner(ownerUid)).canManage).toBe(false);
+        await expect(
+          createCategory(ownerUid, "Categoria bloqueada"),
+        ).rejects.toThrow();
+        await expect(
+          setProductAvailability(ownerUid, productId, true),
+        ).rejects.toThrow();
+        await expect(
+          updateDoc(
+            doc(getFirebaseDb(), "tenants", ownerUid, "products", productId),
+            { priceCents: 2800, updatedAt: serverTimestamp() },
+          ),
+        ).rejects.toMatchObject({ code: "permission-denied" });
+        await expect(
+          setDoc(
+            doc(
+              getFirebaseDb(),
+              "tenants",
+              ownerUid,
+              "categories",
+              "blocked-category",
+            ),
+            {
+              storeId: ownerUid,
+              name: "Categoria bloqueada",
+              description: "",
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+            },
+          ),
+        ).rejects.toMatchObject({ code: "permission-denied" });
+        await expect(
+          uploadBytes(
+            ref(
+              getFirebaseStorage(),
+              `tenants/${ownerUid}/products/${productId}/image`,
+            ),
+            image,
+            { contentType: image.type },
+          ),
+        ).rejects.toMatchObject({ code: "storage/unauthorized" });
+      } finally {
+        await seedTenant(ownerUid);
+      }
+    });
+  }
   test("outro tenant não lê nem exclui produto ou imagem", async () => {
     await expect(
       getDoc(doc(otherDb, "tenants", ownerUid, "products", productId)),

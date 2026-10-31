@@ -237,7 +237,7 @@ service cloud.firestore {
         allow get: if isProductOwner();
         allow list: if isProductOwner() && request.query.limit != null && request.query.limit <= 50;
         allow create, update: if isProductOwner()
-          && get(/databases/$(database)/documents/tenants/$(tenantId)).data.status == 'configured'
+          && get(/databases/$(database)/documents/tenants/$(tenantId)).data.status in ['configured', 'active']
           && get(/databases/$(database)/documents/tenants/$(tenantId)).data.asaasWalletId is string
           && get(/databases/$(database)/documents/tenants/$(tenantId)).data.asaasWalletId.matches('^[a-zA-Z0-9_-]{10,100}$')
           && request.resource.data.keys().hasAll(['storeId', 'name', 'description', 'categoryId', 'priceCents', 'available', 'imagePath', 'createdAt', 'updatedAt'])
@@ -266,7 +266,7 @@ service cloud.firestore {
           && request.resource.data.updatedAt == request.time;
         allow delete: if isProductOwner()
           && resource.data.storeId == tenantId
-          && get(/databases/$(database)/documents/tenants/$(tenantId)).data.status == 'configured'
+          && get(/databases/$(database)/documents/tenants/$(tenantId)).data.status in ['configured', 'active']
           && get(/databases/$(database)/documents/tenants/$(tenantId)).data.asaasWalletId is string
           && get(/databases/$(database)/documents/tenants/$(tenantId)).data.asaasWalletId.matches('^[a-zA-Z0-9_-]{10,100}$');
       }
@@ -282,7 +282,7 @@ service cloud.firestore {
         allow list: if isOwner() && request.query.limit != null && request.query.limit <= 50;
 
         allow create: if isOwner()
-          && get(/databases/$(database)/documents/tenants/$(tenantId)).data.status == 'configured'
+          && get(/databases/$(database)/documents/tenants/$(tenantId)).data.status in ['configured', 'active']
           && get(/databases/$(database)/documents/tenants/$(tenantId)).data.asaasWalletId is string
           && get(/databases/$(database)/documents/tenants/$(tenantId)).data.asaasWalletId.matches('^[a-zA-Z0-9_-]{10,100}$')
           && request.resource.data.keys().hasAll(['storeId', 'name', 'description', 'createdAt', 'updatedAt'])

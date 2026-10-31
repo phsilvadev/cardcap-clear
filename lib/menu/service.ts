@@ -49,7 +49,7 @@ export async function getMenuOwner(storeId: string) {
     throw new Error("Você não tem acesso a esta loja.");
   return {
     canManage:
-      tenant.status === "configured" &&
+      ["configured", "active"].includes(tenant.status) &&
       typeof tenant.asaasWalletId === "string" &&
       /^[a-zA-Z0-9_-]{10,100}$/.test(tenant.asaasWalletId),
   };

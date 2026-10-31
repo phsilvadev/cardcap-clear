@@ -11,12 +11,12 @@ service firebase.storage {
 
       allow get: if isOwner();
       allow create, update: if isOwner()
-        && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.status == 'configured'
+        && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.status in ['configured', 'active']
         && request.resource.size > 0
         && request.resource.size <= 5 * 1024 * 1024
         && request.resource.contentType in ['image/jpeg', 'image/png', 'image/webp'];
       allow delete: if isOwner()
-        && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.status == 'configured'
+        && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.status in ['configured', 'active']
         && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.asaasWalletId is string
         && firestore.get(/databases/(default)/documents/tenants/$(tenantId)).data.asaasWalletId.matches('^[a-zA-Z0-9_-]{10,100}$');
       allow list: if false;
