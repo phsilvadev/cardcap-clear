@@ -186,6 +186,23 @@ Os serviços ficam em `lib/menu/`, os componentes em `app/(tenant)/_components/p
 
 As regras locais de Firestore e Storage foram preparadas para permitir a exclusão de produtos e imagens apenas pelo proprietário de uma loja configurada ou ativa, preservando o bloqueio de outros tenants. Para a exclusão e a substituição de fotos funcionarem no projeto real, é necessário publicar `firestore.rules` e `storage.rules`. Como o Firebase é compartilhado com o `main`, essa publicação afeta os dois aplicativos; mantenha as regras sincronizadas antes de próximos deploys. Não é necessário publicar Functions para esta implementação.
 
+### Publicar as regras no Firebase
+
+Requer Firebase CLI instalado e uma conta com permissão para publicar regras. Na raiz do repositório, atualize o código e autentique-se:
+
+```bash
+git pull origin main
+firebase login
+```
+
+Confirme que `cardap-e0bf0` é o projeto de produção correto antes de executar:
+
+```bash
+firebase deploy --only firestore:rules,storage --project cardap-e0bf0
+```
+
+O comando publica as regras do Firestore e Storage definidas em `firebase.json`. Essa publicação é necessária para permitir o gerenciamento do cardápio após a ativação da loja.
+
 Produto e imagem são armazenados em serviços diferentes. A exclusão remove primeiro o documento; se a limpeza da imagem falhar, a tela informa que o produto foi excluído, mas a imagem não foi removida. Leituras e gravações não utilizam credenciais administrativas no navegador.
 
 Para testar o CRUD e o isolamento sem acessar o Firebase real, use os emuladores com um projeto `demo-`:
