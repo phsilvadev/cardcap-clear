@@ -1,3 +1,4 @@
+import { printerRentalWhatsAppUrl } from "@/lib/support";
 import { requireTenant } from "@/app/(tenant)/_lib/require-tenant";
 import AppsHub from "@/app/(tenant)/_components/apps/apps-hub";
 export const metadata = { title: "Aplicativos Cardap — Cardap" };
@@ -16,9 +17,10 @@ export default async function Page({
 }: {
   params: Promise<{ tenant: string }>;
 }) {
-  await requireTenant((await params).tenant);
+  const tenant = await requireTenant((await params).tenant);
   return (
     <AppsHub
+      printerRentalUrl={printerRentalWhatsAppUrl(tenant.name)}
       links={{
         waiter: installUrl(process.env.CARDAP_WAITER_APP_URL),
         courier: installUrl(process.env.CARDAP_COURIER_APP_URL),

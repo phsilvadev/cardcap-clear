@@ -1,4 +1,5 @@
 "use client";
+import PrinterRental from "./printer-rental";
 import { useStoreOperations } from "../dashboard/operations-provider";
 type AppId = "waiter" | "courier" | "printing";
 const apps = [
@@ -67,8 +68,10 @@ function AppIcon({ type }: { type: AppId }) {
 }
 export default function AppsHub({
   links,
+  printerRentalUrl = null,
 }: {
   links: Record<AppId, string | null>;
+  printerRentalUrl?: string | null;
 }) {
   const { operations } = useStoreOperations();
   return (
@@ -80,6 +83,7 @@ export default function AppsHub({
           <p>Conheça os aplicativos para o dia a dia do seu restaurante.</p>
         </div>
       </header>
+      <PrinterRental contactUrl={printerRentalUrl} />
       <div className="apps-hub-grid">
         {apps.map((app) => {
           const enabled =
