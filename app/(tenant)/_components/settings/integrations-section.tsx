@@ -1,21 +1,90 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { httpsCallable } from "firebase/functions";
-import { getFirebaseFunctions } from "@/lib/firebase/client";
+import { useCallback, useEffect, useState } from "react";
+import Dialog from "../products/product-dialog";
+import WhatsAppIntegrationSettings from "./whatsapp-integration-settings";
+import WhatsAppConnectionDrawer from "./whatsapp-connection-drawer";
 
-type Connection = {
-  configured: boolean;
-  state: "unavailable" | "connected" | "connecting" | "disconnected";
-  qrCode: string | null;
-  qrExpiresAt: number | null;
-};
-const labels = {
-  unavailable: "Configuração pendente",
-  connected: "Conectado",
-  connecting: "Aguardando conexão",
-  disconnected: "Desconectado",
-};
+const integrations = [
+  {
+    id: "whatsapp",
+    title: "WhatsApp",
+    subtitle: "API não oficial · Evolution API",
+    description:
+      "Conecte o WhatsApp do restaurante pelo QR Code e acompanhe o status da conexão.",
+    icon: "chat",
+    color: "green",
+  },
+  {
+    id: "whatsapp-official",
+    title: "WhatsApp Business",
+    subtitle: "API oficial · Meta",
+    description:
+      "Uma futura opção para integrar a comunicação do restaurante com a plataforma oficial do WhatsApp.",
+    icon: "business",
+    color: "green",
+  },
+  {
+    id: "instagram",
+    title: "Instagram",
+    subtitle: "Perfil do restaurante",
+    description:
+      "Uma futura integração para aproximar seu perfil no Instagram da operação do restaurante.",
+    icon: "instagram",
+    color: "pink",
+  },
+  {
+    id: "email",
+    title: "E-mail",
+    subtitle: "Notificações e comunicação",
+    description:
+      "Uma futura integração para enviar avisos e novidades do restaurante por e-mail.",
+    icon: "email",
+    color: "blue",
+  },
+] as const;
+
+function IntegrationIcon({
+  type,
+}: {
+  type: (typeof integrations)[number]["icon"];
+}) {
+  return (
+    <svg
+      width="25"
+      height="25"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {type === "instagram" ? (
+        <>
+          <rect x="3" y="3" width="18" height="18" rx="5" />
+          <circle cx="12" cy="12" r="4" />
+          <path d="M17.5 6.5h.01" />
+        </>
+      ) : type === "email" ? (
+        <>
+          <rect x="3" y="5" width="18" height="14" rx="3" />
+          <path d="m3 7 9 6 9-6" />
+        </>
+      ) : (
+        <>
+          <path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z" />
+          {type === "business" ? (
+            <path d="M9 8h3a2 2 0 0 1 0 4H9m0-4v8h3a2 2 0 0 0 0-4H9" />
+          ) : (
+            <path d="M8.5 8.5c0 3.5 3.5 7 7 7l1-2-2-1-1 1c-1.5-.5-2.5-1.5-3-3l1-1-1-2-2 1Z" />
+          )}
+        </>
+      )}
+    </svg>
+  );
+}
 
 export default function IntegrationsSection({
   storeId,
@@ -24,272 +93,120 @@ export default function IntegrationsSection({
   storeId?: string;
   enabled?: boolean;
 }) {
-  const root = useRef<HTMLElement>(null);
-  const scope = useRef(0);
-  const pending = useRef(false);
-  const polling = useRef(false);
-  const [visible, setVisible] = useState(false);
-  const [connection, setConnection] = useState<Connection | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [expired, setExpired] = useState(false);
-  const [confirmDisconnect, setConfirmDisconnect] = useState(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) =>
-      setVisible(entry.isIntersecting),
-    );
-    if (root.current) observer.observe(root.current);
-    return () => observer.disconnect();
+  const [selected, setSelected] = useState<
+    (typeof integrations)[number] | null
+  >(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [whatsappConnected, setWhatsappConnected] = useState(false);
+  const handleConnected = useCallback(() => {
+    setWhatsappConnected(true);
+    setSelected(null);
+    setDrawerOpen(true);
   }, []);
-  const run = useCallback(
-    async (action: "status" | "connect" | "disconnect") => {
-      if (!storeId || pending.current) return;
-      const version = scope.current;
-      pending.current = true;
-      setBusy(true);
-      setError("");
-      try {
-        const call = httpsCallable<
-          { storeId: string; action: string },
-          Connection
-        >(getFirebaseFunctions(), "tenantWhatsAppIntegration");
-        const response = await call({ storeId, action });
-        if (scope.current !== version) return;
-        polling.current = ["connected", "connecting"].includes(
-          response.data.state,
-        );
-        setConnection((previous) =>
-          action === "status" &&
-          response.data.state === "connecting" &&
-          previous?.qrCode
-            ? {
-                ...response.data,
-                qrCode: previous.qrCode,
-                qrExpiresAt: previous.qrExpiresAt,
-              }
-            : response.data,
-        );
-        if (action !== "status" || response.data.state === "connected")
-          setExpired(false);
-        setConfirmDisconnect(false);
-      } catch (cause) {
-        if (scope.current !== version) return;
-        polling.current = false;
-        const code = (cause as { code?: string })?.code;
-        setError(
-          code === "functions/permission-denied" ||
-            code === "functions/unauthenticated"
-            ? "Entre com a conta do proprietário e conclua o cadastro da loja para gerenciar a conexão."
-            : code === "functions/failed-precondition"
-              ? "O suporte precisa configurar a Evolution API antes de conectar."
-              : code === "functions/aborted" ||
-                  code === "functions/resource-exhausted"
-                ? "Aguarde alguns segundos antes de tentar novamente."
-                : "Não foi possível atualizar a conexão. Confira sua internet e tente novamente.",
-        );
-      } finally {
-        if (scope.current === version) {
-          pending.current = false;
-          setBusy(false);
-        }
-      }
-    },
-    [storeId],
-  );
+  const handleStateChange = useCallback((state: string) => {
+    setWhatsappConnected(state === "connected");
+  }, []);
+  const overlayOpen = Boolean(selected) || drawerOpen;
   useEffect(() => {
-    scope.current++;
-    pending.current = false;
-    setConnection(null);
-    setExpired(false);
-    setError("");
-    setConfirmDisconnect(false);
-    if (!enabled || !visible || !storeId) {
-      setBusy(false);
-      return;
+    if (!enabled) {
+      setSelected(null);
+      setDrawerOpen(false);
     }
-    void run("status");
-    const refresh = () => {
-      if (!document.hidden && polling.current) void run("status");
-    };
-    const interval = window.setInterval(refresh, 10000);
-    document.addEventListener("visibilitychange", refresh);
-    return () => {
-      scope.current++;
-      pending.current = false;
-      window.clearInterval(interval);
-      document.removeEventListener("visibilitychange", refresh);
-    };
-  }, [enabled, visible, storeId, run]);
+  }, [enabled]);
   useEffect(() => {
-    if (!connection?.qrExpiresAt) return;
-    const timer = window.setTimeout(
-      () => {
-        setConnection((previous) =>
-          previous ? { ...previous, qrCode: null, qrExpiresAt: null } : null,
-        );
-        setExpired(true);
-      },
-      Math.max(0, connection.qrExpiresAt - Date.now()),
-    );
-    return () => window.clearTimeout(timer);
-  }, [connection?.qrExpiresAt]);
+    if (!overlayOpen) return;
+    const previous = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = previous;
+    };
+  }, [overlayOpen]);
   return (
-    <section
-      ref={root}
-      className="whatsapp-integration"
-      aria-labelledby="whatsapp-integration-title"
-    >
-      <div className="whatsapp-integration-header">
-        <div className="whatsapp-integration-identity">
-          <span className="whatsapp-integration-icon" aria-hidden="true">
-            <svg
-              width="26"
-              height="26"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z" />
-              <path d="M8.5 8.5c0 3.5 3.5 7 7 7l1-2-2-1-1 1c-1.5-.5-2.5-1.5-3-3l1-1-1-2-2 1Z" />
-            </svg>
-          </span>
-          <div>
-            <h3 id="whatsapp-integration-title">WhatsApp</h3>
-            <p>Evolution API · API não oficial</p>
-          </div>
-        </div>
-        <span
-          className="team-badge"
-          data-whatsapp-state={connection?.state}
-          role="status"
-        >
-          {connection
-            ? labels[connection.state]
-            : busy
-              ? "Consultando…"
-              : "Não consultado"}
-        </span>
-      </div>
-      <p className="whatsapp-integration-description">
-        Conecte o WhatsApp do restaurante escaneando um QR Code. A conexão fica
-        separada das outras lojas.
-      </p>
-      {connection?.state === "unavailable" && (
-        <div className="whatsapp-integration-status">
-          <span
-            className="whatsapp-integration-status-dot"
-            aria-hidden="true"
-          />
-          <div>
-            <strong>Aguardando configuração do provedor</strong>
-            <p>
-              O suporte precisa habilitar a Evolution API para disponibilizar a
-              conexão.
+    <>
+      <div className="integrations-grid">
+        {integrations.map((integration) => (
+          <article className="integration-card" key={integration.id}>
+            <div className="integration-card-heading">
+              <span
+                className="integration-card-icon"
+                data-color={integration.color}
+              >
+                <IntegrationIcon type={integration.icon} />
+              </span>
+              <div>
+                <h3>{integration.title}</h3>
+                <p>{integration.subtitle}</p>
+              </div>
+            </div>
+            <p className="integration-card-description">
+              {integration.description}
             </p>
-          </div>
-        </div>
-      )}
-      {connection?.state === "connected" && (
-        <p className="whatsapp-connection-success">
-          ✓ WhatsApp conectado ao restaurante.
-        </p>
-      )}
-      {connection?.qrCode && (
-        <div className="whatsapp-pairing">
-          <img
-            src={connection.qrCode}
-            width="240"
-            height="240"
-            alt="QR Code para conectar o WhatsApp do restaurante"
-          />
-          <div>
-            <h4>Conecte pelo seu celular</h4>
-            <ol>
-              <li>Abra o WhatsApp do restaurante.</li>
-              <li>Acesse Aparelhos conectados → Conectar um aparelho.</li>
-              <li>Aponte a câmera para este QR Code.</li>
-            </ol>
-            <p>O código expira em poucos segundos. Gere outro se necessário.</p>
-          </div>
-        </div>
-      )}
-      {expired && (
-        <p role="status">
-          O QR Code expirou. Gere um novo código para continuar.
-        </p>
-      )}
-      {connection?.state === "connecting" && !connection.qrCode && !expired && (
-        <p role="status">
-          Aguardando conexão. Se o celular ainda não foi pareado, gere um novo
-          QR Code.
-        </p>
-      )}
-      <div className="whatsapp-integration-actions">
-        {connection?.configured && connection.state !== "connected" && (
-          <button
-            className="whatsapp-connect-button"
-            type="button"
-            disabled={busy}
-            onClick={() => void run("connect")}
-          >
-            {busy
-              ? "Aguarde…"
-              : connection.state === "connecting" || expired
-                ? "Gerar novo QR Code"
-                : "Conectar WhatsApp"}
-          </button>
-        )}
-        <button
-          type="button"
-          disabled={busy || !storeId}
-          onClick={() => void run("status")}
-        >
-          {busy ? "Atualizando…" : "Atualizar status"}
-        </button>
-        {connection?.configured && connection.state !== "disconnected" && (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => setConfirmDisconnect(true)}
-          >
-            Desconectar
-          </button>
-        )}
+            <div className="integration-card-footer">
+              <span className="integration-card-label">
+                {integration.id === "whatsapp"
+                  ? whatsappConnected
+                    ? "Conectado"
+                    : "Conexão por QR Code"
+                  : "Em breve"}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (integration.id === "whatsapp" && whatsappConnected)
+                    setDrawerOpen(true);
+                  else setSelected(integration);
+                }}
+                aria-label={`${integration.id === "whatsapp" && whatsappConnected ? "Gerenciar" : "Configurar"} ${integration.title}${integration.id === "whatsapp" ? " não oficial" : ""}`}
+              >
+                {integration.id === "whatsapp" && whatsappConnected
+                  ? "Gerenciar"
+                  : "Configurar"}{" "}
+                <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+          </article>
+        ))}
       </div>
-      {confirmDisconnect && (
-        <div className="whatsapp-disconnect-confirm">
-          <p>
-            Desconectar o WhatsApp deste restaurante? Será necessário escanear
-            outro QR Code para conectar novamente.
-          </p>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void run("disconnect")}
-          >
-            Confirmar desconexão
-          </button>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => setConfirmDisconnect(false)}
-          >
-            Cancelar
-          </button>
-        </div>
-      )}
-      {error && (
-        <p className="whatsapp-integration-error" role="alert">
-          {error}
-        </p>
-      )}
-      <p className="whatsapp-integration-footnote">
-        Esta integração conecta o aparelho. O envio automático de mensagens
-        ainda não está habilitado.
-      </p>
-    </section>
+      <Dialog
+        id="integration-config-dialog"
+        title={
+          selected ? `Configurar ${selected.title}` : "Configurar integração"
+        }
+        open={Boolean(selected)}
+        onClose={() => setSelected(null)}
+      >
+        {selected?.id === "whatsapp" ? (
+          <WhatsAppIntegrationSettings
+            storeId={storeId}
+            enabled={enabled}
+            onConnected={handleConnected}
+            onStateChange={handleStateChange}
+          />
+        ) : selected ? (
+          <div className="integration-preview">
+            <span className="integration-card-icon" data-color={selected.color}>
+              <IntegrationIcon type={selected.icon} />
+            </span>
+            <span className="integration-preview-badge">Em breve</span>
+            <h3>Esta integração ainda está em preparação.</h3>
+            <p>{selected.description}</p>
+            <p>
+              As opções de configuração serão disponibilizadas aqui quando a
+              integração estiver pronta.
+            </p>
+            <button type="button" onClick={() => setSelected(null)}>
+              Entendi
+            </button>
+          </div>
+        ) : null}
+      </Dialog>
+      <WhatsAppConnectionDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        storeId={storeId}
+        enabled={enabled}
+        onStateChange={handleStateChange}
+      />
+    </>
   );
 }

@@ -291,13 +291,20 @@ exports.publicJoinWaitlist = onCall(
 const { createEvolution } = require("./evolution.cjs");
 const { createWhatsAppHandler } = require("./whatsapp.cjs");
 const evolutionApiKey = defineSecret("EVOLUTION_API_KEY");
+const evolutionWebhookSecret = defineSecret("EVOLUTION_WEBHOOK_SECRET");
+const evolutionProjectId =
+  process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || "cardap";
+const evolutionProvider = createEvolution({
+  baseUrl: () => process.env.EVOLUTION_API_URL || "",
+  apiKey: () => evolutionApiKey.value(),
+});
 exports.tenantWhatsAppIntegration = onCall(
   {
     region: "southamerica-east1",
     maxInstances: 5,
     timeoutSeconds: 60,
     enforceAppCheck: process.env.FUNCTIONS_EMULATOR !== "true",
-    secrets: [evolutionApiKey],
+    secrets: [evolutionApiKey, evolutionWebhookSecret],
   },
   createWhatsAppHandler({
     db: getFirestore(),
@@ -307,9 +314,78 @@ exports.tenantWhatsAppIntegration = onCall(
       process.env.GOOGLE_CLOUD_PROJECT ||
       "cardap",
     timestamp: () => FieldValue.serverTimestamp(),
-    provider: createEvolution({
-      baseUrl: () => process.env.EVOLUTION_API_URL || "",
-      apiKey: () => evolutionApiKey.value(),
-    }),
+    provider: evolutionProvider,
+    onInstanceReady: (storeId) => whatsappMessages.restoreWebhook(storeId),
   }),
+);
+
+const { createWhatsAppMessages } = require("./whatsapp-messages.cjs");
+const whatsappMessages = createWhatsAppMessages({
+  db: getFirestore(),
+  HttpsError,
+  provider: evolutionProvider,
+  projectId: evolutionProjectId,
+  timestamp: () => FieldValue.serverTimestamp(),
+  webhookSecret: () => evolutionWebhookSecret.value(),
+  webhookUrl: () =>
+    process.env.EVOLUTION_WEBHOOK_URL ||
+    `https://southamerica-east1-${evolutionProjectId}.cloudfunctions.net/evolutionWhatsAppWebhook`,
+});
+exports.tenantWhatsAppMessaging = onCall(
+  {
+    region: "southamerica-east1",
+    maxInstances: 5,
+    timeoutSeconds: 60,
+    enforceAppCheck: process.env.FUNCTIONS_EMULATOR !== "true",
+    secrets: [evolutionApiKey, evolutionWebhookSecret],
+  },
+  whatsappMessages.handler,
+);
+exports.whatsAppOrderChanged = onDocumentWritten(
+  {
+    document: "tenants/{storeId}/orders/{orderId}",
+    region: "southamerica-east1",
+    retry: true,
+    maxInstances: 5,
+  },
+  whatsappMessages.orderChanged,
+);
+exports.whatsAppMessageCreated = onDocumentCreated(
+  {
+    document:
+      "tenantWhatsAppIntegrations/{storeId}/whatsappMessages/{messageId}",
+    region: "southamerica-east1",
+    retry: true,
+    maxInstances: 5,
+    timeoutSeconds: 60,
+    secrets: [evolutionApiKey],
+  },
+  whatsappMessages.messageCreated,
+);
+exports.evolutionWhatsAppWebhook = onRequest(
+  {
+    region: "southamerica-east1",
+    maxInstances: 5,
+    secrets: [evolutionWebhookSecret],
+  },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.set("Allow", "POST").status(405).end();
+      return;
+    }
+    if (!req.rawBody || req.rawBody.length > 65536) {
+      res.status(400).end();
+      return;
+    }
+    try {
+      const accepted = await whatsappMessages.inbound({
+        storeId: req.query.storeId,
+        authorization: req.get("authorization"),
+        body: req.body,
+      });
+      res.status(accepted ? 200 : 401).json({ received: accepted });
+    } catch {
+      res.status(503).json({ received: false });
+    }
+  },
 );

@@ -18,6 +18,7 @@ function createWhatsAppHandler({
   projectId,
   timestamp,
   now = Date.now,
+  onInstanceReady = async () => {},
 }) {
   return async (request) => {
     if (!request.auth)
@@ -109,6 +110,7 @@ function createWhatsAppHandler({
             } catch (error) {
               if ((await provider.state(instance)) === "missing") throw error;
             }
+            await onInstanceReady(storeId);
           }
           const response = await provider.connect(instance);
           state = response?.instance?.state === "open" ? "open" : "connecting";

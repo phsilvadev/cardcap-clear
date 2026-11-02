@@ -67,6 +67,23 @@ function createEvolution({ baseUrl, apiKey, fetchImpl = fetch }) {
         readStatus: false,
         syncFullHistory: false,
       }),
+    sendText: (instance, number, text) =>
+      request("POST", `/message/sendText/${encodeURIComponent(instance)}`, {
+        number,
+        text,
+        linkPreview: false,
+      }),
+    setWebhook: (instance, url, token) =>
+      request("POST", `/webhook/set/${encodeURIComponent(instance)}`, {
+        webhook: {
+          enabled: true,
+          url,
+          headers: { Authorization: `Bearer ${token}` },
+          byEvents: false,
+          base64: false,
+          events: ["MESSAGES_UPSERT"],
+        },
+      }),
     connect: (instance) =>
       request("GET", `/instance/connect/${encodeURIComponent(instance)}`),
     async disconnect(instance) {
