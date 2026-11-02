@@ -287,3 +287,29 @@ exports.publicJoinWaitlist = onCall(
     timestamp: () => FieldValue.serverTimestamp(),
   }),
 );
+
+const { createEvolution } = require("./evolution.cjs");
+const { createWhatsAppHandler } = require("./whatsapp.cjs");
+const evolutionApiKey = defineSecret("EVOLUTION_API_KEY");
+exports.tenantWhatsAppIntegration = onCall(
+  {
+    region: "southamerica-east1",
+    maxInstances: 5,
+    timeoutSeconds: 60,
+    enforceAppCheck: process.env.FUNCTIONS_EMULATOR !== "true",
+    secrets: [evolutionApiKey],
+  },
+  createWhatsAppHandler({
+    db: getFirestore(),
+    HttpsError,
+    projectId:
+      process.env.GCLOUD_PROJECT ||
+      process.env.GOOGLE_CLOUD_PROJECT ||
+      "cardap",
+    timestamp: () => FieldValue.serverTimestamp(),
+    provider: createEvolution({
+      baseUrl: () => process.env.EVOLUTION_API_URL || "",
+      apiKey: () => evolutionApiKey.value(),
+    }),
+  }),
+);

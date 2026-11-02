@@ -89,7 +89,10 @@ export default function DashboardSettings({
               {section.id === "operations" ? (
                 <OperationsSection storeId={storeId} />
               ) : section.id === "integrations" ? (
-                <IntegrationsSection />
+                <IntegrationsSection
+                  storeId={storeId}
+                  enabled={active === "integrations"}
+                />
               ) : section.id === "details" ? (
                 <StoreDetailsSection storeId={storeId} />
               ) : section.id === "employees" ? (

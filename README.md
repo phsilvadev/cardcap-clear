@@ -128,3 +128,7 @@ Os aplicativos de garçom e entregador são distribuídos separadamente. Configu
 Acesse `/em-breve` para ver a página em construção e a inscrição para receber novidades. O formulário salva os interessados no Firestore pela Function `publicJoinWaitlist`. Consulte [publicação e funcionamento da lista](docs/launch-waitlist.md). O envio de campanhas por e-mail ainda depende de um serviço de e-mail.
 
 O modo de pré-lançamento fica ativo por padrão: somente `/em-breve` pode ser acessada; as demais páginas redirecionam para ela, e as APIs internas ficam indisponíveis. Para liberar o sistema, defina `CARDAP_PRELAUNCH_ONLY=false` no servidor e reinicie/republique. Esse modo não desativa os serviços independentes do Firebase.
+
+### Integração WhatsApp
+
+Configurações → Integrações permite conectar o WhatsApp do restaurante pela Evolution API, consultar o status e desconectar. O envio automático de mensagens ainda não está habilitado. Veja [como configurar a URL, o segredo e publicar a Function](docs/whatsapp-evolution.md).

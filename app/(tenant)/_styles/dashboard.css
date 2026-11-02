@@ -4097,3 +4097,94 @@
 .tour-skip {
   color: var(--color-muted);
 }
+
+.whatsapp-integration-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 24px 0 16px;
+}
+.whatsapp-integration-actions button,
+.whatsapp-disconnect-confirm button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #fff;
+}
+.whatsapp-integration-actions .whatsapp-connect-button {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+}
+.whatsapp-integration-actions button:disabled {
+  opacity: 0.5;
+}
+.whatsapp-pairing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 28px;
+  padding: 24px;
+  margin-top: 24px;
+  border: 1px solid var(--color-line);
+  border-radius: 20px;
+}
+.whatsapp-pairing img {
+  width: 240px;
+  max-width: 100%;
+  height: auto;
+}
+.whatsapp-pairing > div {
+  flex: 1;
+  min-width: 200px;
+}
+.whatsapp-pairing h4 {
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.whatsapp-pairing ol {
+  padding-left: 18px;
+  list-style: decimal;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.whatsapp-pairing p,
+.whatsapp-integration-footnote {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+.whatsapp-connection-success {
+  color: #22693c;
+  margin-top: 20px;
+}
+.team-badge[data-whatsapp-state="connected"] {
+  color: #22693c;
+  background: #edf8f0;
+}
+.whatsapp-integration-error {
+  color: #a12c24;
+  font-size: 13px;
+  margin-top: 16px;
+  line-height: 1.6;
+}
+.whatsapp-disconnect-confirm {
+  padding: 20px;
+  background: #fff3e5;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.whatsapp-disconnect-confirm p {
+  margin-bottom: 12px;
+}
+.whatsapp-disconnect-confirm button {
+  margin-right: 8px;
+  margin-top: 8px;
+}
