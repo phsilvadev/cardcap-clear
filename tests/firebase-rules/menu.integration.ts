@@ -443,6 +443,32 @@ test.describe.serial("CRUD do cardápio com regras reais nos emuladores", () => 
       ),
     ).rejects.toMatchObject({ code: "storage/object-not-found" });
   });
+  test("cliente não forja pagamentos, índices de busca ou pedidos diretamente", async () => {
+    await expect(
+      setDoc(
+        doc(getFirebaseDb(), "tenants", ownerUid, "orders", "forged-order"),
+        { paymentStatus: "paid", total: 1 },
+      ),
+    ).rejects.toMatchObject({ code: "permission-denied" });
+    await expect(
+      setDoc(
+        doc(
+          getFirebaseDb(),
+          "tenants",
+          ownerUid,
+          "checkoutSessions",
+          "forged-session",
+        ),
+        { paymentStatus: "paid" },
+      ),
+    ).rejects.toMatchObject({ code: "permission-denied" });
+    await expect(
+      updateDoc(doc(getFirebaseDb(), "tenants", ownerUid), {
+        publicCityKey: "outra cidade",
+        publicStateKey: "SP",
+      }),
+    ).rejects.toMatchObject({ code: "permission-denied" });
+  });
   test("funcionários: proprietário lista, ativa, desativa e remove o vínculo", async () => {
     const reference = doc(
       getFirebaseDb(),

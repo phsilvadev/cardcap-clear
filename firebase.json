@@ -1,26 +1,22 @@
 {
   "functions": [
     {
-      "source": "../../functions",
-      "codebase": "cardap",
+      "source": "firebase/employee-access",
+      "codebase": "employee-access",
       "ignore": [
         "node_modules",
         ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
+        "*.log",
+        "**/*.test.cjs",
+        "backfill-store-search.cjs"
       ]
-    },
-    {
-      "source": "firebase/employee-access",
-      "codebase": "employee-access",
-      "ignore": ["node_modules", ".git", "*.log"]
     }
   ],
   "storage": {
     "rules": "storage.rules"
   },
   "firestore": {
-    "rules": "firestore.rules"
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   }
 }

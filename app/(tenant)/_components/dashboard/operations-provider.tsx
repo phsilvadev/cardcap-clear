@@ -71,7 +71,8 @@ export default function OperationsProvider({
     ready &&
     (((pathname.includes("/garcons") || pathname.includes("/salao")) &&
       !operations.salon) ||
-      (pathname.includes("/entregadores") && !operations.ownDelivery));
+      ((pathname.includes("/entregadores") || pathname.includes("/entregas")) &&
+        !operations.ownDelivery));
   useEffect(() => {
     if (disabled) router.replace("/dashboard?view=settings&section=operations");
   }, [disabled, router]);

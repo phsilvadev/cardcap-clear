@@ -7,6 +7,7 @@ const {
   shell,
 } = require("electron");
 const path = require("node:path");
+const { tenantOrdersEndpoint } = require("./firebase-endpoint.cjs");
 const { allowedSupportLink } = require("./support-link.cjs");
 const { allowedPanelUrl } = require("./panel-origin.cjs");
 const fs = require("node:fs");
@@ -327,20 +328,17 @@ else {
       },
       saveInflight: (value) => save(inflightFile, value),
       call: async (session, action, fields) => {
-        const response = await fetch(
-          "https://southamerica-east1-cardap-e0bf0.cloudfunctions.net/tenantOrderOperations",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${session.idToken}`,
-            },
-            body: JSON.stringify({
-              data: { ...fields, storeId: session.storeId, action },
-            }),
-            signal: AbortSignal.timeout(15000),
+        const response = await fetch(tenantOrdersEndpoint(session), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.idToken}`,
           },
-        );
+          body: JSON.stringify({
+            data: { ...fields, storeId: session.storeId, action },
+          }),
+          signal: AbortSignal.timeout(15000),
+        });
         const result = await response.json();
         if (!response.ok || result.error) {
           const error = new Error("Falha no serviço de impressão.");

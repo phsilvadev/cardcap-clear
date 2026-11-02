@@ -1,4 +1,7 @@
 "use client";
+
+import BrandLogo from "@/components/brand-logo";
+
 import { useEffect, useRef, useState } from "react";
 import { signInWithCustomToken } from "firebase/auth";
 import { getFirebaseAuth } from "@/lib/firebase/client";
@@ -43,7 +46,7 @@ export default function CompleteTenantLogin() {
     >
       <div>
         <div className="wordmark text-3xl">
-          cardap<span className="text-brand">.</span>
+          <BrandLogo />
         </div>
         <p style={{ marginTop: 20 }} role="status">
           {error || "Preparando seu acesso ao restaurante…"}

@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { onIdTokenChanged } from "firebase/auth";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { getFirebaseAuth, getFirebaseApp } from "@/lib/firebase/client";
 import { getDemoOrderStore } from "@/lib/orders/demo-store";
 import {
   orderOperation,
@@ -46,6 +46,7 @@ type ContextValue = {
   setAutoAccept: (enabled: boolean) => void;
   setDevice: (deviceId: string, deviceName: string) => void;
   retryPrint: (jobId: string) => void;
+  confirmPayment: (orderId: string) => Promise<boolean>;
 };
 const Context = createContext<ContextValue>({
   orders: [],
@@ -64,6 +65,7 @@ const Context = createContext<ContextValue>({
   setAutoAccept() {},
   setDevice() {},
   retryPrint() {},
+  confirmPayment: async () => false,
 });
 export const useTenantOrders = () => useContext(Context);
 export default function TenantOrdersProvider({
@@ -208,7 +210,12 @@ export default function TenantOrdersProvider({
           );
           return;
         }
-        await window.cardapPrinter?.connect({ storeId, idToken });
+        await window.cardapPrinter?.connect({
+          storeId,
+          idToken,
+          projectId: getFirebaseApp().options.projectId,
+          functionsRegion: "southamerica-east1",
+        });
       } catch {
         if (!cancelled)
           setError(
@@ -296,6 +303,12 @@ export default function TenantOrdersProvider({
               : "Impressão automática pausada.",
           );
         },
+        confirmPayment: (orderId) =>
+          run(
+            "confirmPayment",
+            { orderId, confirmed: true },
+            "Pagamento presencial registrado.",
+          ),
         retryPrint: (jobId) => {
           void run(
             "retry",

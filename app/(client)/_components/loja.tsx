@@ -175,7 +175,13 @@ export default function LojaContent({
                         />
                       )}
                       <div className="catalog-product-copy">
-                        <h3>{product.name}</h3>
+                        <h3>
+                          <a
+                            href={`/produto?store=${encodeURIComponent(store.slug)}&product=${encodeURIComponent(product.id)}${catalog.data?.preview ? "&preview=1" : ""}`}
+                          >
+                            {product.name}
+                          </a>
+                        </h3>
                         <p>{product.description}</p>
                         <strong>{formatMoney(product.priceCents)}</strong>
                       </div>

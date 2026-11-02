@@ -1,3 +1,4 @@
+import BrandLogo from "@/components/brand-logo";
 import Image from "next/image";
 import HomeAccountLink from "./home-account-link";
 import PageBehavior from "@/app/(client)/_components/home-behavior";
@@ -24,8 +25,7 @@ export default function HomeContent({
             aria-label={"Cardap — início"}
             className={"wordmark text-3xl"}
           >
-            {"cardap"}
-            <span className={"text-brand"}>{"."}</span>
+            <BrandLogo />
           </a>
 
           <nav
@@ -359,8 +359,7 @@ export default function HomeContent({
           }
         >
           <a className={"wordmark text-2xl text-ink"} href={"#"}>
-            {"cardap"}
-            <span className={"text-brand"}>{"."}</span>
+            <BrandLogo />
           </a>
           <p>{"Cardap · Sua próxima refeição começa aqui."}</p>
           <button

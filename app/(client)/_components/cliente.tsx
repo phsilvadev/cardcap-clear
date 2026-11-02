@@ -1,3 +1,4 @@
+import BrandLogo from "@/components/brand-logo";
 import PageBehavior from "@/app/(client)/_components/cliente-behavior";
 
 export default function ClienteContent() {
@@ -13,8 +14,7 @@ export default function ClienteContent() {
             aria-label={"Cardap — início"}
             className={"wordmark text-3xl"}
           >
-            {"cardap"}
-            <span className={"text-brand"}>{"."}</span>
+            <BrandLogo />
           </a>
           <a href={"/#buscar"}>{"Encontrar restaurantes"}</a>
         </header>
@@ -191,8 +191,7 @@ export default function ClienteContent() {
         </main>
         <footer className={"flow-footer"}>
           <span className={"wordmark text-2xl text-ink"}>
-            {"cardap"}
-            <span className={"text-brand"}>{"."}</span>
+            <BrandLogo />
           </span>
           <p>{"Sua próxima refeição começa aqui."}</p>
         </footer>

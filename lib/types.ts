@@ -45,7 +45,13 @@ export interface DeliveryCourier {
   available: boolean;
 }
 export interface DashboardOrder {
-  source?: "salon";
+  source?: "salon" | "web";
+  payment?: "cash" | "card" | "pix";
+  paymentStatus?: string;
+  fulfillment?: "delivery" | "pickup";
+  address?: string;
+  phone?: string;
+  shippingCents?: number;
   tableName?: string;
   notes?: string;
   id: string;

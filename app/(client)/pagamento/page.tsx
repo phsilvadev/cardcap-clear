@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     "Explore uma proposta visual do Cardap e escolha sua cidade para começar.",
 };
 
-export default function Page() {
-  return <Content />;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ store?: string }>;
+}) {
+  const { store } = await searchParams;
+  return <Content storeSlug={typeof store === "string" ? store : ""} />;
 }

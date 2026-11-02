@@ -7,7 +7,5 @@ export default async function Page({
   params: Promise<{ tenant: string }>;
 }) {
   const tenant = await requireTenant((await params).tenant);
-  return (
-    <DashboardOrders tenantSlug={tenant.slug} storeId={tenant.uid} />
-  );
+  return <DashboardOrders tenantSlug={tenant.slug} storeId={tenant.uid} />;
 }

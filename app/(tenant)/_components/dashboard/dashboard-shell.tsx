@@ -1,3 +1,4 @@
+import { TenantDashboardTour } from "./dashboard-tour";
 import StoreSettingsProvider from "../settings/store-settings-provider";
 import TenantOrdersProvider from "../orders/tenant-orders-provider";
 import OperationsProvider from "./operations-provider";
@@ -32,6 +33,7 @@ export default function DashboardShell({
               <DashboardFooter />
             </div>
           </div>
+          <TenantDashboardTour storeId={tenant.uid} />
         </TenantOrdersProvider>
       </StoreSettingsProvider>
     </OperationsProvider>

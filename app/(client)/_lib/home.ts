@@ -32,7 +32,8 @@ export default function initialize() {
     "TO",
   ];
   const stateSelect = query<HTMLSelectElement>("#state");
-  states.forEach((uf) => stateSelect.add(new Option(uf, uf)));
+  const options = states.map((uf) => new Option(uf, uf));
+  options.forEach((option) => stateSelect.add(option));
   query<HTMLFormElement>("#location-form").addEventListener(
     "submit",
     (event) => {
@@ -49,36 +50,50 @@ export default function initialize() {
       });
       window.location.href = `/restaurantes?${params.toString()}`;
     },
+    { signal: controller.signal },
   );
-  query<HTMLInputElement>("#city").addEventListener("input", (event) => {
-    (event.target as HTMLInputElement).setCustomValidity("");
-    query<HTMLElement>("#search-feedback").textContent = "";
-  });
-  stateSelect.addEventListener("change", () => {
-    query<HTMLElement>("#search-feedback").textContent = "";
-  });
+  query<HTMLInputElement>("#city").addEventListener(
+    "input",
+    (event) => {
+      (event.target as HTMLInputElement).setCustomValidity("");
+      query<HTMLElement>("#search-feedback").textContent = "";
+    },
+    { signal: controller.signal },
+  );
+  stateSelect.addEventListener(
+    "change",
+    () => {
+      query<HTMLElement>("#search-feedback").textContent = "";
+    },
+    { signal: controller.signal },
+  );
   const messages: Record<string, [string, string]> = {
     login: [
       "Entrar no Cardap",
-      "Este HTML demonstra a nova identidade visual. O acesso à conta não está conectado nesta prévia.",
+      "A conta do consumidor ainda é demonstrativa. Você pode comprar como visitante nas lojas disponíveis.",
     ],
     about: [
       "Uma nova apresentação para o Cardap",
-      "Protótipo em HTML com Tailwind, inspirado nas cores, tipografia e botões do projeto Gelada. A busca, o acesso e o cadastro não estão integrados ao backend.",
+      "Encontre restaurantes da sua região, consulte o cardápio e acompanhe seu pedido. O acesso do restaurante é separado da conta do consumidor.",
     ],
   };
   const dialog = query<HTMLDialogElement>("#info-dialog");
   queryAll<HTMLButtonElement>("[data-info]").forEach((button) =>
-    button.addEventListener("click", () => {
-      const [title, description] = messages[button.dataset.info ?? "about"];
-      query<HTMLElement>("#dialog-title").textContent = title;
-      query<HTMLElement>("#dialog-description").textContent = description;
-      dialog.showModal();
-    }),
+    button.addEventListener(
+      "click",
+      () => {
+        const [title, description] = messages[button.dataset.info ?? "about"];
+        query<HTMLElement>("#dialog-title").textContent = title;
+        query<HTMLElement>("#dialog-description").textContent = description;
+        dialog.showModal();
+      },
+      { signal: controller.signal },
+    ),
   );
 
   return () => {
     controller.abort();
+    options.forEach((option) => option.remove());
     delete document.body.dataset.step;
     document.body.classList.remove("has-floating-cart");
   };

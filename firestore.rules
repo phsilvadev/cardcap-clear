@@ -66,7 +66,8 @@ service cloud.firestore {
           'legalName', 'cnpj', 'phone', 'whatsapp', 'contactEmail',
           'category', 'description', 'postalCode', 'street', 'number',
           'complement', 'district', 'city', 'state', 'openingTime',
-          'closingTime', 'openingDay', 'closingDay', 'acceptsDelivery', 'acceptsPickup', 'asaasWalletId', 'updatedAt'
+          'closingTime', 'openingDay', 'closingDay', 'acceptsDelivery', 'acceptsPickup', 'asaasWalletId', 'updatedAt',
+          'publicCityKey', 'publicStateKey'
         ])
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'ownerName', 'name', 'status', 'legalName', 'cnpj', 'phone', 'whatsapp', 'contactEmail',

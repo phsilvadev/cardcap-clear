@@ -1,4 +1,6 @@
 "use client";
+import { useEffect, useState } from "react";
+import type { EmployeeRole } from "@/lib/employees/types";
 import { useEmployees } from "@/app/(tenant)/_hooks/use-employees";
 import { employeeRoles } from "@/lib/employees/types";
 import EmployeeDialogs from "@/app/(tenant)/_components/employees/employee-dialogs";
@@ -10,7 +12,23 @@ export default function TeamSection({
   storeId?: string;
   enabled: boolean;
 }) {
-  const control = useEmployees(storeId, enabled);
+  const [role, setRole] = useState<EmployeeRole | "all">("all");
+  useEffect(() => {
+    if (!enabled) return;
+    const requestedRole = new URLSearchParams(window.location.search).get(
+      "role",
+    );
+    setRole(
+      requestedRole && Object.hasOwn(employeeRoles, requestedRole)
+        ? (requestedRole as EmployeeRole)
+        : "all",
+    );
+  }, [enabled]);
+  const control = useEmployees(
+    storeId,
+    enabled,
+    role === "all" ? undefined : role,
+  );
   return (
     <div className="employees-section">
       <div className="employees-header">
@@ -54,6 +72,23 @@ export default function TeamSection({
             placeholder="Nome ou e-mail"
             maxLength={254}
           />
+        </label>
+        <label className="search-label" htmlFor="employee-role-filter">
+          Cargo
+          <select
+            id="employee-role-filter"
+            value={role}
+            onChange={(event) =>
+              setRole(event.target.value as EmployeeRole | "all")
+            }
+          >
+            <option value="all">Todos os cargos</option>
+            {Object.entries(employeeRoles).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="search-label" htmlFor="employee-filter">
           Situação

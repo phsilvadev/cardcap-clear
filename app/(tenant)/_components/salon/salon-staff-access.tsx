@@ -1,4 +1,7 @@
 "use client";
+
+import BrandLogo from "@/components/brand-logo";
+
 import { useEffect, useState, type FormEvent } from "react";
 import {
   onAuthStateChanged,
@@ -49,7 +52,7 @@ export default function SalonStaffAccess() {
     <div className="salon-staff-shell">
       <header className="salon-staff-header">
         <a className="wordmark text-3xl" href="/">
-          cardap<span className="text-brand">.</span>
+          <BrandLogo />
         </a>
         {signed && (
           <button

@@ -1,3 +1,4 @@
+import BrandLogo from "@/components/brand-logo";
 import type { ReactNode } from "react";
 export function CatalogHeader({
   backHref = "/#buscar",
@@ -13,7 +14,7 @@ export function CatalogHeader({
       </a>
       <header className="listing-header">
         <a className="wordmark text-3xl" href="/" aria-label="Cardap — início">
-          cardap<span className="text-brand">.</span>
+          <BrandLogo />
         </a>
         <nav className="catalog-nav" aria-label="Navegação do cliente">
           <a href="/cliente">Minha conta</a>
@@ -116,7 +117,7 @@ export function CatalogFooter() {
   return (
     <footer className="catalog-footer">
       <a href="/" className="wordmark">
-        cardap<span className="text-brand">.</span>
+        <BrandLogo />
       </a>
       <span>Sua cidade. Seus sabores.</span>
     </footer>

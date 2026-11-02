@@ -16,6 +16,8 @@ const active = {
   status: "active",
   name: "Minha Loja",
   city: "São Paulo",
+  publicCityKey: "sao paulo",
+  publicStateKey: "SP",
   state: "SP",
   receivingOrders: true,
   deliveryFeeCents: 590,
@@ -149,6 +151,7 @@ test("listagem pública filtra cidade sem acentos, oculta lojas não liberadas e
       ownerUid: "other",
       slug: "outra-loja",
       city: "Recife",
+      publicCityKey: "recife",
     },
     "tenants/pending": { ...active, ownerUid: "pending", status: "configured" },
     "tenants/malformed": { ...active, ownerUid: "wrong" },
@@ -278,4 +281,32 @@ test("paginação do catálogo preserva o cursor sem misturar restaurantes", asy
   assert.equal(second.stores.length, 1);
   assert.equal(second.stores[0].slug, "loja-40");
   assert.equal(second.nextCursor, null);
+});
+
+test("filtra a região no banco antes do limite, mesmo com 60 lojas de outra cidade", async () => {
+  const records = {};
+  for (let i = 0; i < 60; i++) {
+    const id = `aaa${i}`;
+    records[`tenants/${id}`] = {
+      ...active,
+      ownerUid: id,
+      slug: `loja-${i}`,
+      city: "Recife",
+      publicCityKey: "recife",
+      publicStateKey: "PE",
+      state: "PE",
+    };
+  }
+  records["tenants/owner"] = active;
+  const f = fixture(records);
+  const result = await createStorefrontHandler({ ...f, HttpsError })(
+    call({ action: "list", city: "  SÃO   PAULO  ", state: "SP" }),
+  );
+  assert.equal(result.stores.length, 1);
+  assert.equal(result.stores[0].slug, "minha-loja");
+  assert.deepEqual(f.queries[0].filters, [
+    ["status", "active"],
+    ["publicStateKey", "SP"],
+    ["publicCityKey", "sao paulo"],
+  ]);
 });

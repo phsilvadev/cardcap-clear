@@ -1,3 +1,4 @@
+import BrandLogo from "@/components/brand-logo";
 import type { Metadata } from "next";
 import RestaurantSignup from "@/app/(tenant)/_components/restaurant-signup";
 import "@/app/(tenant)/_styles/restaurant-login.css";
@@ -15,7 +16,7 @@ const Page = () => (
     </a>
     <header className="restaurant-login-header">
       <a className="wordmark text-3xl" href="/" aria-label="Cardap — início">
-        cardap<span className="text-brand">.</span>
+        <BrandLogo />
       </a>
       <a href="/restaurantes/login">Voltar ao login</a>
     </header>

@@ -111,15 +111,28 @@
 .catalog-message .catalog-button {
   margin-top: 20px;
 }
-.catalog-button:disabled,
-.catalog-text-button:disabled {
+.catalog-button:disabled {
   opacity: 0.5;
   cursor: wait;
 }
-.catalog-text-button {
-  font-size: 13px;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+.catalog-refresh-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+.catalog-refresh-button:hover:not(:disabled) {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: #fff;
+}
+.catalog-refresh-button svg {
+  flex-shrink: 0;
 }
 .catalog-load-more {
   display: flex;

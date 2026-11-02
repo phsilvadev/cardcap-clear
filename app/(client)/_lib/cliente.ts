@@ -139,37 +139,45 @@ export default function initialize() {
       query<HTMLElement>("#no-carts").hidden = itemCount > 0;
       query<HTMLElement>("#no-orders").hidden = orderCount > 0;
     };
-    query<HTMLButtonElement>("#demo-login").addEventListener("click", () => {
-      try {
-        sessionStorage.setItem(
-          userKey,
-          JSON.stringify({
-            id: "demo-customer",
-            name: "Cliente de demonstração",
-            email: "cliente@example.com",
-            demo: true,
-          }),
-        );
-        render();
-      } catch {
-        query<HTMLElement>("#guest-status").textContent =
-          "Não foi possível iniciar a sessão neste navegador.";
-      }
-    });
-    query<HTMLButtonElement>("#sign-out").addEventListener("click", () => {
-      try {
-        sessionStorage.removeItem(userKey);
-        query<HTMLFormElement>("#profile-form").reset();
-        query<HTMLElement>("#profile-status").textContent = "";
-        render();
-        query<HTMLElement>("#account-status").textContent =
-          "Você saiu da sessão de demonstração.";
-        query<HTMLButtonElement>("#demo-login").focus();
-      } catch {
-        query<HTMLElement>("#account-status").textContent =
-          "Não foi possível encerrar a sessão. Tente novamente.";
-      }
-    });
+    query<HTMLButtonElement>("#demo-login").addEventListener(
+      "click",
+      () => {
+        try {
+          sessionStorage.setItem(
+            userKey,
+            JSON.stringify({
+              id: "demo-customer",
+              name: "Cliente de demonstração",
+              email: "cliente@example.com",
+              demo: true,
+            }),
+          );
+          render();
+        } catch {
+          query<HTMLElement>("#guest-status").textContent =
+            "Não foi possível iniciar a sessão neste navegador.";
+        }
+      },
+      { signal: controller.signal },
+    );
+    query<HTMLButtonElement>("#sign-out").addEventListener(
+      "click",
+      () => {
+        try {
+          sessionStorage.removeItem(userKey);
+          query<HTMLFormElement>("#profile-form").reset();
+          query<HTMLElement>("#profile-status").textContent = "";
+          render();
+          query<HTMLElement>("#account-status").textContent =
+            "Você saiu da sessão de demonstração.";
+          query<HTMLButtonElement>("#demo-login").focus();
+        } catch {
+          query<HTMLElement>("#account-status").textContent =
+            "Não foi possível encerrar a sessão. Tente novamente.";
+        }
+      },
+      { signal: controller.signal },
+    );
     query<HTMLFormElement>("#profile-form").addEventListener(
       "submit",
       (event) => {
@@ -200,6 +208,7 @@ export default function initialize() {
             "Não foi possível salvar o perfil.";
         }
       },
+      { signal: controller.signal },
     );
     listenWindow("pageshow", render);
     listenWindow("storage", render);

@@ -1,5 +1,6 @@
 "use client";
 import { useState, type FormEvent } from "react";
+import { TOUR_EVENT } from "@/lib/onboarding/tour";
 const questions = [
   {
     title: "O que falta para minha loja aparecer na plataforma?",
@@ -104,6 +105,12 @@ export default function HelpPage({
         </div>
       </header>
       <nav className="help-shortcuts" aria-label="Atalhos de ajuda">
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event(TOUR_EVENT))}
+        >
+          Rever tour do painel <span aria-hidden="true">↗</span>
+        </button>
         <a href="/dashboard?view=settings">
           Configurações <span aria-hidden="true">↗</span>
         </a>

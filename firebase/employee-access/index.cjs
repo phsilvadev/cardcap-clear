@@ -190,3 +190,100 @@ exports.salonOperations = onCall(
     timestamp: () => FieldValue.serverTimestamp(),
   }).handler,
 );
+
+const { onDocumentWritten } = require("firebase-functions/v2/firestore");
+const { createStoreSearchSync } = require("./store-search.cjs");
+exports.tenantStoreSearchUpdated = onDocumentWritten(
+  {
+    document: "tenants/{storeId}",
+    region: "southamerica-east1",
+    retry: true,
+    maxInstances: 5,
+  },
+  createStoreSearchSync({ db: getFirestore() }),
+);
+
+const { defineSecret } = require("firebase-functions/params");
+const { onRequest } = require("firebase-functions/v2/https");
+const { createCheckout } = require("./checkout.cjs");
+const { createCheckoutPix, validWebhookToken } = require("./checkout-pix.cjs");
+const { createAsaas } = require("./asaas.cjs");
+const asaasApiKey = defineSecret("ASAAS_API_KEY");
+const asaasWebhookToken = defineSecret("ASAAS_WEBHOOK_TOKEN");
+const checkout = createCheckout({
+  db: getFirestore(),
+  HttpsError,
+  timestamp: () => FieldValue.serverTimestamp(),
+  pixEnabled: () => process.env.CHECKOUT_PIX_ENABLED === "true",
+});
+const checkoutOptions = {
+  region: "southamerica-east1",
+  maxInstances: 5,
+  timeoutSeconds: 60,
+  enforceAppCheck: process.env.FUNCTIONS_EMULATOR !== "true",
+};
+exports.publicCheckout = onCall(checkoutOptions, checkout.handler);
+const pix = createCheckoutPix({
+  db: getFirestore(),
+  checkout,
+  HttpsError,
+  timestamp: () => FieldValue.serverTimestamp(),
+  provider: createAsaas({
+    apiKey: () => asaasApiKey.value(),
+    environment: process.env.ASAAS_ENVIRONMENT || "sandbox",
+  }),
+});
+exports.publicCheckoutPix = onCall(
+  { ...checkoutOptions, secrets: [asaasApiKey] },
+  pix.handler,
+);
+exports.asaasCheckoutWebhook = onRequest(
+  {
+    region: "southamerica-east1",
+    maxInstances: 5,
+    secrets: [asaasApiKey, asaasWebhookToken],
+  },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).end();
+      return;
+    }
+    if (
+      !validWebhookToken(
+        req.get("asaas-access-token"),
+        asaasWebhookToken.value(),
+      )
+    ) {
+      res.status(401).end();
+      return;
+    }
+    if (
+      req.rawBody?.length > 65536 ||
+      typeof req.body?.payment?.id !== "string" ||
+      !/^pay_[a-zA-Z0-9_-]+$/.test(req.body.payment.id)
+    ) {
+      res.status(400).end();
+      return;
+    }
+    try {
+      await pix.applyPayment(req.body.payment.id);
+      res.status(200).json({ received: true });
+    } catch {
+      res.status(503).json({ received: false });
+    }
+  },
+);
+
+const { createWaitlistHandler } = require("./waitlist.cjs");
+exports.publicJoinWaitlist = onCall(
+  {
+    region: "southamerica-east1",
+    maxInstances: 3,
+    enforceAppCheck: process.env.FUNCTIONS_EMULATOR !== "true",
+  },
+  createWaitlistHandler({
+    db: getFirestore(),
+    HttpsError,
+    timestamp: () => FieldValue.serverTimestamp(),
+  }),
+);

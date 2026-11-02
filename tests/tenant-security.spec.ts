@@ -110,6 +110,34 @@ test.describe("validação da sessão no servidor", () => {
       mock();
       expect(await verifyTenantSession(token(claims))).toBeNull();
     });
+  test("consulta identidade e cadastro em paralelo sem reaproveitar autorização entre requisições", async () => {
+    const requests: string[] = [];
+    const release: ((response: Response) => void)[] = [];
+    globalThis.fetch = (async (url: string | URL | Request) => {
+      requests.push(String(url));
+      if (requests.length <= 2)
+        return new Promise<Response>((resolve) => release.push(resolve));
+      return Response.json({ fields: { tenantId: { stringValue: "owner" } } });
+    }) as typeof fetch;
+    const checking = verifyTenantSession(token());
+    expect(requests).toHaveLength(2);
+    expect(requests[0]).toContain("accounts:lookup");
+    expect(requests[1]).toContain("tenants/owner");
+    release[0](Response.json({ users: [{ localId: "owner" }] }));
+    release[1](
+      Response.json({
+        fields: {
+          ownerUid: { stringValue: "owner" },
+          slug: { stringValue: "minha-loja" },
+          status: { stringValue: "active" },
+          name: { stringValue: "Loja" },
+        },
+      }),
+    );
+    expect((await checking)?.uid).toBe("owner");
+    mock({ status: "suspended" });
+    expect(await verifyTenantSession(token())).toBeNull();
+  });
   test("estabelece cookie protegido e permite logout", async () => {
     mock();
     const response = await POST(

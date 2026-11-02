@@ -1,4 +1,7 @@
 "use client";
+
+import BrandLogo from "@/components/brand-logo";
+
 import { useStoreSettings } from "../settings/store-settings-provider";
 import { useStoreOperations } from "./operations-provider";
 import { usePathname } from "next/navigation";
@@ -11,12 +14,11 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
     typeof profile?.name === "string" ? profile.name : tenant.name;
   const { operations } = useStoreOperations();
   const isSalon = pathname.includes("/salao");
-  const isWaiters = pathname.includes("/garcons");
   const isHelp = pathname.endsWith("/dashboard/ajuda");
   const isApps = pathname.includes("/aplicativos");
   const isOrders = pathname.includes("/pedidos");
   const isMenu = pathname.includes("/cardapio");
-  const isCouriers = pathname.includes("/entregadores");
+  const isCouriers = pathname.includes("/entregas");
   return (
     <aside className={"sidebar"}>
       <a
@@ -24,8 +26,7 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
         className={"sidebar-brand wordmark text-3xl"}
         aria-label={"Cardap — início"}
       >
-        {"cardap"}
-        <span className={"text-brand"}>{"."}</span>
+        <BrandLogo />
       </a>
       <div className={"workspace"}>
         <svg
@@ -62,7 +63,6 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
           aria-current={
             !isMenu &&
             !isCouriers &&
-            !isWaiters &&
             !isSalon &&
             !isOrders &&
             !isApps &&
@@ -94,6 +94,7 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
         </a>
         <a
           href="/dashboard/pedidos"
+          data-tour="orders"
           aria-current={isOrders ? "page" : undefined}
         >
           <svg
@@ -123,6 +124,7 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
         </a>
         <a
           href="/dashboard/cardapio"
+          data-tour="menu"
           data-view="menu"
           aria-current={isMenu ? "page" : undefined}
         >
@@ -149,6 +151,7 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
         {operations.salon && (
           <a
             href="/dashboard/salao"
+            data-tour="salon"
             aria-current={isSalon ? "page" : undefined}
           >
             <svg
@@ -167,30 +170,10 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
             Salão
           </a>
         )}
-        {operations.salon && (
-          <a
-            href="/dashboard/garcons"
-            aria-current={isWaiters ? "page" : undefined}
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M3 17h18M5 17a7 7 0 0 1 14 0M12 8V6M10 6h4M5 21h14" />
-            </svg>
-            Garçons
-          </a>
-        )}
         {operations.ownDelivery && (
           <a
-            href="/dashboard/entregadores"
+            href="/dashboard/entregas"
+            data-tour="deliveries"
             aria-current={isCouriers ? "page" : undefined}
           >
             <svg
@@ -208,11 +191,12 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
               <circle cx="5" cy="18" r="2" />
               <circle cx="18" cy="18" r="2" />
             </svg>
-            Entregadores
+            Entregas
           </a>
         )}
         <a
           href="/dashboard?view=settings"
+          data-tour="settings"
           data-view="settings"
           aria-current={undefined}
         >
@@ -310,7 +294,7 @@ export default function DashboardSidebar({ tenant }: { tenant: Tenant }) {
           {" Ver minha loja"}
         </a>
         <TenantSessionControls />
-        <p className={"sidebar-note"}>{"Painel de demonstração"}</p>
+        <p className={"sidebar-note"}>{"Cardap · Área do restaurante"}</p>
       </div>
     </aside>
   );

@@ -60,7 +60,10 @@ export default function SalonPage({ storeId }: { storeId?: string }) {
           <h1>Salão</h1>
           <p>Da solicitação da conta à mesa pronta para receber novamente.</p>
         </div>
-        <a href="/dashboard/garcons" className="button">
+        <a
+          href="/dashboard?view=settings&section=employees&role=waiter"
+          className="button"
+        >
           Equipe de garçons
         </a>
       </header>

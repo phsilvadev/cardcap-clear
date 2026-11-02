@@ -70,25 +70,6 @@ test("permite entrar e sair da conta demonstrativa", async ({ page }) => {
   await expect(page.locator("#guest")).toBeVisible();
 });
 
-test("conclui o fluxo de compra demonstrativo", async ({ page }) => {
-  await page.goto("/carrinho");
-  await page.locator("#load-example").click();
-  await expect(page.locator("#cart-lines .cart-line")).toHaveCount(2);
-  await page.locator("#checkout-link").click();
-  await expect(page).toHaveURL(/\/checkout\?/);
-  await page.locator("#customer-name").fill("Maria Silva");
-  await page.locator("#customer-phone").fill("11999999999");
-  await page.locator("#customer-address").fill("Rua das Flores, 123");
-  await page.locator("#checkout-form button[type=submit]").click();
-  await expect(page).toHaveURL(/\/pagamento\?/);
-  await page.locator("#payment-form button[type=submit]").click();
-  await expect(page).toHaveURL(/\/pedido-confirmado\?/);
-  await expect(page.locator("#confirmation-details")).toContainText(
-    "Maria Silva",
-  );
-  await expect(page.locator("#confirmation-details")).toContainText("DEMO-");
-});
-
 test("dashboard exige sessão em todos os domínios", async ({ request }) => {
   for (const host of [
     "localhost:3100",

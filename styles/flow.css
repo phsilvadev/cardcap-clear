@@ -267,3 +267,124 @@ p[hidden] {
 [hidden] {
   display: none !important;
 }
+
+.live-product {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  margin: 32px 0;
+}
+.live-product-image {
+  width: 100%;
+  max-height: 460px;
+  object-fit: cover;
+  border-radius: 20px;
+}
+.commerce-form {
+  display: grid;
+  gap: 20px;
+  max-width: 640px;
+  margin: 28px 0;
+}
+.commerce-form label,
+.commerce-pix label {
+  display: grid;
+  gap: 8px;
+}
+.commerce-form input,
+.commerce-form select,
+.commerce-form textarea,
+.live-product input,
+.commerce-pix textarea {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 12px;
+  font: inherit;
+  max-width: 100%;
+}
+.commerce-option {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 12px 0;
+}
+.commerce-option input[type="number"] {
+  width: 80px;
+}
+.commerce-form fieldset,
+.live-product fieldset {
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 20px 0;
+}
+.commerce-form input[type="radio"],
+.live-product input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
+.commerce-error {
+  color: #a12626;
+  background: #fff0ed;
+  padding: 16px;
+  border-radius: 12px;
+}
+.commerce-steps {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.commerce-cart-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #ddd;
+  padding: 24px 0;
+}
+.commerce-cart-line h2 {
+  font-size: 20px;
+}
+.commerce-cart-line input {
+  width: 70px;
+  border: 1px solid #ddd;
+  padding: 8px;
+  border-radius: 8px;
+}
+.commerce-summary {
+  max-width: 700px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 24px;
+  margin: 30px 0;
+}
+.commerce-summary > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 16px;
+}
+.commerce-pix {
+  display: grid;
+  gap: 16px;
+  max-width: 500px;
+  margin-top: 24px;
+}
+.commerce-pix img {
+  width: 240px;
+  max-width: 100%;
+}
+.commerce-pix textarea {
+  width: 100%;
+  min-height: 120px;
+}
+@media (max-width: 700px) {
+  .live-product {
+    grid-template-columns: 1fr;
+  }
+  .commerce-cart-line {
+    flex-wrap: wrap;
+  }
+}

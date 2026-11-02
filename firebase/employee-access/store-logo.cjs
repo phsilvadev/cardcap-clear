@@ -79,16 +79,14 @@ function createStoreLogoHandler({
       }[contentType];
       path = `tenants/${storeId}/branding/${uuid()}.${extension}`;
       const token = uuid();
-      await bucket
-        .file(path)
-        .save(bytes, {
-          resumable: false,
-          metadata: {
-            contentType,
-            cacheControl: "public, max-age=31536000, immutable",
-            metadata: { firebaseStorageDownloadTokens: token },
-          },
-        });
+      await bucket.file(path).save(bytes, {
+        resumable: false,
+        metadata: {
+          contentType,
+          cacheControl: "public, max-age=31536000, immutable",
+          metadata: { firebaseStorageDownloadTokens: token },
+        },
+      });
       url = `https://firebasestorage.googleapis.com/v0/b/${encodeURIComponent(bucket.name)}/o/${encodeURIComponent(path)}?alt=media&token=${token}`;
     }
     let previous;

@@ -58,6 +58,18 @@ function createTenantOrders({
             timeZone: "America/Sao_Paulo",
           })
         : "Horário não informado",
+      ...(order.source === "web"
+        ? {
+            source: "web",
+            payment: order.payment,
+            paymentStatus: order.paymentStatus,
+            fulfillment: order.fulfillment,
+            phone: order.phone,
+            address: order.address,
+            shippingCents: order.shippingCents,
+            notes: order.notes || "",
+          }
+        : {}),
       ...(order.source === "salon"
         ? {
             source: "salon",
@@ -240,6 +252,61 @@ function createTenantOrders({
       });
       return { ok: true };
     }
+    if (action === "confirmPayment") {
+      if (!validId(input.orderId) || input.confirmed !== true)
+        fail(
+          "invalid-argument",
+          "Confirme o recebimento antes de registrar o pagamento.",
+        );
+      await db.runTransaction(async (tx) => {
+        const ref = orders(storeId).doc(input.orderId);
+        const [tenant, orderDoc] = await Promise.all([
+          tx.get(tenantRef(storeId)),
+          tx.get(ref),
+        ]);
+        checkTenant(tenant.data(), storeId);
+        const order = orderDoc.data();
+        if (
+          !order ||
+          order.storeId !== storeId ||
+          order.source !== "web" ||
+          !["card", "cash"].includes(order.payment) ||
+          order.status === "cancelled" ||
+          !validId(order.checkoutId)
+        )
+          fail(
+            "failed-precondition",
+            "Este pedido não permite confirmação de pagamento presencial.",
+          );
+        if (order.paymentStatus === "paid") return;
+        if (order.paymentStatus !== "due_on_fulfillment")
+          fail(
+            "failed-precondition",
+            "O pagamento mudou. Atualize antes de continuar.",
+          );
+        const sessionRef = db.doc(
+          `tenants/${storeId}/checkoutSessions/${order.checkoutId}`,
+        );
+        const session = (await tx.get(sessionRef)).data();
+        if (
+          !session ||
+          session.storeId !== storeId ||
+          session.payment !== order.payment
+        )
+          fail("failed-precondition", "Confira a origem deste pedido.");
+        tx.update(ref, {
+          paymentStatus: "paid",
+          paymentConfirmedBy: storeId,
+          paymentConfirmedAt: timestamp(),
+          updatedAt: timestamp(),
+        });
+        tx.update(sessionRef, {
+          paymentStatus: "paid",
+          updatedAt: timestamp(),
+        });
+      });
+      return { ok: true };
+    }
     if (action === "transition") {
       if (
         !validId(input.orderId) ||
@@ -338,6 +405,7 @@ function createTenantOrders({
         if (
           !order ||
           order.source === "salon" ||
+          order.fulfillment === "pickup" ||
           order.storeId !== storeId ||
           !["preparing", "delivery"].includes(order.status)
         )

@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
-  reactStrictMode: false,
+  reactStrictMode: true,
   // Preserva a origem no rewrite, inclusive ao usar IPs de loopback no ambiente local.
   skipProxyUrlNormalize: true,
   async redirects() {

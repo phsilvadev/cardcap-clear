@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { StoreOperations } from "@/lib/operations";
 import { cookies } from "next/headers";
 
@@ -20,34 +21,20 @@ export async function verifyTenantSession(
   const key = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
   const project = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   if (!key || !project) return null;
+  const started = performance.now();
   try {
-    const identity = await fetch(
-      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(key)}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(appCheckToken ? { "X-Firebase-AppCheck": appCheckToken } : {}),
-        },
-        body: JSON.stringify({ idToken: token }),
-        cache: "no-store",
-        signal: AbortSignal.timeout(10000),
-      },
-    );
-    if (!identity.ok) return null;
-    const { users } = await identity.json();
-    const user = users?.[0];
-    if (!user?.localId || user.disabled) return null;
-    // Decoding is only used after Firebase has verified the token.
+    // Preliminary decoding selects a document path only. Both services still validate the token.
     const claims = JSON.parse(
       Buffer.from(token.split(".")[1], "base64url").toString(),
     );
     if (
       claims.aud !== project ||
       claims.iss !== `https://securetoken.google.com/${project}` ||
-      claims.sub !== user.localId ||
+      typeof claims.sub !== "string" ||
+      !/^[a-zA-Z0-9_-]{1,128}$/.test(claims.sub) ||
+      !Number.isFinite(claims.exp) ||
       claims.exp <= Date.now() / 1000 ||
-      claims.auth_time < Number(user.validSince ?? 0)
+      !Number.isFinite(claims.auth_time)
     )
       return null;
     const base = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(project)}/databases/(default)/documents`;
@@ -62,7 +49,32 @@ export async function verifyTenantSession(
       });
       return response.ok ? (await response.json()).fields : null;
     };
-    const tenant = await read(`tenants/${encodeURIComponent(user.localId)}`);
+    // Firestore independently authorizes this read using the caller's token and the rules.
+    const [identity, tenant] = await Promise.all([
+      fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(key)}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(appCheckToken ? { "X-Firebase-AppCheck": appCheckToken } : {}),
+          },
+          body: JSON.stringify({ idToken: token }),
+          cache: "no-store",
+          signal: AbortSignal.timeout(10000),
+        },
+      ),
+      read(`tenants/${encodeURIComponent(claims.sub)}`),
+    ]);
+    if (!identity.ok) return null;
+    const { users } = await identity.json();
+    const user = users?.[0];
+    if (!user?.localId || user.disabled) return null;
+    if (
+      claims.sub !== user.localId ||
+      claims.auth_time < Number(user.validSince ?? 0)
+    )
+      return null;
     const slug = tenant?.slug?.stringValue;
     const status = tenant?.status?.stringValue;
     if (
@@ -89,13 +101,21 @@ export async function verifyTenantSession(
     };
   } catch {
     return null;
+  } finally {
+    if (process.env.CARDAP_AUTH_TIMING === "true")
+      console.info(
+        JSON.stringify({
+          event: "tenant-session-check",
+          durationMs: Math.round(performance.now() - started),
+        }),
+      );
   }
 }
 
-export async function getTenantSession() {
+export const getTenantSession = cache(async function getTenantSession() {
   const jar = await cookies();
   return verifyTenantSession(
     jar.get(SESSION_COOKIE)?.value ?? "",
     jar.get(APP_CHECK_SESSION_COOKIE)?.value,
   );
-}
+});

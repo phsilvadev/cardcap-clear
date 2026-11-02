@@ -1,5 +1,6 @@
 "use client";
 import { useState, type FormEvent } from "react";
+import { useTenantOrders } from "./tenant-orders-provider";
 import type { DashboardOrder, DeliveryCourier } from "@/lib/types";
 import { orderStages } from "@/lib/orders/demo-store";
 import { formatProductPrice } from "@/lib/menu/product-validation";
@@ -20,6 +21,8 @@ export default function OrderDetails({
   onAssign: (orderId: string, courierId: string) => void;
   ownDelivery: boolean;
 }) {
+  const payments = useTenantOrders();
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const stages =
     order.source === "salon"
       ? orderStages.map((item) => ({
@@ -37,7 +40,23 @@ export default function OrderDetails({
                 ? "Marcar como servido"
                 : item.action,
         }))
-      : orderStages;
+      : order.fulfillment === "pickup"
+        ? orderStages.map((item) => ({
+            ...item,
+            label:
+              item.id === "delivery"
+                ? "Pronto para retirada"
+                : item.id === "done"
+                  ? "Retirado"
+                  : item.label,
+            action:
+              item.id === "preparing"
+                ? "Marcar como pronto"
+                : item.id === "delivery"
+                  ? "Confirmar retirada"
+                  : item.action,
+          }))
+        : orderStages;
   const stage = stages.find((item) => item.id === order.status)!;
   const [cancelling, setCancelling] = useState(false);
   const [reason, setReason] = useState("");
@@ -91,6 +110,57 @@ export default function OrderDetails({
         <h3>{order.source === "salon" ? "Atendimento no salão" : "Cliente"}</h3>
         <strong className="order-details-customer">{order.customer}</strong>
       </section>
+      {order.source === "web" && (
+        <section className="order-details-section">
+          <h3>
+            {order.fulfillment === "pickup" ? "Retirada na loja" : "Entrega"}
+          </h3>
+          {order.phone && <p>Telefone: {order.phone}</p>}
+          {order.address && <p>{order.address}</p>}
+          <h3>Pagamento</h3>
+          <p>
+            {order.payment === "pix"
+              ? "Pix online"
+              : order.payment === "card"
+                ? "Cartão presencial"
+                : "Dinheiro presencial"}{" "}
+            ·{" "}
+            {order.paymentStatus === "paid"
+              ? "Pago"
+              : order.paymentStatus === "refunded"
+                ? "Estorno: conferir com o cliente"
+                : "A pagar"}
+          </p>
+          {order.status !== "cancelled" &&
+            order.paymentStatus === "due_on_fulfillment" &&
+            ["cash", "card"].includes(order.payment ?? "") && (
+              <>
+                <label className="commerce-option">
+                  <input
+                    type="checkbox"
+                    checked={paymentConfirmed}
+                    onChange={(event) =>
+                      setPaymentConfirmed(event.target.checked)
+                    }
+                  />
+                  Conferi que o pagamento foi recebido.
+                </label>
+                <button
+                  type="button"
+                  className="button"
+                  disabled={busy || payments.busy || !paymentConfirmed}
+                  onClick={() =>
+                    void payments.confirmPayment(order.id).then((ok) => {
+                      if (ok) setPaymentConfirmed(false);
+                    })
+                  }
+                >
+                  Registrar pagamento recebido
+                </button>
+              </>
+            )}
+        </section>
+      )}
       <section className="order-details-section">
         <h3>Itens do pedido</h3>
         <ul className="order-details-items">
@@ -104,6 +174,7 @@ export default function OrderDetails({
         </div>
       </section>
       {order.source !== "salon" &&
+        order.fulfillment !== "pickup" &&
         ownDelivery &&
         ["preparing", "delivery"].includes(order.status) && (
           <section className="order-details-section">

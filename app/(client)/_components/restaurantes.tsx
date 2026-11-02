@@ -53,12 +53,28 @@ export default function RestaurantesContent({
               {catalog.hasRegion ? `${city}, ${state}` : "Escolha sua região"}
             </span>
             <button
-              className="catalog-text-button"
+              className="catalog-button catalog-refresh-button"
               type="button"
               onClick={catalog.reload}
               disabled={catalog.loading || !catalog.hasRegion}
+              aria-busy={catalog.loading}
             >
-              Atualizar lojas
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 7v5h-5" />
+                <path d="M4 17v-5h5" />
+                <path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17" />
+              </svg>
+              {catalog.loading ? "Atualizando…" : "Atualizar lojas"}
             </button>
           </div>
         </section>

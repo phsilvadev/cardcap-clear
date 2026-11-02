@@ -1,3 +1,4 @@
+import { prelaunchResponse } from "@/lib/prelaunch";
 import { tenantDashboardUrl } from "@/lib/auth/tenant-url";
 import { NextResponse, type NextRequest } from "next/server";
 import { resolveTenant, isCentralHost } from "@/lib/tenant";
@@ -8,6 +9,16 @@ import {
 } from "@/lib/auth/session";
 
 export async function proxy(request: NextRequest) {
+  const prelaunch = prelaunchResponse(request);
+  if (prelaunch) return prelaunch;
+  const path = request.nextUrl.pathname;
+  if (
+    path !== "/dashboard" &&
+    !path.startsWith("/dashboard/") &&
+    path !== "/tenants" &&
+    !path.startsWith("/tenants/")
+  )
+    return NextResponse.next();
   if (
     request.nextUrl.pathname === "/tenants" ||
     request.nextUrl.pathname.startsWith("/tenants/")
@@ -36,12 +47,13 @@ export async function proxy(request: NextRequest) {
       status: 403,
     });
   }
-  const path = request.nextUrl.pathname;
   if (
     ((path === "/dashboard/garcons" ||
       path.startsWith("/dashboard/garcons/")) &&
       !session.operations.salon) ||
-    ((path === "/dashboard/entregadores" ||
+    ((path === "/dashboard/entregas" ||
+      path.startsWith("/dashboard/entregas/") ||
+      path === "/dashboard/entregadores" ||
       path.startsWith("/dashboard/entregadores/")) &&
       !session.operations.ownDelivery)
   ) {
@@ -73,5 +85,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/tenants/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

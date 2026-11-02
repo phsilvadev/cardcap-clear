@@ -1,3 +1,4 @@
+import BrandLogo from "@/components/brand-logo";
 import BrowserHomeLink from "@/app/(tenant)/_components/browser-home-link";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
@@ -34,7 +35,7 @@ export default async function Page() {
       </a>
       <header className="restaurant-login-header">
         <a className="wordmark text-3xl" href="/" aria-label="Cardap — início">
-          cardap<span className="text-brand">.</span>
+          <BrandLogo />
         </a>
         <BrowserHomeLink />
       </header>

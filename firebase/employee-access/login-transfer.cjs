@@ -76,16 +76,14 @@ function createLoginTransfer({
       )
         fail("permission-denied", "Domínio sem vínculo.");
       const code = randomBytes(32).toString("hex");
-      await db
-        .doc(`loginTransfers/${hash(code)}`)
-        .create({
-          uid,
-          slug: tenant.slug,
-          sourceOrigin: data.sourceOrigin,
-          destinationOrigin,
-          authTime,
-          expiresAt: now() + 60000,
-        });
+      await db.doc(`loginTransfers/${hash(code)}`).create({
+        uid,
+        slug: tenant.slug,
+        sourceOrigin: data.sourceOrigin,
+        destinationOrigin,
+        authTime,
+        expiresAt: now() + 60000,
+      });
       return { code, destinationOrigin };
     }
     if (data.action === "redeem") {

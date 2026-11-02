@@ -21,7 +21,12 @@ declare global {
       openSupport?: (url: string) => Promise<void>;
       ready: () => Promise<void>;
       status: () => Promise<PrinterStatus>;
-      connect: (session: { storeId: string; idToken: string }) => Promise<void>;
+      connect: (session: {
+        storeId: string;
+        idToken: string;
+        projectId?: string;
+        functionsRegion?: string;
+      }) => Promise<void>;
       disconnect: () => Promise<void>;
       configure: () => Promise<void>;
     };

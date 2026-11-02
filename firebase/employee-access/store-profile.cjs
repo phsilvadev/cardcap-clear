@@ -1,3 +1,4 @@
+const { storeSearchFields } = require("./store-search.cjs");
 const {
   normalizeSection,
   profileComplete,
@@ -53,7 +54,11 @@ function createStoreProfileHandler({ db, HttpsError, timestamp }) {
           ? { status: "configured" }
           : {}),
       };
-      const updates = { ...publicFields, updatedAt: timestamp() };
+      const updates = {
+        ...publicFields,
+        ...storeSearchFields(data),
+        updatedAt: timestamp(),
+      };
       if (
         section === "company" &&
         normalized.values.hasCnpj === false &&

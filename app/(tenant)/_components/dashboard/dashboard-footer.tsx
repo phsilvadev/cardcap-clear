@@ -1,9 +1,9 @@
+import BrandLogo from "@/components/brand-logo";
 export default function DashboardFooter() {
   return (
     <footer className={"dashboard-footer"}>
       <span className={"wordmark"}>
-        {"cardap"}
-        <span className={"text-brand"}>{"."}</span>
+        <BrandLogo />
       </span>
       <p>{"Área do restaurante · Prévia de gestão"}</p>
     </footer>

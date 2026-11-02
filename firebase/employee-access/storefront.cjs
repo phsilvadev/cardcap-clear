@@ -1,13 +1,6 @@
 const slugPattern = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
 const idPattern = /^[a-zA-Z0-9_-]{1,128}$/;
-const normalize = (value) =>
-  typeof value === "string"
-    ? value
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .trim()
-        .toLowerCase()
-    : "";
+const { normalizeCity: normalize } = require("./store-search.cjs");
 const text = (value, max = 100) =>
   typeof value === "string" ? value.trim().slice(0, max) : "";
 function publicStore(data) {
@@ -101,6 +94,8 @@ function createStorefrontHandler({
       let query = db
         .collection("tenants")
         .where("status", "==", "active")
+        .where("publicStateKey", "==", state)
+        .where("publicCityKey", "==", normalize(city))
         .orderBy("__name__");
       if (cursor) query = query.startAfter(cursor);
       const result = await query.limit(40).get();
@@ -123,7 +118,7 @@ function createStorefrontHandler({
       };
     }
     if (
-      !["get", "summary"].includes(action) ||
+      !["get", "summary", "product"].includes(action) ||
       typeof slug !== "string" ||
       !slugPattern.test(slug) ||
       (productCursor !== undefined &&
@@ -151,6 +146,42 @@ function createStorefrontHandler({
     const store = publicStore(data);
     if (action === "summary")
       return { store, preview: ownerPreview && data.status !== "active" };
+    if (action === "product") {
+      const productId = request.data.productId;
+      if (!idPattern.test(productId ?? ""))
+        fail("invalid-argument", "Produto inválido.");
+      const item = (
+        await db.doc(`tenants/${tenantId}/products/${productId}`).get()
+      ).data();
+      if (
+        !item ||
+        item.storeId !== tenantId ||
+        item.available !== true ||
+        !idPattern.test(item.categoryId ?? "") ||
+        !Number.isSafeInteger(item.priceCents) ||
+        item.priceCents < 1
+      )
+        fail("not-found", "Produto indisponível.");
+      const category = (
+        await db.doc(`tenants/${tenantId}/categories/${item.categoryId}`).get()
+      ).data();
+      if (category?.storeId !== tenantId)
+        fail("not-found", "Produto indisponível.");
+      const path = `tenants/${tenantId}/products/${productId}/image`;
+      return {
+        store,
+        preview: !!ownerPreview,
+        product: {
+          id: productId,
+          name: text(item.name),
+          description: text(item.description, 1000),
+          categoryId: item.categoryId,
+          priceCents: item.priceCents,
+          imageUrl: item.imagePath === path ? await imageUrl(path) : null,
+          customization: item.customization ?? { groups: [], division: null },
+        },
+      };
+    }
     let productsQuery = ref
       .collection("products")
       .where("available", "==", true)

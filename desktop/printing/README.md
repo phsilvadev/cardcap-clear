@@ -32,7 +32,7 @@ O aceite automático agora é uma configuração da loja, não de uma aba: o gat
 
 Cada instalação recebe um identificador aleatório persistente. Cada restaurante escolhe um computador responsável. A mesma instalação pode ser escolhida por restaurantes diferentes, mas só consome a fila do restaurante da sessão atual.
 
-O processo nativo valida a sessão usando `tenantOrderOperations`. O token Firebase é mantido apenas em memória. Sair, mudar de conta, fechar ou navegar para outra página interrompe novas reservas; não é possível recolher papel já enviado ao sistema de impressão.
+O processo nativo valida a sessão usando `tenantOrderOperations` no projeto informado pela configuração Firebase do painel. O destino não contém um projeto fixo no executável. Para fixar um ambiente, configure `CARDAP_FIREBASE_PROJECT_ID`; um painel de outro projeto será rejeitado. `CARDAP_FIREBASE_FUNCTIONS_REGION` permite selecionar a região quando ela não vier do painel. O token Firebase é mantido apenas em memória. Sair, mudar de conta, fechar ou navegar para outra página interrompe novas reservas; não é possível recolher papel já enviado ao sistema de impressão.
 
 Antes de imprimir, o aplicativo reserva uma comanda por transação e confirma o início no servidor. A reserva tem 30 segundos e pode ser recuperada somente enquanto o envio ainda não começou. Cada reserva recebe um token novo. Trocar o computador invalida o início por uma reserva anterior.
 
@@ -44,7 +44,7 @@ O cadastro do computador e o registro local de envios ficam em `userData` do Ele
 
 ## Origem dos pedidos reais
 
-A tela de Pedidos lê exclusivamente `tenants/{tenantId}/orders` pelo serviço autenticado. Pedidos locais de demonstração não são migrados nem impressos. O checkout e os apps ainda precisam usar um backend de criação de pedidos que grave nessa coleção; esta entrega não cria cobranças nem conecta o checkout de demonstração.
+A tela de Pedidos lê exclusivamente `tenants/{tenantId}/orders` pelo serviço autenticado. Pedidos locais de demonstração não são migrados nem impressos. O checkout público usa `publicCheckout`: pagamento presencial cria um pedido a pagar, enquanto Pix Asaas fica fora da cozinha até a confirmação do webhook. O app de garçom usa `salonOperations` para criar pedidos de salão. Confira os requisitos de publicação em [checkout e pagamentos](../../docs/checkout-deployment.md).
 
 Consulte [o contrato e os estados da fila](../../docs/firebase-order-printing.md). Nenhuma alteração nas regras do Firestore foi necessária: clientes não recebem permissão direta de escrever pedidos ou filas. As alterações passam por funções autenticadas.
 

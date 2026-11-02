@@ -27,10 +27,9 @@ export default function DashboardHeader() {
   const isHelp = pathname.endsWith("/dashboard/ajuda");
   const isApps = pathname.includes("/aplicativos");
   const isSalon = pathname.includes("/salao");
-  const isWaiters = pathname.includes("/garcons");
   const isOrders = pathname.includes("/pedidos");
   const isMenu = pathname.includes("/cardapio");
-  const isCouriers = pathname.includes("/entregadores");
+  const isCouriers = pathname.includes("/entregas");
   return (
     <header className={"dashboard-top"}>
       <span>
@@ -39,23 +38,20 @@ export default function DashboardHeader() {
           {isMenu
             ? "Cardápio"
             : isCouriers
-              ? "Entregadores"
-              : isWaiters
-                ? "Garçons"
-                : isOrders
-                  ? "Pedidos"
-                  : isSalon
-                    ? "Salão"
-                    : isApps
-                      ? "Aplicativos"
-                      : isHelp
-                        ? "Ajuda e suporte"
-                        : "Visão geral"}
+              ? "Entregas"
+              : isOrders
+                ? "Pedidos"
+                : isSalon
+                  ? "Salão"
+                  : isApps
+                    ? "Aplicativos"
+                    : isHelp
+                      ? "Ajuda e suporte"
+                      : "Visão geral"}
         </strong>
       </span>
       {!isMenu &&
         !isCouriers &&
-        !isWaiters &&
         !isSalon &&
         !isOrders &&
         !isApps &&
