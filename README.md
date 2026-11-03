@@ -132,3 +132,7 @@ O modo de pré-lançamento fica ativo por padrão: somente `/em-breve` pode ser 
 ### Integração WhatsApp
 
 Configurações → Integrações permite conectar o WhatsApp do restaurante pela Evolution API, consultar o status e desconectar. O painel permite ativar avisos de pedidos, boas-vindas e respostas rápidas, com histórico de envios. As automações começam desativadas. Veja [como configurar a URL, o segredo e publicar a Function](docs/whatsapp-evolution.md).
+
+### Pendências do sistema completo
+
+Consulte o [checklist de pendências para concluir o Cardap](docs/pendencias-sistema.md), organizado por compra e pagamento, operação, salão, impressão, WhatsApp, partes demonstrativas, aplicativos e produção.
