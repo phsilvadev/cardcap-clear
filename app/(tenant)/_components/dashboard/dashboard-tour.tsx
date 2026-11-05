@@ -89,13 +89,16 @@ export default function DashboardTour({
       setHighlight(null);
       return;
     }
-    target.scrollIntoView({
-      block: window.innerWidth <= 800 ? "start" : "center",
-      inline: "nearest",
-      behavior: "instant",
-    });
-    if (window.innerWidth <= 800)
-      window.scrollBy({ top: -24, behavior: "instant" });
+    const targetRect = target.getBoundingClientRect();
+    // Keep the dashboard in place when the menu item is already visible.
+    // Centering it also scrolls ancestor containers and shifts the header.
+    if (targetRect.top < 5 || targetRect.bottom > window.innerHeight - 5) {
+      target.scrollIntoView({
+        block: "nearest",
+        inline: "nearest",
+        behavior: "instant",
+      });
+    }
     function update() {
       if (!target || !card.current) return;
       const rect = target.getBoundingClientRect();

@@ -1,397 +1,282 @@
-import BrandLogo from "@/components/brand-logo";
+﻿import BrandLogo from "@/components/brand-logo";
 import Image from "next/image";
 import HomeAccountLink from "./home-account-link";
-import PageBehavior from "@/app/(client)/_components/home-behavior";
+import PageBehavior from "./home-behavior";
+import "../_styles/home.css";
 
+function Icon({
+  kind,
+  size = 22,
+}: {
+  kind: "search" | "pin" | "store" | "arrow" | "food";
+  size?: number;
+}) {
+  const paths = {
+    search: (
+      <>
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="m16 16 5 5" />
+      </>
+    ),
+    pin: (
+      <>
+        <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" />
+        <circle cx="12" cy="10" r="2.5" />
+      </>
+    ),
+    store: (
+      <>
+        <path d="m3 9 3-6h12l3 6M3 9h18M5 9v12h14V9M9 21v-7h6v7" />
+      </>
+    ),
+    arrow: <path d="M7 17 17 7M7 7h10v10" />,
+    food: (
+      <>
+        <path d="M3 2v7a3 3 0 0 0 6 0V2M6 2v20M18 22V2c-5 3-5 11 0 11M22 2v20" />
+      </>
+    ),
+  };
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[kind]}
+    </svg>
+  );
+}
+const steps = [
+  {
+    image: "Mapa dobrado com pino laranja.png",
+    title: "Escolha sua região",
+    description: "Informe sua cidade e estado para começar.",
+  },
+  {
+    image: "Loja Charmosa com Toldinho Listrado.png",
+    title: "Descubra restaurantes",
+    description: "Acesse os restaurantes disponíveis e explore os cardápios.",
+  },
+  {
+    image: "Ícone de Hambúrguer 3D Brilhante.png",
+    title: "Encontre sua próxima refeição",
+    description: "Escolha, faça seu pedido e aproveite.",
+  },
+];
 export default function HomeContent({
   restaurant,
 }: {
   restaurant?: { name: string; href: string };
 }) {
   return (
-    <>
-      <a href={"#conteudo"} className={"sr-only focus:not-sr-only"}>
-        {"Ir para o conteúdo"}
+    <div className="home-page">
+      <a href="#conteudo" className="home-skip">
+        Ir para o conteúdo
       </a>
-
-      <div className={"mx-auto max-w-6xl px-5 sm:px-8"}>
-        <header
-          className={
-            "flex flex-wrap items-center justify-between gap-5 border-b border-line py-6 lg:border-0 lg:py-8"
-          }
-        >
-          <a
-            href={"#"}
-            aria-label={"Cardap — início"}
-            className={"wordmark text-3xl"}
-          >
+      <div className="home-container">
+        <header className="home-header">
+          <a href="/" aria-label="Cardap — início">
             <BrandLogo />
           </a>
-
-          <nav
-            aria-label={"Navegação principal"}
-            className={"flex flex-wrap items-center gap-4 text-sm sm:gap-8"}
-          >
-            <a href={"/cliente"}>{"Minha conta"}</a>
-            <a href={"#como-funciona"} className={"hover:underline"}>
-              {"Como funciona"}
-            </a>
-
-            <a
-              href="/restaurantes/login"
-              className={"border-0 bg-transparent p-0 hover:underline"}
-            >
-              {"Para restaurantes"}
-            </a>
-
+          <nav aria-label="Navegação principal">
+            <a href="/cliente">Minha conta</a>
+            <a href="#como-funciona">Como funciona</a>
             <HomeAccountLink restaurant={restaurant} />
           </nav>
         </header>
-
-        <main id={"conteudo"}>
-          <section
-            className={
-              "grid items-center gap-10 py-10 lg:grid-cols-2 lg:gap-14 lg:py-14"
-            }
-            aria-labelledby={"hero-title"}
-          >
-            <div>
-              <p
-                className={
-                  "mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-muted"
-                }
-              >
-                {"Sua cidade. Seus sabores."}
-              </p>
-
-              <h1
-                id={"hero-title"}
-                className={
-                  "text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl"
-                }
-              >
-                {"Deu fome?"}
+        <main id="conteudo">
+          <section className="home-hero" aria-labelledby="hero-title">
+            <div className="home-hero-copy">
+              <p className="home-eyebrow">Sua cidade. Seus sabores.</p>
+              <h1 id="hero-title">
+                Deu fome?
+                <br />O próximo sabor
                 <br />
-                {"O próximo sabor"}
-                <br />
-                {"está "}
-                <span className={"text-brand"}>{"por perto."}</span>
+                está <span>por perto.</span>
               </h1>
-
-              <p
-                className={"mt-6 max-w-md text-base leading-relaxed text-muted"}
-              >
-                {
-                  "Descubra os restaurantes da sua região. Escolha sua cidade e dê o primeiro passo para encontrar sua próxima refeição."
-                }
+              <p className="home-intro">
+                Encontre os melhores restaurantes da sua região, explore
+                cardápios, faça seu pedido e receba com praticidade.
               </p>
-
-              <a
-                href={"#buscar"}
-                className={
-                  "mt-7 inline-flex min-h-12 items-center gap-6 rounded-full border border-ink px-6 text-sm font-semibold hover:bg-ink hover:text-white"
-                }
-              >
-                {"Encontrar restaurantes "}
-                <svg
-                  xmlns={"http://www.w3.org/2000/svg"}
-                  width={"20"}
-                  height={"20"}
-                  viewBox={"0 0 24 24"}
-                  fill={"none"}
-                  stroke={"currentColor"}
-                  strokeWidth={"2"}
-                  strokeLinecap={"round"}
-                  strokeLinejoin={"round"}
-                  className={"lucide lucide-arrow-down"}
-                  aria-hidden={"true"}
-                  focusable={"false"}
-                  style={{ display: "inline-block", verticalAlign: "middle" }}
+              <div className="home-actions">
+                <a href="#buscar" className="home-button home-primary">
+                  <Icon kind="search" size={19} />
+                  Encontrar restaurantes
+                </a>
+                <a
+                  href="/restaurantes/cadastro"
+                  className="home-button home-secondary"
                 >
-                  <path d={"M12 5v14"}></path>
-                  <path d={"m19 12-7 7-7-7"}></path>
-                </svg>
-              </a>
-
-              <p className={"hashtag mt-8 text-3xl text-brand"}>
-                {"#PARTIUCOMER"}
-              </p>
+                  <Icon kind="store" />
+                  Cadastrar restaurante
+                </a>
+              </div>
             </div>
-
-            <div
-              className="flex min-h-80 items-center justify-center py-6 sm:min-h-96"
-              aria-hidden="true"
-            >
-              <Image
-                src="/i01.png"
-                alt=""
-                width={1477}
-                height={1065}
-                sizes="(min-width: 1024px) 536px, (min-width: 640px) 50vw, 100vw"
-                className="home-hero-image"
-                priority
-              />
-            </div>
+            <Image
+              className="home-art"
+              src="/Restaurante Cardap com Entrega.png"
+              alt="Restaurante Cardap com entregador de moto e sacola de delivery"
+              width={1448}
+              height={1086}
+              sizes="(min-width: 900px) 52vw, 100vw"
+              priority
+            />
           </section>
-
           <section
-            id={"buscar"}
-            aria-labelledby={"search-title"}
-            className={"scroll-mt-6 rounded-3xl border border-line p-5 sm:p-8"}
+            id="buscar"
+            className="home-search"
+            aria-labelledby="search-title"
           >
-            <div
-              className={"mb-6 flex flex-wrap items-end justify-between gap-3"}
-            >
+            <div className="home-search-heading">
               <div>
-                <p
-                  className={
-                    "text-xs font-semibold uppercase tracking-widest text-muted"
-                  }
-                >
-                  {"Vamos começar"}
-                </p>
-                <h2
-                  id={"search-title"}
-                  className={"mt-2 text-2xl font-bold sm:text-3xl"}
-                >
-                  {"Onde bateu a fome?"}
-                </h2>
+                <p className="home-kicker">Vamos começar</p>
+                <h2 id="search-title">Onde bateu a fome?</h2>
               </div>
-              <p className={"text-sm text-muted"}>
-                {"Escolha sua cidade e seu estado."}
+              <p className="home-search-hint">
+                <Icon kind="food" size={31} />
+                Escolha sua cidade e encontre restaurantes perto de você.
               </p>
             </div>
-
             <form
-              id={"location-form"}
-              className={"grid gap-4 sm:grid-cols-[minmax(0,1fr)_120px_auto]"}
+              id="location-form"
+              className="home-search-form"
+              action="/restaurantes"
+              method="get"
             >
-              <div className={"rounded-2xl border border-line px-4 py-3"}>
-                <label
-                  htmlFor={"city"}
-                  className={"block text-xs font-medium text-muted"}
-                >
-                  {"Cidade"}
-                </label>
-                <input
-                  id={"city"}
-                  name={"city"}
-                  autoComplete={"address-level2"}
-                  placeholder={"Ex.: São Paulo"}
-                  maxLength={100}
-                  required={true}
-                  className={
-                    "mt-1 w-full min-w-0 border-0 bg-transparent text-base outline-none"
-                  }
-                />
+              <div className="home-location-fields">
+                <Icon kind="pin" size={26} />
+                <div className="home-city">
+                  <label htmlFor="city">Cidade</label>
+                  <input
+                    id="city"
+                    name="city"
+                    autoComplete="address-level2"
+                    placeholder="Ex.: São Paulo"
+                    maxLength={100}
+                    required
+                  />
+                </div>
+                <div className="home-state">
+                  <label htmlFor="state">Estado</label>
+                  <select
+                    id="state"
+                    name="state"
+                    autoComplete="address-level1"
+                    required
+                  >
+                    <option value="">UF</option>
+                    {"AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO"
+                      .split(" ")
+                      .map((state) => (
+                        <option key={state} value={state}>
+                          {state}
+                        </option>
+                      ))}
+                  </select>
+                </div>
               </div>
-
-              <div className={"rounded-2xl border border-line px-4 py-3"}>
-                <label
-                  htmlFor={"state"}
-                  className={"block text-xs font-medium text-muted"}
-                >
-                  {"Estado"}
-                </label>
-                <select
-                  id={"state"}
-                  name={"state"}
-                  autoComplete={"address-level1"}
-                  required={true}
-                  className={"mt-1 w-full border-0 bg-transparent text-base"}
-                >
-                  <option value={""}>{"UF"}</option>
-                </select>
-              </div>
-
-              <button
-                type={"submit"}
-                className={
-                  "flex min-h-14 items-center justify-center gap-4 rounded-full border-0 bg-brand px-8 font-semibold hover:bg-ink hover:text-white"
-                }
-              >
-                {"Buscar "}
-                <svg
-                  xmlns={"http://www.w3.org/2000/svg"}
-                  width={"20"}
-                  height={"20"}
-                  viewBox={"0 0 24 24"}
-                  fill={"none"}
-                  stroke={"currentColor"}
-                  strokeWidth={"2"}
-                  strokeLinecap={"round"}
-                  strokeLinejoin={"round"}
-                  className={"lucide lucide-search"}
-                  aria-hidden={"true"}
-                  focusable={"false"}
-                  style={{ display: "inline-block", verticalAlign: "middle" }}
-                >
-                  <path d={"m21 21-4.34-4.34"}></path>
-                  <circle cx={"11"} cy={"11"} r={"8"}></circle>
-                </svg>
+              <button type="submit" className="home-button home-primary">
+                <Icon kind="search" size={29} />
+                Buscar
               </button>
             </form>
-
-            <p
-              id={"search-feedback"}
-              role={"status"}
-              aria-live={"polite"}
-              className={"mt-3 min-h-5 text-sm text-muted"}
-            ></p>
-
-            <p className={"mt-1 text-xs text-muted"}>
-              {
-                "Encontre restaurantes disponíveis na região escolhida e conheça seus cardápios."
-              }
-            </p>
+            <p id="search-feedback" role="status" aria-live="polite" />
           </section>
-
           <section
-            id={"como-funciona"}
-            aria-labelledby={"steps-title"}
-            className={"py-12 sm:py-16"}
+            id="como-funciona"
+            className="home-how"
+            aria-labelledby="steps-title"
           >
-            <div
-              className={"mb-8 flex flex-wrap items-end justify-between gap-3"}
-            >
-              <h2 id={"steps-title"} className={"text-3xl font-bold"}>
-                {"Perto de você."}
-                <br />
-                {"Simples assim."}
-              </h2>
-              <p className={"max-w-xs text-sm leading-relaxed text-muted"}>
-                {
-                  "Tudo começa com o lugar onde você está e a vontade de comer bem."
-                }
-              </p>
-            </div>
-
-            <ol className={"m-0 grid list-none gap-6 p-0 sm:grid-cols-3"}>
-              <li className={"border-t border-line pt-5"}>
-                <span className={"hashtag text-3xl text-brand"}>{"01"}</span>
-                <h3 className={"mt-3 text-lg font-bold"}>
-                  {"Escolha sua região"}
-                </h3>
-                <p className={"mt-2 text-sm leading-relaxed text-muted"}>
-                  {"Informe sua cidade e seu estado para começar."}
-                </p>
-              </li>
-
-              <li className={"border-t border-line pt-5"}>
-                <span className={"hashtag text-3xl text-brand"}>{"02"}</span>
-                <h3 className={"mt-3 text-lg font-bold"}>
-                  {"Descubra restaurantes"}
-                </h3>
-                <p className={"mt-2 text-sm leading-relaxed text-muted"}>
-                  {
-                    "A proposta do Cardap é conectar você aos sabores da sua região."
-                  }
-                </p>
-              </li>
-
-              <li className={"border-t border-line pt-5"}>
-                <span className={"hashtag text-3xl text-brand"}>{"03"}</span>
-                <h3 className={"mt-3 text-lg font-bold"}>
-                  {"Encontre sua próxima refeição"}
-                </h3>
-                <p className={"mt-2 text-sm leading-relaxed text-muted"}>
-                  {
-                    "Seu lugar de sempre ou uma nova descoberta: a escolha começa aqui."
-                  }
-                </p>
-              </li>
+            <h2 id="steps-title">Como funciona?</h2>
+            <p className="home-how-intro">
+              É simples, rápido e você encontra o que tem de melhor na sua
+              região.
+            </p>
+            <ol className="home-steps">
+              {steps.map((step, index) => (
+                <li key={step.title}>
+                  <Image
+                    src={`/${step.image}`}
+                    alt=""
+                    width={120}
+                    height={120}
+                    sizes="110px"
+                  />
+                  <span className="home-step-number">0{index + 1}</span>
+                  <div className="home-step-copy">
+                    <h3>{step.title}</h3>
+                    <p>{step.description}</p>
+                  </div>
+                  {index < 2 && (
+                    <span className="home-step-next" aria-hidden="true">
+                      ›
+                    </span>
+                  )}
+                </li>
+              ))}
             </ol>
           </section>
-
-          <section
-            className={
-              "mb-12 flex flex-wrap items-center justify-between gap-6 rounded-3xl bg-ink p-6 text-white sm:p-8"
-            }
-            aria-labelledby={"partner-title"}
-          >
+          <section className="home-partners" aria-labelledby="partner-title">
+            <Image
+              src="/Ícone 3D de loja com toldo listrado.png"
+              alt=""
+              width={185}
+              height={150}
+              sizes="170px"
+            />
             <div>
-              <p
-                className={
-                  "text-xs font-semibold uppercase tracking-widest text-brand"
-                }
-              >
-                {"Para quem faz acontecer"}
-              </p>
-              <h2 id={"partner-title"} className={"mt-2 text-2xl font-bold"}>
-                {"Seu restaurante também pode estar perto."}
+              <p className="home-kicker">Para restaurantes</p>
+              <h2 id="partner-title">
+                Seu restaurante também pode estar no Cardap.
               </h2>
-              <p className={"mt-2 text-sm text-white/70"}>
-                {"Conheça a área de parceiros do Cardap."}
+              <p>
+                Mais visibilidade, pedidos organizados e clientes na sua região.
               </p>
             </div>
-            <a
-              href="/restaurantes/login"
-              className={
-                "min-h-12 shrink-0 rounded-full border-0 bg-brand px-6 font-semibold text-ink hover:bg-white"
-              }
-            >
-              {"Conhecer a área de parceiros "}
-              <svg
-                xmlns={"http://www.w3.org/2000/svg"}
-                width={"20"}
-                height={"20"}
-                viewBox={"0 0 24 24"}
-                fill={"none"}
-                stroke={"currentColor"}
-                strokeWidth={"2"}
-                strokeLinecap={"round"}
-                strokeLinejoin={"round"}
-                className={"lucide lucide-arrow-up-right"}
-                aria-hidden={"true"}
-                focusable={"false"}
-                style={{ display: "inline-block", verticalAlign: "middle" }}
-              >
-                <path d={"M7 7h10v10"}></path>
-                <path d={"M7 17 17 7"}></path>
-              </svg>
+            <a href="/restaurantes/login" className="home-button home-primary">
+              Conhecer a área de parceiros <Icon kind="arrow" size={19} />
             </a>
           </section>
         </main>
-
-        <footer
-          className={
-            "flex flex-wrap items-center justify-between gap-5 border-t border-line py-7 text-xs text-muted"
-          }
-        >
-          <a className={"wordmark text-2xl text-ink"} href={"#"}>
+        <footer className="home-footer">
+          <a href="/" aria-label="Cardap — início">
             <BrandLogo />
           </a>
-          <p>{"Cardap · Sua próxima refeição começa aqui."}</p>
-          <button
-            type={"button"}
-            data-info={"about"}
-            className={"min-h-11 border-0 bg-transparent p-0 hover:underline"}
-          >
-            {"Sobre esta prévia"}
-          </button>
+          <p>Cardap · Sua próxima refeição começa aqui.</p>
+          <nav aria-label="Informações">
+            <button type="button" data-info="about">
+              Sobre
+            </button>
+            <button type="button" data-info="terms">
+              Termos
+            </button>
+            <button type="button" data-info="privacy">
+              Privacidade
+            </button>
+            <button type="button" data-info="contact">
+              Contato
+            </button>
+          </nav>
         </footer>
       </div>
-
       <dialog
-        id={"info-dialog"}
-        aria-labelledby={"dialog-title"}
-        aria-describedby={"dialog-description"}
+        id="info-dialog"
+        aria-labelledby="dialog-title"
+        aria-describedby="dialog-description"
       >
-        <h2 id={"dialog-title"} className={"text-2xl font-bold"}></h2>
-        <p
-          id={"dialog-description"}
-          className={"mt-4 text-sm leading-relaxed text-muted"}
-        ></p>
-        <form method={"dialog"} className={"mt-6"}>
-          <button
-            className={"min-h-11 rounded-full border-0 bg-ink px-6 text-white"}
-          >
-            {"Entendi"}
-          </button>
+        <h2 id="dialog-title" />
+        <p id="dialog-description" />
+        <form method="dialog">
+          <button className="home-button home-primary">Entendi</button>
         </form>
       </dialog>
-      {"\n\n"}
       <PageBehavior />
-    </>
+    </div>
   );
 }

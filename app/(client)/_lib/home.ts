@@ -32,7 +32,12 @@ export default function initialize() {
     "TO",
   ];
   const stateSelect = query<HTMLSelectElement>("#state");
-  const options = states.map((uf) => new Option(uf, uf));
+  const options = states
+    .filter(
+      (uf) =>
+        !Array.from(stateSelect.options).some((option) => option.value === uf),
+    )
+    .map((uf) => new Option(uf, uf));
   options.forEach((option) => stateSelect.add(option));
   query<HTMLFormElement>("#location-form").addEventListener(
     "submit",
@@ -68,6 +73,18 @@ export default function initialize() {
     { signal: controller.signal },
   );
   const messages: Record<string, [string, string]> = {
+    terms: [
+      "Termos de uso",
+      "Consulte as condições de compra, entrega e cancelamento diretamente com o restaurante escolhido antes de concluir seu pedido.",
+    ],
+    privacy: [
+      "Privacidade",
+      "Para esclarecer dúvidas sobre o tratamento dos seus dados, entre em contato com o suporte do Cardap pela área da sua conta.",
+    ],
+    contact: [
+      "Contato",
+      "Precisa de ajuda? Acesse Minha conta para encontrar o suporte. Para assuntos relacionados a um pedido, fale com o restaurante responsável.",
+    ],
     login: [
       "Entrar no Cardap",
       "A conta do consumidor ainda é demonstrativa. Você pode comprar como visitante nas lojas disponíveis.",
