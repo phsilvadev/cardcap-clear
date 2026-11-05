@@ -40,6 +40,7 @@ export function useSalon(storeId?: string) {
       )
         return;
       setData(result);
+      if (!pendingRef.current) setError("");
     } catch (reason) {
       if (version === scope.current) setError(salonError(reason));
     } finally {
