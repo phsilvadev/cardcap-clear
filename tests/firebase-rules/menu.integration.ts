@@ -153,6 +153,27 @@ test.describe.serial("CRUD do cardápio com regras reais nos emuladores", () => 
     await terminate(getFirebaseDb());
     await deleteApp(getFirebaseApp());
   });
+  test("carteira e prova Asaas não podem ser adulteradas diretamente pelo proprietário", async () => {
+    const db = getFirebaseDb();
+    for (const status of ["pending", "configured", "active"]) {
+      await seedTenant(ownerUid, status);
+      await expect(
+        updateDoc(doc(db, "tenants", ownerUid), {
+          asaasWalletId: "forged-wallet-123",
+          updatedAt: serverTimestamp(),
+        }),
+      ).rejects.toThrow();
+    }
+    await expect(
+      setDoc(doc(db, "tenantAsaasVerification", ownerUid), {
+        verified: { walletId: "forged-wallet-123" },
+      }),
+    ).rejects.toThrow();
+    await expect(
+      getDoc(doc(db, "tenantAsaasVerification", ownerUid)),
+    ).rejects.toThrow();
+    await seedTenant(ownerUid);
+  });
   test("cria categoria e rejeita duplicata", async () => {
     const category = await createCategory(ownerUid, "Pratos principais");
     categoryId = category.id;

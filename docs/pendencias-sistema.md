@@ -8,6 +8,8 @@ Este checklist reúne o que ainda precisa ser implementado, configurado, publica
 
 ## 1. Compra e pagamento — prioridade alta
 
+- [x] Implementar [validação de conta Asaas independente](asaas-validacao-conta.md) com conferência de carteira, documento e confirmação do titular.
+- [ ] Publicar e homologar essa validação em sandbox e produção; ligar a conferência à política de ativação comercial, se exigida.
 - [ ] Configurar os segredos, o ambiente, as carteiras e o webhook do Asaas.
 - [ ] Homologar Pix com pagamento real e conferir o recebimento na carteira correta do restaurante.
 - [ ] Validar confirmação de pagamento, expiração, cancelamento e estorno nos cenários suportados.

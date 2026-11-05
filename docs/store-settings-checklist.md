@@ -1,6 +1,6 @@
 # Configurações da loja e checklist
 
-Os formulários de Dados da loja, Empresa e contato, Endereço, Horários, Entrega e retirada e Recebimentos usam o documento `tenants/{uid}`. Campos são carregados por uma assinatura autenticada e alterações passam pela função `tenantSaveProfile`, restrita ao proprietário.
+Os formulários de Dados da loja, Empresa e contato, Endereço, Horários, Entrega e retirada e Recebimentos usam o documento `tenants/{uid}`. Campos são carregados por uma assinatura autenticada e alterações passam pela função `tenantSaveProfile`, restrita ao proprietário. Recebimentos tem fluxo próprio de [validação e confirmação da conta Asaas](asaas-validacao-conta.md), pela função `tenantValidateAsaasAccount`.
 
 O checklist observa os dados gravados da loja, a presença de categorias e produtos disponíveis, além de atualizar ao abrir ou recuperar o foco. Alterar um rascunho não conclui uma etapa: é necessário salvar. Taxas são exibidas em reais e persistidas como `deliveryFeeCents`; telefone e CEP são normalizados antes de gravar.
 
@@ -10,4 +10,4 @@ Empresa e contato oferecem as escolhas Tenho CNPJ e Ainda não tenho CNPJ. A seg
 
 A validação aceita os formatos numérico e alfanumérico, seguindo o [manual de cálculo do dígito verificador da Receita Federal](https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/documentos-tecnicos/cnpj/manual-dv-cnpj.pdf).
 
-Não são usadas as antigas prévias em `sessionStorage` como fonte cadastral. A logo continua com seu fluxo próprio de upload. Nenhuma regra do Firestore ou permissão IAM foi alterada para publicar o salvamento das configurações.
+Não são usadas as antigas prévias em `sessionStorage` como fonte cadastral. A logo continua com seu fluxo próprio de upload. O salvamento de carteiras exige consulta ao Asaas e confirmação do titular no backend; gravações diretas da carteira no Firestore são bloqueadas. Não houve alteração de permissões IAM.

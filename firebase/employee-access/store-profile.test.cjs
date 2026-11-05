@@ -138,12 +138,14 @@ test("apenas o dono altera a própria loja e status não pode vir no formulário
   );
   assert.equal(f.updates.length, 0);
 });
-test("cadastro inicial completo passa para configurado, sem ativar a loja", async () => {
+test("carteira não pode ser salva sem validação autenticada", async () => {
   const f = fixture({ ...complete, status: "pending", asaasWalletId: "" });
   assert(!profileComplete(f.get()));
-  await f.save("wallet", { asaasWalletId: "test-wallet-id" });
-  assert.equal(f.get().status, "configured");
-  assert.equal(f.get().setupCompleted, true);
+  await assert.rejects(f.save("wallet", { asaasWalletId: "test-wallet-id" }), {
+    code: "failed-precondition",
+  });
+  assert.equal(f.get().status, "pending");
+  assert.equal(f.get().asaasWalletId, "");
   assert.equal(f.get().ownerUid, "owner");
 });
 test("cadastro incompleto continua pendente e não é marcado como finalizado", async () => {

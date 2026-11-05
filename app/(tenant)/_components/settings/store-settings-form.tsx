@@ -4,7 +4,6 @@ import type { StoreProfileSection } from "@/firebase/employee-access/store-profi
 import { previewFields } from "./settings-sections";
 import HoursSettingsFields from "./hours-settings-fields";
 import DeliverySettingsFields from "./delivery-settings-fields";
-import AsaasSetupGuide from "./asaas-setup-guide";
 import CompanyRegistrationFields from "./company-registration-fields";
 import SuccessAlert from "../feedback/success-alert";
 const detailsFields = [
@@ -30,7 +29,7 @@ const detailsFields = [
 export default function StoreSettingsForm({
   section,
 }: {
-  section: StoreProfileSection;
+  section: Exclude<StoreProfileSection, "wallet">;
 }) {
   const form = useStoreSettingsForm(section);
   const definitions =
@@ -52,15 +51,6 @@ export default function StoreSettingsForm({
         className="store-settings-fields"
         disabled={form.loading || form.saving || !form.canEdit}
       >
-        {section === "wallet" && (
-          <>
-            <AsaasSetupGuide />
-            <p className="settings-section-note">
-              O Wallet ID informado será salvo no cadastro da loja. A
-              verificação da conta e dos recebimentos é feita pelo Asaas.
-            </p>
-          </>
-        )}
         {section === "company" && (
           <CompanyRegistrationFields
             values={form.values}
@@ -161,12 +151,6 @@ export default function StoreSettingsForm({
           </button>
         </div>
       </fieldset>
-      {form.walletLocked && (
-        <p className="settings-section-note">
-          Para alterar a carteira de uma loja ativa, entre em contato com o
-          suporte.
-        </p>
-      )}
       {form.error && (
         <p className="flow-status" role="alert">
           {form.error}

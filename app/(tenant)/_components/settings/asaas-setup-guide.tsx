@@ -14,8 +14,8 @@ const steps = [
     text: "O Wallet ID é o identificador da sua carteira Asaas. Consulte esse identificador no painel da sua conta. Se não encontrar, peça orientação ao suporte do Asaas pela Central de Ajuda.",
   },
   {
-    title: "Informe o identificador aqui no Cardap",
-    text: "Copie o Wallet ID da conta do seu restaurante e cole no campo abaixo. Confira se o identificador pertence à conta que deverá receber os pagamentos.",
+    title: "Valide a conta aqui no Cardap",
+    text: "Informe o Wallet ID e uma chave de API da mesma conta Asaas. Valide, confira o nome e o documento do titular e confirme a conta para os repasses.",
   },
 ];
 
@@ -63,9 +63,10 @@ export default function AsaasSetupGuide() {
       </ol>
       <div className="asaas-guide-help">
         <p>
-          Já tem uma conta? Confira seu cadastro e siga a partir da etapa 3.
-          Este formulário pede apenas o Wallet ID; não informe sua senha nem sua
-          chave de API.
+          Já tem uma conta? Confira seu cadastro e siga a partir da etapa 3. Use
+          uma chave de API da sua própria conta, no ambiente indicado abaixo.
+          Ela será usada apenas na consulta e não será salva. Nunca informe sua
+          senha do Asaas.
         </p>
         <a
           href="https://central.ajuda.asaas.com/hc/pt-br"

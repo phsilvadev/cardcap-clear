@@ -1,4 +1,5 @@
 "use client";
+import AsaasAccountSettings from "../settings/asaas-account-settings";
 import IntegrationsSection from "../settings/integrations-section";
 import OperationsSection from "../settings/operations-section";
 import PlanSection from "@/app/(tenant)/_components/settings/plan-section";
@@ -92,6 +93,11 @@ export default function DashboardSettings({
                 <IntegrationsSection
                   storeId={storeId}
                   enabled={active === "integrations"}
+                />
+              ) : section.id === "wallet" ? (
+                <AsaasAccountSettings
+                  storeId={storeId}
+                  enabled={active === "wallet"}
                 />
               ) : section.id === "details" ? (
                 <StoreDetailsSection storeId={storeId} />

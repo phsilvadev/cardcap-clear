@@ -389,3 +389,18 @@ exports.evolutionWhatsAppWebhook = onRequest(
     }
   },
 );
+
+const { createAsaasAccountHandler } = require("./asaas-account.cjs");
+exports.tenantValidateAsaasAccount = onCall(
+  {
+    region: "southamerica-east1",
+    maxInstances: 5,
+    enforceAppCheck: process.env.FUNCTIONS_EMULATOR !== "true",
+  },
+  createAsaasAccountHandler({
+    db: getFirestore(),
+    HttpsError,
+    timestamp: () => FieldValue.serverTimestamp(),
+    environment: process.env.ASAAS_ENVIRONMENT || "sandbox",
+  }),
+);

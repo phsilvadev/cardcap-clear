@@ -24,6 +24,11 @@ function createStoreProfileHandler({ db, HttpsError, timestamp }) {
         "invalid-argument",
         `Confira: ${normalized.issues.join("; ")}.`,
       );
+    if (section === "wallet")
+      throw new HttpsError(
+        "failed-precondition",
+        "Valide a conta Asaas e confirme o titular antes de salvar a carteira.",
+      );
     return db.runTransaction(async (tx) => {
       const ref = db.doc(`tenants/${storeId}`);
       const tenant = (await tx.get(ref)).data();
