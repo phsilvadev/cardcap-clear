@@ -3,15 +3,21 @@
 import { useRef, useState, type FormEvent } from "react";
 import { httpsCallable } from "firebase/functions";
 import { getFirebaseFunctions } from "@/lib/firebase/client";
-import BotProtectionNotice from "@/app/(tenant)/_components/bot-protection-notice";
+import Turnstile from "./turnstile";
 
 export default function LaunchSignup() {
   const [status, setStatus] = useState<"idle" | "saving" | "success">("idle");
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [challenge, setChallenge] = useState(0);
   const pending = useRef(false);
   async function subscribe(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending.current) return;
+    if (!turnstileToken) {
+      setError("Conclua a verificação de segurança antes de enviar.");
+      return;
+    }
     const values = new FormData(event.currentTarget);
     pending.current = true;
     setStatus("saving");
@@ -25,6 +31,7 @@ export default function LaunchSignup() {
         email: String(values.get("email") || "").trim(),
         consent: values.get("consent") === "on",
         website: values.get("website") || "",
+        turnstileToken,
       });
       if (!response.data.accepted) throw new Error("not-accepted");
       setStatus("success");
@@ -37,6 +44,8 @@ export default function LaunchSignup() {
       );
       setStatus("idle");
     } finally {
+      setTurnstileToken("");
+      setChallenge((value) => value + 1);
       pending.current = false;
     }
   }
@@ -73,7 +82,7 @@ export default function LaunchSignup() {
           disabled={status === "saving"}
           aria-describedby={error ? "launch-error" : undefined}
         />
-        <button type="submit" disabled={status === "saving"}>
+        <button type="submit" disabled={status === "saving" || !turnstileToken}>
           {status === "saving" ? "Inscrevendo…" : "Quero fazer parte"}
           <span aria-hidden="true">↗</span>
         </button>
@@ -103,7 +112,7 @@ export default function LaunchSignup() {
         Seu e-mail será usado apenas para essas comunicações. A inscrição não
         cria uma conta nem garante acesso imediato.
       </p>
-      <BotProtectionNotice />
+      <Turnstile key={challenge} onToken={setTurnstileToken} />
       {error && (
         <p className="launch-error" id="launch-error" role="alert">
           {error}

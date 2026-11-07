@@ -1,7 +1,13 @@
 const { createHash } = require("node:crypto");
 const digest = (value) => createHash("sha256").update(value).digest("hex");
 
-function createWaitlistHandler({ db, HttpsError, timestamp, now = Date.now }) {
+function createWaitlistHandler({
+  db,
+  HttpsError,
+  timestamp,
+  verifyTurnstile,
+  now = Date.now,
+}) {
   return async (request) => {
     const input = request.data;
     if (!input || typeof input !== "object" || Array.isArray(input))
@@ -20,6 +26,11 @@ function createWaitlistHandler({ db, HttpsError, timestamp, now = Date.now }) {
       throw new HttpsError(
         "invalid-argument",
         "Informe um e-mail válido e aceite receber novidades.",
+      );
+    if (!verifyTurnstile || !(await verifyTurnstile(input.turnstileToken)))
+      throw new HttpsError(
+        "permission-denied",
+        "Conclua novamente a verificação de segurança.",
       );
     const clock = now();
     const ip = request.rawRequest?.ip || "unknown";

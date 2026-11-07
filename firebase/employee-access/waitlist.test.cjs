@@ -7,7 +7,7 @@ class HttpsError extends Error {
     this.code = code;
   }
 }
-function fixture() {
+function fixture(verifyTurnstile = async () => true) {
   const data = new Map();
   let clock = 1700000000000;
   let chain = Promise.resolve();
@@ -46,6 +46,7 @@ function fixture() {
     HttpsError,
     timestamp: () => new Date(clock),
     now: () => clock,
+    verifyTurnstile,
   });
   const request = (email = "partner@example.com", extras = {}) => ({
     data: { email, consent: true, ...extras },
@@ -60,6 +61,14 @@ function fixture() {
     },
   };
 }
+
+test("Turnstile inválido impede qualquer gravação", async () => {
+  const f = fixture(async () => false);
+  await assert.rejects(() => f.handler(f.request()), {
+    code: "permission-denied",
+  });
+  assert.equal(f.data.size, 0);
+});
 test("salva e-mail normalizado, origem e consentimento sem expor documentos", async () => {
   const f = fixture();
   assert.deepEqual(await f.handler(f.request(" PARTNER@EXAMPLE.COM ")), {

@@ -2,13 +2,23 @@
 
 A página pública `/em-breve` apresenta a plataforma em construção e convida restaurantes a receber novidades. É uma lista de interesse, sem criar uma conta ou garantir acesso imediato. A página inicial existente continua disponível.
 
-O formulário chama `publicJoinWaitlist`. O backend valida o e-mail e o consentimento e salva em `launchWaitlist`, com um ID derivado do e-mail normalizado. Reenvios não criam duplicatas nem alteram uma inscrição existente. O resultado público não revela se o e-mail já estava cadastrado. Há limite de cinco tentativas por IP a cada 15 minutos, App Check em produção e uma armadilha para robôs.
+O formulário chama `publicJoinWaitlist`. O backend valida o e-mail, o consentimento e o token Cloudflare Turnstile (incluindo hostname e ação `launch_signup`) e salva em `launchWaitlist`, com um ID derivado do e-mail normalizado. Reenvios não criam duplicatas nem alteram uma inscrição existente. O resultado público não revela se o e-mail já estava cadastrado. Há limite de cinco tentativas por IP a cada 15 minutos e uma armadilha para robôs. Nesta Function, o Turnstile substitui a exigência de App Check; as demais Functions mantêm sua proteção existente.
 
 A coleção de inscritos e os controles de limite são privados: as regras existentes negam leitura e escrita direta de clientes. A Function usa o Admin SDK. Não habilite acesso público à coleção. O consentimento registra a versão `launch-news-v1`, apresentada na tela, e o horário do servidor.
 
 ## Publicação
 
-Configure as variáveis públicas de Firebase e a chave de App Check/reCAPTCHA já usadas pelo projeto, registre o domínio de publicação e publique:
+Configure as variáveis públicas de Firebase. No painel Cloudflare, abra Turnstile, adicione um widget Managed e autorize o domínio do site (e `localhost` para desenvolvimento). Copie a Site Key para `NEXT_PUBLIC_TURNSTILE_SITE_KEY` em `.env.local` e no ambiente de build da hospedagem. Reinicie o Next.js depois de alterar a chave.
+
+Configure `TURNSTILE_ALLOWED_HOSTNAMES` no ambiente das Functions (`firebase/employee-access/.env.<project-id>`), com os hosts exatos separados por vírgula, sem protocolo ou porta. Guarde a Secret Key apenas no Secret Manager:
+
+```sh
+firebase functions:secrets:set TURNSTILE_SECRET_KEY --project cardap-e0bf0
+```
+
+O comando solicita a chave de forma interativa. Não coloque a Secret Key em variáveis `NEXT_PUBLIC_*` nem no repositório. Para emuladores, use `.secret.local` na pasta das Functions e chaves de teste oficiais, nunca chaves de teste em produção. Sem configuração válida, as inscrições ficam bloqueadas.
+
+Publique a Function e o aplicativo web juntos:
 
 ```sh
 firebase deploy --only functions:publicJoinWaitlist,firestore:indexes --project cardap-e0bf0

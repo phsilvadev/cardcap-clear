@@ -285,16 +285,23 @@ exports.asaasCheckoutWebhook = onRequest(
 );
 
 const { createWaitlistHandler } = require("./waitlist.cjs");
+const { createTurnstileVerifier } = require("./turnstile.cjs");
+const turnstileSecret = defineSecret("TURNSTILE_SECRET_KEY");
 exports.publicJoinWaitlist = onCall(
   {
     region: "southamerica-east1",
     maxInstances: 3,
-    enforceAppCheck: process.env.FUNCTIONS_EMULATOR !== "true",
+    enforceAppCheck: false,
+    secrets: [turnstileSecret],
   },
   createWaitlistHandler({
     db: getFirestore(),
     HttpsError,
     timestamp: () => FieldValue.serverTimestamp(),
+    verifyTurnstile: createTurnstileVerifier({
+      secret: () => turnstileSecret.value(),
+      hostnames: () => process.env.TURNSTILE_ALLOWED_HOSTNAMES || "",
+    }),
   }),
 );
 

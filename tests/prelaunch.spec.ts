@@ -36,6 +36,9 @@ test("libera somente a página e suas imagens no proxy", async () => {
     "/em-breve",
     "/branding/cardap-logo.png",
     "/images/launch-restaurant.png",
+    "/images/launch-dashboard.png",
+    "/images/launch-cardap-devices.png",
+    "/images/launch-cardap-transparent.png",
   ]) {
     const response = await proxy(new NextRequest(`http://localhost${path}`));
     expect(response.headers.get("x-middleware-next")).toBe("1");

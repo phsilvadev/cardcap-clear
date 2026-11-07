@@ -23,41 +23,28 @@ export default function ComingSoonPage() {
         </span>
       </header>
       <main id="conteudo" className="launch-main">
-        <section className="launch-content" aria-labelledby="launch-title">
-          <h1 id="launch-title">
-            Seu próximo
-            <br />
-            grande pedido
-            <br />
-            começa <span>aqui.</span>
-          </h1>
-          <p className="launch-description">
-            Uma nova forma de conectar seu restaurante a quem está com fome.
-            Estamos preparando tudo para receber nossos primeiros parceiros.
-          </p>
-          <div className="launch-invitation">
-            <h2>Seu restaurante pode fazer parte.</h2>
-            <p>
-              Entre na lista de interesse para receber novidades e saber quando
-              o acesso estiver disponível.
-            </p>
-          </div>
-          <LaunchSignup />
-        </section>
-        <aside
-          className="launch-visual"
-          aria-label="Uma prévia do que estamos preparando"
-        >
+        <div className="launch-visual">
           <Image
             className="launch-hero-image"
-            src="/images/launch-restaurant.png"
-            alt="Restaurante com toldo laranja ao lado de um celular com cardápio e uma sacola de delivery."
-            width={1122}
-            height={1402}
-            sizes="(max-width: 760px) calc(100vw - 56px), (max-width: 1280px) 45vw, 520px"
+            src="/images/launch-cardap-transparent.png"
+            alt="Área do restaurante Cardap em um notebook e um celular, com ilustração de restaurante e formulário de acesso."
+            width={1536}
+            height={1024}
+            sizes="(max-width: 760px) calc(100vw - 48px), 720px"
             preload
           />
-        </aside>
+        </div>
+        <section className="launch-content" aria-labelledby="launch-title">
+          <h1 id="launch-title">
+            Ainda estamos arrumando a <span>cozinha.</span>
+          </h1>
+          <p className="launch-description">
+            O Cardap vai ajudar seu restaurante a chegar em quem está com fome,
+            sem complicação. Falta pouco. Se quiser ser avisado quando abrirmos,
+            deixa seu e-mail aqui embaixo.
+          </p>
+          <LaunchSignup />
+        </section>
       </main>
       <footer className="launch-footer">
         <span>Cardap · Sua próxima refeição começa aqui.</span>

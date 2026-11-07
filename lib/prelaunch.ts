@@ -3,6 +3,9 @@ import { NextResponse, type NextRequest } from "next/server";
 const publicAssets = new Set([
   "/branding/cardap-logo.png",
   "/images/launch-restaurant.png",
+  "/images/launch-dashboard.png",
+  "/images/launch-cardap-devices.png",
+  "/images/launch-cardap-transparent.png",
 ]);
 
 export function prelaunchResponse(request: NextRequest) {
