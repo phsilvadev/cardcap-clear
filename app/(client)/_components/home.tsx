@@ -1,6 +1,7 @@
 ﻿import BrandLogo from "@/components/brand-logo";
 import Image from "next/image";
 import HomeAccountLink from "./home-account-link";
+import CustomerHomeLink from "./customer-home-link";
 import PageBehavior from "./home-behavior";
 import "../_styles/home.css";
 
@@ -85,7 +86,7 @@ export default function HomeContent({
             <BrandLogo />
           </a>
           <nav aria-label="Navegação principal">
-            <a href="/cliente">Minha conta</a>
+            <CustomerHomeLink />
             <a href="#como-funciona">Como funciona</a>
             <HomeAccountLink restaurant={restaurant} />
           </nav>

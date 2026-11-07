@@ -3,7 +3,17 @@ const { getAuth } = require("firebase-admin/auth");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { createAccessLinkHandler } = require("./handler.cjs");
+const { createCustomer } = require("./customer.cjs");
 initializeApp();
+exports.customerOperations = onCall(
+  { region: "southamerica-east1", maxInstances: 5, timeoutSeconds: 60 },
+  createCustomer({
+    db: getFirestore(),
+    auth: getAuth(),
+    HttpsError,
+    timestamp: () => FieldValue.serverTimestamp(),
+  }).handler,
+);
 exports.employeeAccessLink = onCall(
   { region: "southamerica-east1", maxInstances: 5 },
   createAccessLinkHandler({ db: getFirestore(), auth: getAuth(), HttpsError }),

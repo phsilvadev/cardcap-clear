@@ -71,26 +71,64 @@ export default function RestaurantLogin() {
   return (
     <form className="restaurant-login-form" onSubmit={handleSubmit}>
       <label htmlFor="restaurant-email">E-mail</label>
-      <input
-        id="restaurant-email"
-        name="email"
-        type="email"
-        autoComplete="username"
-        placeholder="voce@restaurante.com.br"
-        maxLength={254}
-        required
-        onChange={() => setStatus("")}
-      />
-      <label htmlFor="restaurant-password">Senha</label>
-      <div className="restaurant-password-field">
+      <div className="restaurant-login-input">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          aria-hidden="true"
+        >
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <path d="m3 5 9 8 9-8" />
+        </svg>
         <input
-          id="restaurant-password"
-          name="password"
-          type={showPassword ? "text" : "password"}
-          autoComplete="current-password"
+          id="restaurant-email"
+          name="email"
+          type="email"
+          autoComplete="username"
+          placeholder="voce@restaurante.com.br"
+          maxLength={254}
           required
           onChange={() => setStatus("")}
         />
+      </div>
+      <label htmlFor="restaurant-password">Senha</label>
+      <div className="restaurant-password-field">
+        <div className="restaurant-login-input">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            aria-hidden="true"
+          >
+            <rect x="4" y="10" width="16" height="11" rx="2" />
+            <path d="M8 10V6a4 4 0 0 1 8 0v4" />
+            <path d="M12 14v3" />
+          </svg>
+          <input
+            id="restaurant-password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            placeholder="••••••••"
+            required
+            onChange={() => setStatus("")}
+          />
+          <svg
+            className="restaurant-password-eye"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            aria-hidden="true"
+          >
+            <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" />
+            <circle cx="12" cy="12" r="3" />
+            {showPassword && <path d="m3 3 18 18" />}
+          </svg>
+        </div>
         <button
           type="button"
           aria-controls="restaurant-password"
@@ -110,7 +148,7 @@ export default function RestaurantLogin() {
         disabled={loading}
       >
         {loading ? "Entrando…" : "Entrar no restaurante"}{" "}
-        <span aria-hidden="true">↗</span>
+        <span aria-hidden="true">→</span>
       </button>
       <p className="restaurant-login-status" role="status" aria-live="polite">
         {status}

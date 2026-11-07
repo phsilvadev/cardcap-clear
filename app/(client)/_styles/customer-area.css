@@ -1,0 +1,485 @@
+.customer-shell {
+  max-width: 1200px;
+  min-height: 100dvh;
+  padding: 0 28px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  color: #141414;
+}
+.customer-header {
+  min-height: 94px;
+  border-bottom: 1px solid #e6e6e6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 15px;
+}
+.customer-header .cardap-brand-logo {
+  width: 125px;
+}
+.customer-header > a:last-child:hover {
+  color: #f66b00;
+}
+.customer-footer {
+  margin-top: auto;
+  border-top: 1px solid #e6e6e6;
+  padding: 23px 0;
+  font-size: 13px;
+  color: #64646a;
+}
+.customer-access-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  padding: 60px 0;
+}
+.customer-eyebrow {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  font-size: 12px;
+  color: #64646a;
+}
+.customer-access-intro h1 {
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 1.07;
+  letter-spacing: -0.035em;
+  font-weight: 750;
+  margin: 22px 0;
+}
+.customer-access-intro em {
+  color: #ff7400;
+  font-style: normal;
+}
+.customer-access-intro > p {
+  color: #606068;
+  font-size: 18px;
+  line-height: 1.6;
+  max-width: 400px;
+}
+.customer-access-intro > a {
+  display: inline-block;
+  color: #ea6600;
+  margin-top: 25px;
+  font-weight: 550;
+}
+.customer-panel {
+  padding: 28px;
+  border: 1px solid #e2e2e5;
+  border-radius: 24px;
+  min-width: 0;
+  background: #fff;
+}
+.customer-panel h2 {
+  font-size: 27px;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+.customer-panel h3 {
+  font-size: 17px;
+  font-weight: 600;
+}
+.customer-panel > p {
+  color: #64646a;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.customer-access-card > h2 {
+  margin-top: 13px;
+}
+.customer-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 25px;
+}
+.customer-form > label {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 550;
+}
+.customer-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  border: 1px solid #d9d9de;
+  border-radius: 12px;
+  padding: 10px 13px;
+  font-size: 16px;
+  background: white;
+  color: #191919;
+}
+.customer-form input[readonly] {
+  background: #f7f7f8;
+  color: #64646a;
+}
+.customer-password {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.customer-password input {
+  padding-right: 80px;
+}
+.customer-password button {
+  position: absolute;
+  right: 5px;
+  min-height: 36px;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+  padding: 6px 10px;
+  color: #62626a;
+}
+.customer-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 19px;
+  border: 1px solid #dedee2;
+  border-radius: 999px;
+  background: white;
+  color: #171717;
+  font-size: 14px;
+  font-weight: 550;
+  cursor: pointer;
+}
+.customer-primary {
+  border-color: #ff8100;
+  background: linear-gradient(175deg, #ff9600, #ff6800);
+  color: white;
+}
+.customer-primary:hover {
+  transform: translateY(-1px);
+}
+.customer-form > .customer-primary {
+  justify-content: space-between;
+}
+.customer-button:disabled,
+.customer-text-link:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.customer-text-link {
+  display: inline-block;
+  border: 0;
+  background: none;
+  color: #de5d00;
+  font-size: 14px;
+  padding: 6px 0;
+  text-align: left;
+  font-weight: 500;
+}
+.customer-text-link:hover {
+  text-decoration: underline;
+}
+.customer-access-switch {
+  border-top: 1px solid #e8e8e8;
+  margin-top: 26px;
+  padding-top: 22px;
+}
+.customer-access-switch a {
+  color: #e65f00;
+  font-weight: 600;
+}
+.customer-access-partner {
+  margin-top: 16px;
+  font-size: 12px !important;
+}
+.customer-access-partner a {
+  text-decoration: underline;
+}
+.customer-error,
+.customer-success {
+  padding: 13px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.customer-error {
+  color: #a52b23;
+  background: #fff1ef;
+}
+.customer-success {
+  color: #24613e;
+  background: #eef8f0;
+}
+.customer-muted {
+  color: #696970;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.customer-account-main {
+  padding: 42px 0;
+}
+.customer-account-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 26px;
+}
+.customer-account-heading h1 {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 10px 0;
+}
+.customer-account-heading > div > p:last-child {
+  color: #64646a;
+  font-size: 15px;
+}
+.customer-notice {
+  background: #fff6e9;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 18px;
+  margin-bottom: 25px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+.customer-notice p {
+  flex: 1;
+  min-width: 200px;
+}
+.customer-notice button {
+  border: 0;
+  background: none;
+  color: #a74700;
+  padding: 7px 0;
+  font-weight: 550;
+}
+.customer-account-layout {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 25px;
+  align-items: start;
+}
+.customer-sidebar {
+  min-width: 0;
+  border: 1px solid #e2e2e5;
+  border-radius: 24px;
+  padding: 23px 18px;
+}
+.customer-sidebar > strong {
+  font-size: 16px;
+}
+.customer-sidebar > p {
+  color: #64646a;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  margin-top: 7px;
+}
+.customer-sidebar nav {
+  display: grid;
+  gap: 5px;
+  margin: 23px 0;
+}
+.customer-sidebar nav button {
+  min-height: 44px;
+  text-align: left;
+  background: white;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 13px;
+  font-size: 14px;
+}
+.customer-sidebar nav button[aria-current="page"] {
+  background: #ff8b00;
+  font-weight: 600;
+}
+.customer-sidebar nav button:hover:not([aria-current="page"]) {
+  background: #f7f7f7;
+}
+.customer-sidebar > .customer-button {
+  width: 100%;
+}
+.customer-account-content {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+.customer-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.customer-section-heading h2 {
+  margin-bottom: 0;
+}
+.customer-list {
+  display: grid;
+  gap: 15px;
+  margin: 22px 0;
+}
+.customer-order,
+.customer-address {
+  border: 1px solid #e4e4e7;
+  border-radius: 16px;
+  padding: 18px;
+  min-width: 0;
+}
+.customer-order > p {
+  color: #62626a;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 16px 0;
+}
+.customer-order .customer-section-heading > div > p {
+  color: #77777d;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.customer-badge {
+  display: inline-flex;
+  padding: 5px 10px;
+  font-size: 11px;
+  color: #ac4900;
+  background: #fff0dc;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.customer-order-detail {
+  border-top: 1px solid #e7e7e9;
+  margin-top: 15px;
+  padding-top: 18px;
+  display: grid;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.customer-order-detail > div > p:last-child {
+  color: #64646a;
+}
+.customer-empty {
+  padding: 35px 12px;
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #64646a;
+}
+.customer-empty h3 {
+  color: #171717;
+}
+.customer-address p {
+  font-size: 14px;
+  color: #64646a;
+  line-height: 1.6;
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+.customer-inline-actions {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.customer-address-form {
+  grid-template-columns: 1fr 1fr;
+}
+.customer-form .customer-checkbox {
+  display: flex;
+  align-items: center;
+  grid-column: 1/-1;
+}
+.customer-checkbox input {
+  min-height: 20px;
+  width: 18px;
+  height: 18px;
+  accent-color: #ff8000;
+}
+.customer-address-form > .customer-inline-actions {
+  grid-column: 1/-1;
+}
+@media (max-width: 760px) {
+  .customer-shell {
+    padding: 0 20px;
+  }
+  .customer-header {
+    min-height: 80px;
+    font-size: 13px;
+  }
+  .customer-header .cardap-brand-logo {
+    width: 105px;
+  }
+  .customer-access-layout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 32px 0;
+  }
+  .customer-access-intro h1 {
+    font-size: 38px;
+  }
+  .customer-access-intro > p {
+    font-size: 16px;
+  }
+  .customer-panel {
+    padding: 23px 19px;
+    border-radius: 20px;
+  }
+  .customer-panel h2 {
+    font-size: 25px;
+  }
+  .customer-account-main {
+    padding-top: 28px;
+  }
+  .customer-account-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .customer-account-heading h1 {
+    font-size: 32px;
+  }
+  .customer-account-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .customer-sidebar {
+    padding: 18px;
+  }
+  .customer-sidebar nav {
+    display: flex;
+    overflow-x: auto;
+    margin: 16px 0;
+    gap: 6px;
+    padding-bottom: 5px;
+  }
+  .customer-sidebar nav button {
+    flex-shrink: 0;
+    padding-inline: 15px;
+  }
+  .customer-sidebar > .customer-button {
+    width: auto;
+  }
+  .customer-section-heading {
+    gap: 10px;
+  }
+  .customer-order,
+  .customer-address {
+    padding: 16px;
+  }
+  .customer-address-form {
+    grid-template-columns: 1fr;
+  }
+  .customer-notice {
+    gap: 8px 16px;
+  }
+}

@@ -134,6 +134,7 @@ function createCheckout({
     return {
       storeId: session.storeId,
       source: "web",
+      customerUid: session.customerUid || null,
       customer: session.customer.name,
       phone: session.customer.phone,
       address: session.customer.address,
@@ -252,6 +253,8 @@ function createCheckout({
         );
       const session = {
         id: sessionId,
+        customerUid: request.auth?.uid || null,
+        createdAtMs: now(),
         storeId: context.storeId,
         slug: input.slug,
         fingerprint,
@@ -272,6 +275,17 @@ function createCheckout({
         expiresAt: new Date(now() + 86400000),
       });
       tx.create(ref, session);
+      if (session.customerUid)
+        tx.create(
+          db.doc(`customers/${session.customerUid}/orders/${sessionId}`),
+          {
+            checkoutId: sessionId,
+            storeId: context.storeId,
+            storeName: context.store.name || input.slug,
+            slug: input.slug,
+            createdAtMs: session.createdAtMs,
+          },
+        );
       if (input.payment !== "pix")
         tx.create(
           db.doc(`tenants/${context.storeId}/orders/${sessionId}`),

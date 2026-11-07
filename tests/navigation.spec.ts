@@ -57,17 +57,25 @@ test("busca restaurantes pela região informada", async ({ page }) => {
   await expect(page.locator("main")).toContainText("Campinas");
 });
 
-test("permite entrar e sair da conta demonstrativa", async ({ page }) => {
+test("conta de cliente exige login real e ignora sessão demonstrativa", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    sessionStorage.setItem(
+      "cardap-demo-user",
+      JSON.stringify({
+        id: "demo-customer",
+        name: "Cliente fictício",
+        demo: true,
+      }),
+    ),
+  );
   await page.goto("/cliente");
-  await page.locator("#demo-login").click();
-  await expect(page.locator("#account")).toBeVisible();
-  await page.locator("#profile-name").fill("Maria Silva");
-  await page.locator("#profile-form button[type=submit]").click();
-  await expect(page.locator("#account-name")).toHaveText("Maria Silva");
-  await page.reload();
-  await expect(page.locator("#account-name")).toHaveText("Maria Silva");
-  await page.locator("#sign-out").click();
-  await expect(page.locator("#guest")).toBeVisible();
+  await expect(page).toHaveURL("/cliente/login");
+  await expect(
+    page.getByRole("form", { name: "Login do cliente" }),
+  ).toBeVisible();
+  await expect(page.getByText("Cliente fictício")).toHaveCount(0);
 });
 
 test("dashboard exige sessão em todos os domínios", async ({ request }) => {
@@ -118,7 +126,7 @@ test("Para restaurantes abre o login e mantém o formulário acessível", async 
 }) => {
   await page.goto("/");
   await page
-    .getByRole("link", { name: "Para restaurantes", exact: true })
+    .getByRole("link", { name: "Área do restaurante", exact: true })
     .click();
   await expect(page).toHaveURL("/restaurantes/login");
   await expect(page).toHaveTitle("Entrar no restaurante — Cardap");

@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCustomer } from "@/lib/customer/use-customer";
+import { addressText } from "@/lib/customer/types";
 import { CatalogHeader, CatalogFooter } from "./catalog-shared";
 import { useStoreCart, cartSelections } from "@/lib/checkout/cart";
 import {
@@ -56,6 +58,8 @@ export default function Commerce({
     [sandbox, setSandbox] = useState(false),
     [message, setMessage] = useState("");
   const cart = useStoreCart(slug);
+  const customerAccount = useCustomer();
+  const draftTouched = useRef(false);
   const url = (next: Step) => `/${next}?store=${encodeURIComponent(slug)}`;
   useEffect(() => {
     const value = slug;
@@ -65,6 +69,7 @@ export default function Commerce({
     setSaved(null);
     setPending(null);
     setError("");
+    draftTouched.current = false;
     if (!value) return;
     try {
       const valueDraft = JSON.parse(
@@ -108,6 +113,19 @@ export default function Commerce({
       active = false;
     };
   }, [slug, step]);
+  useEffect(() => {
+    const profile = customerAccount.profile;
+    if (step !== "checkout" || !profile || draftTouched.current) return;
+    const primary =
+      profile.addresses.find((address) => address.isDefault) ??
+      profile.addresses[0];
+    setDraft((current) => ({
+      ...current,
+      name: current.name || profile.name,
+      phone: current.phone || profile.phone,
+      address: current.address || (primary ? addressText(primary) : ""),
+    }));
+  }, [customerAccount.profile, step, slug]);
   const selectionKey = JSON.stringify(cartSelections(cart.items));
   useEffect(() => {
     if (
@@ -288,6 +306,54 @@ export default function Commerce({
         ) : (
           <>
             <p>{store?.name ?? "Sua loja"}</p>
+            {step === "checkout" && (
+              <p className="restaurant-login-note">
+                {customerAccount.user ? (
+                  <>
+                    Este pedido será vinculado à sua conta.{" "}
+                    <a href="/cliente">Minha conta</a>
+                  </>
+                ) : (
+                  <>
+                    Você pode comprar como visitante ou{" "}
+                    <a
+                      href={`/cliente/login?next=${encodeURIComponent(url("checkout"))}`}
+                    >
+                      entrar para acompanhar seus pedidos na sua conta
+                    </a>
+                    .
+                  </>
+                )}
+              </p>
+            )}
+            {step === "checkout" &&
+              !!customerAccount.profile?.addresses.length && (
+                <label className="flow-field">
+                  Usar endereço salvo
+                  <select
+                    defaultValue=""
+                    onChange={(event) => {
+                      const selected = customerAccount.profile?.addresses.find(
+                        (item) => item.id === event.target.value,
+                      );
+                      if (selected) {
+                        draftTouched.current = true;
+                        setDraft((current) => ({
+                          ...current,
+                          address: addressText(selected),
+                        }));
+                      }
+                    }}
+                  >
+                    <option value="">Selecione um endereço</option>
+                    {customerAccount.profile.addresses.map((item) => (
+                      <option value={item.id} key={item.id}>
+                        {item.label} — {item.street}, {item.number}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
             <nav className="commerce-steps" aria-label="Etapas da compra">
               <a href={url("carrinho")}>Carrinho</a>
               <a href={url("checkout")}>Entrega</a>
@@ -371,7 +437,13 @@ export default function Commerce({
               </section>
             )}
             {step === "checkout" && (
-              <form className="commerce-form" onSubmit={continueCheckout}>
+              <form
+                className="commerce-form"
+                onSubmit={continueCheckout}
+                onChangeCapture={() => {
+                  draftTouched.current = true;
+                }}
+              >
                 <label>
                   Nome
                   <input

@@ -57,3 +57,16 @@ export const getFirebaseDb = () => getFirestore(getFirebaseApp());
 export const getFirebaseStorage = () => getStorage(getFirebaseApp());
 export const getFirebaseFunctions = () =>
   getFunctions(getFirebaseApp(), "southamerica-east1");
+
+// Keep customer persistence separate from restaurant authentication.
+export function getCustomerApp(): FirebaseApp {
+  getFirebaseApp();
+  const app =
+    getApps().find((entry) => entry.name === "cardap-customer") ??
+    initializeApp(firebaseOptions, "cardap-customer");
+  initializeWebAppCheck(app);
+  return app;
+}
+export const getCustomerAuth = () => getAuth(getCustomerApp());
+export const getCustomerFunctions = () =>
+  getFunctions(getCustomerApp(), "southamerica-east1");

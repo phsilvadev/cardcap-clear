@@ -1,4 +1,5 @@
 import BrandLogo from "@/components/brand-logo";
+import CustomerHomeLink from "./customer-home-link";
 import type { ReactNode } from "react";
 export function CatalogHeader({
   backHref = "/#buscar",
@@ -17,7 +18,7 @@ export function CatalogHeader({
           <BrandLogo />
         </a>
         <nav className="catalog-nav" aria-label="Navegação do cliente">
-          <a href="/cliente">Minha conta</a>
+          <CustomerHomeLink />
           <a href={backHref} className="link-icon back">
             <span aria-hidden="true">←</span> {backLabel}
           </a>

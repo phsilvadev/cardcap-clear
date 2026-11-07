@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import CustomerFavorite from "./customer-favorite";
 import { usePublicStore } from "../_hooks/use-public-store";
 import {
   categoryLabels,
@@ -90,6 +91,7 @@ export default function LojaContent({
                     "Restaurante"}
                 </p>
                 <h1 id="store-name">{store.name}</h1>
+                {!preview && <CustomerFavorite slug={slug} />}
                 <p>{store.description}</p>
                 <div className="store-meta">
                   <CatalogStatus

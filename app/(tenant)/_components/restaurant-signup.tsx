@@ -1,6 +1,7 @@
 "use client";
 
 import BotProtectionNotice from "./bot-protection-notice";
+import SignupIcon from "./signup-icon";
 
 import { useRestaurantSignup } from "@/app/(tenant)/_hooks/use-restaurant-signup";
 
@@ -22,7 +23,10 @@ const RestaurantSignup = () => {
       aria-label="Cadastro do restaurante"
     >
       <div className="restaurant-signup-field">
-        <label htmlFor="signup-owner">Seu nome</label>
+        <label htmlFor="signup-owner">
+          <SignupIcon name="user" />
+          Seu nome <span aria-hidden="true">*</span>
+        </label>
         <input
           id="signup-owner"
           required
@@ -35,7 +39,10 @@ const RestaurantSignup = () => {
         />
       </div>
       <div className="restaurant-signup-field">
-        <label htmlFor="signup-store">Nome do restaurante</label>
+        <label htmlFor="signup-store">
+          <SignupIcon name="store" />
+          Nome do restaurante <span aria-hidden="true">*</span>
+        </label>
         <input
           id="signup-store"
           required
@@ -44,11 +51,14 @@ const RestaurantSignup = () => {
           name="storeName"
           type="text"
           autoComplete="organization"
-          placeholder="Como seu restaurante se chama?"
+          placeholder="Ex.: Hero Burgues"
         />
       </div>
       <div className="restaurant-signup-field restaurant-signup-full">
-        <label htmlFor="signup-email">E-mail</label>
+        <label htmlFor="signup-email">
+          <SignupIcon name="mail" />
+          E-mail <span aria-hidden="true">*</span>
+        </label>
         <input
           id="signup-email"
           required
@@ -59,8 +69,11 @@ const RestaurantSignup = () => {
           placeholder="voce@restaurante.com.br"
         />
       </div>
-      <div className="restaurant-signup-field restaurant-signup-full">
-        <label htmlFor="signup-password">Senha</label>
+      <div className="restaurant-signup-field">
+        <label htmlFor="signup-password">
+          <SignupIcon name="lock" />
+          Senha <span aria-hidden="true">*</span>
+        </label>
         <div className="restaurant-password-field">
           <input
             id="signup-password"
@@ -77,24 +90,45 @@ const RestaurantSignup = () => {
             onClick={togglePassword}
             aria-controls="signup-password signup-confirmation"
             aria-pressed={showPassword}
+            aria-label={showPassword ? "Ocultar senhas" : "Mostrar senhas"}
           >
-            {showPassword ? "Ocultar senhas" : "Mostrar senhas"}
+            <SignupIcon name="eye" />
           </button>
         </div>
       </div>
-      <div className="restaurant-signup-field restaurant-signup-full">
-        <label htmlFor="signup-confirmation">Confirme a senha</label>
-        <input
-          id="signup-confirmation"
-          required
-          name="confirmation"
-          type={showPassword ? "text" : "password"}
-          autoComplete="new-password"
-          placeholder="Digite sua senha novamente"
-        />
+      <div className="restaurant-signup-field">
+        <label htmlFor="signup-confirmation">
+          <SignupIcon name="lock" />
+          Confirme a senha <span aria-hidden="true">*</span>
+        </label>
+        <div className="restaurant-password-field">
+          <input
+            id="signup-confirmation"
+            required
+            name="confirmation"
+            type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
+            placeholder="Digite sua senha novamente"
+          />
+          <button
+            type="button"
+            onClick={togglePassword}
+            aria-controls="signup-password signup-confirmation"
+            aria-pressed={showPassword}
+            aria-label={
+              showPassword
+                ? "Ocultar confirmação da senha"
+                : "Mostrar confirmação da senha"
+            }
+          >
+            <SignupIcon name="eye" />
+          </button>
+        </div>
       </div>
       <p className="restaurant-login-note restaurant-signup-full">
-        Crie sua conta para iniciar a configuração do restaurante.
+        <SignupIcon name="info" />
+        Esta conta será usada para acessar e configurar seu restaurante na
+        plataforma.
       </p>
       <BotProtectionNotice className="restaurant-signup-full" />
       <button
@@ -103,7 +137,7 @@ const RestaurantSignup = () => {
         disabled={loading}
       >
         {loading ? "Cadastrando…" : "Cadastrar restaurante"}{" "}
-        <span aria-hidden="true">↗</span>
+        <span aria-hidden="true">→</span>
       </button>
       <p
         className="restaurant-login-status restaurant-signup-full"

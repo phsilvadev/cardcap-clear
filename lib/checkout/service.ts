@@ -1,17 +1,24 @@
 "use client";
 import { httpsCallable } from "firebase/functions";
-import { getFirebaseFunctions, getFirebaseAuth } from "@/lib/firebase/client";
+import {
+  getFirebaseFunctions,
+  getFirebaseAuth,
+  getCustomerAuth,
+  getCustomerFunctions,
+} from "@/lib/firebase/client";
 import type { ProductResult } from "./types";
-export function checkoutCall<T>(
+export async function checkoutCall<T>(
   action: string,
   values: Record<string, unknown>,
 ): Promise<T> {
+  await getCustomerAuth().authStateReady();
   return httpsCallable<Record<string, unknown>, T>(
-    getFirebaseFunctions(),
+    getCustomerFunctions(),
     "publicCheckout",
   )({ ...values, action }).then((result) => result.data);
 }
-export function checkoutPix(slug: string, requestId: string) {
+export async function checkoutPix(slug: string, requestId: string) {
+  await getCustomerAuth().authStateReady();
   return httpsCallable<
     { slug: string; requestId: string },
     {
@@ -19,7 +26,7 @@ export function checkoutPix(slug: string, requestId: string) {
       environment: string;
     }
   >(
-    getFirebaseFunctions(),
+    getCustomerFunctions(),
     "publicCheckoutPix",
   )({ slug, requestId }).then((result) => result.data);
 }
@@ -38,6 +45,8 @@ export async function getPublicProduct(
 }
 export function checkoutError(error: unknown) {
   const e = error as { code?: string; message?: string };
+  if (e.code === "functions/unauthenticated")
+    return "Não foi possível validar a segurança do pedido. Atualize a página e tente novamente.";
   return e.code?.startsWith("functions/") &&
     ![
       "functions/internal",

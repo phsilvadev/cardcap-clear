@@ -1,6 +1,105 @@
+﻿.restaurant-signup-shell {
+  max-width: 1408px;
+}
+.restaurant-signup-shell .restaurant-login-header {
+  min-height: 83px;
+}
+.restaurant-signup-shell .restaurant-login-header > a:last-child {
+  font-size: 17px;
+}
+.restaurant-signup-shell .restaurant-login-header > a:last-child svg {
+  color: var(--color-ink);
+}
+.restaurant-signup-shell .restaurant-login-main {
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr);
+  gap: 70px;
+  padding: 48px 0 34px;
+}
+.restaurant-signup-shell .restaurant-login-intro {
+  min-height: 640px;
+}
+.restaurant-signup-shell .restaurant-login-intro > .restaurant-signup-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 17px;
+  border-radius: 30px;
+  background: #ffe8d0;
+  color: #ef6600;
+  font-size: 16px;
+  font-weight: 550;
+}
+.restaurant-signup-shell .restaurant-login-intro h1 {
+  font-size: clamp(38px, 3.15vw, 54px);
+  line-height: 1.08;
+  margin: 19px 0 28px;
+}
+.restaurant-signup-shell .restaurant-login-intro h1 span {
+  color: #ff7000;
+}
+.restaurant-signup-shell
+  .restaurant-login-intro
+  > p:not(.restaurant-login-eyebrow):not(.restaurant-signup-badge) {
+  max-width: 470px;
+  font-size: 20px;
+  line-height: 1.45;
+}
+.restaurant-signup-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 31px 0 0;
+  display: grid;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+  font-size: 17px;
+}
+.restaurant-signup-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.restaurant-signup-benefits li span {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: linear-gradient(#ff9900, #ff6500);
+  color: white;
+  font-size: 17px;
+}
+.restaurant-signup-art {
+  position: absolute;
+  bottom: -18px;
+  right: -23px;
+  width: 550px;
+  max-width: 100%;
+  height: auto;
+  z-index: 0;
+}
+.restaurant-signup-shell .restaurant-login-card {
+  max-width: none;
+  border-radius: 28px;
+  padding: 27px 34px 23px;
+}
+.restaurant-signup-shell .restaurant-login-card h2 {
+  font-size: 36px;
+  margin-top: 8px;
+}
+.restaurant-signup-shell .restaurant-login-card .restaurant-login-eyebrow {
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+.restaurant-signup-shell .restaurant-login-card > h2 + p {
+  font-size: 19px;
+  color: #555b65;
+  margin-top: 4px;
+}
 .restaurant-signup-form {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 23px 24px;
+  margin-top: 29px;
 }
 .restaurant-signup-field {
   display: grid;
@@ -8,25 +107,180 @@
   min-width: 0;
 }
 .restaurant-signup-field > label {
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
   font-weight: 600;
+}
+.restaurant-signup-field > label > span {
+  color: #f13017;
+  margin-left: -6px;
+}
+.restaurant-signup-form input {
+  border: 1px solid #d1d3d7;
+  border-radius: 16px;
+  min-height: 49px;
+  padding: 11px 23px;
+  background: white;
+  font-size: 16px;
+}
+.restaurant-signup-form input:focus-visible {
+  outline: 2px solid #ff8000;
+  outline-offset: 2px;
+}
+.restaurant-signup-form .restaurant-password-field {
+  position: relative;
+  gap: 0;
+}
+.restaurant-signup-form .restaurant-password-field input {
+  padding-right: 45px;
+}
+.restaurant-signup-form .restaurant-password-field button {
+  position: absolute;
+  right: 8px;
+  width: 36px;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
 }
 .restaurant-signup-full {
   grid-column: 1 / -1;
 }
-.restaurant-signup-switch {
-  margin-top: 16px;
+.restaurant-signup-form > .restaurant-login-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 17px;
+  background: #f5f5f5;
+  padding: 13px 17px;
   font-size: 14px;
+  line-height: 1.45;
+  margin: 0;
+}
+.restaurant-signup-form > .restaurant-login-note > svg {
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+  color: #ff7900;
+}
+.restaurant-signup-form .restaurant-login-submit {
+  justify-content: center;
+  position: relative;
+  min-height: 49px;
+  font-size: 18px;
+  border-radius: 16px;
+  margin: 0;
+}
+.restaurant-signup-form .restaurant-login-submit span {
+  position: absolute;
+  right: 23px;
+  font-size: 28px;
+}
+.restaurant-signup-switch {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 15px;
   line-height: 1.6;
-  color: var(--color-muted);
 }
 .restaurant-signup-switch a {
-  color: var(--color-ink);
+  color: #ff6800;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
+  margin-left: 8px;
 }
-@media (max-width: 480px) {
+@media (max-width: 1100px) and (min-width: 761px) {
+  .restaurant-signup-shell .restaurant-login-main {
+    gap: 35px;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+  }
+  .restaurant-signup-shell .restaurant-login-intro h1 {
+    font-size: 38px;
+  }
+  .restaurant-signup-shell
+    .restaurant-login-intro
+    > p:not(.restaurant-login-eyebrow):not(.restaurant-signup-badge) {
+    font-size: 17px;
+  }
+  .restaurant-signup-shell .restaurant-login-card {
+    padding: 25px;
+  }
+  .restaurant-signup-form {
+    gap: 20px 15px;
+  }
+  .restaurant-signup-field > label {
+    gap: 6px;
+    font-size: 13px;
+  }
+  .restaurant-signup-form input {
+    padding-inline: 13px;
+    font-size: 14px;
+  }
+}
+@media (max-width: 760px) {
+  .restaurant-signup-shell .restaurant-login-main {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 28px 0;
+  }
+  .restaurant-signup-shell .restaurant-login-intro {
+    min-height: 0;
+  }
+  .restaurant-signup-shell .restaurant-login-header > a:last-child {
+    font-size: 14px;
+  }
+  .restaurant-signup-badge {
+    font-size: 14px;
+  }
+  .restaurant-signup-shell .restaurant-login-intro h1 {
+    font-size: clamp(34px, 8vw, 46px);
+  }
+  .restaurant-signup-shell
+    .restaurant-login-intro
+    > p:not(.restaurant-login-eyebrow):not(.restaurant-signup-badge) {
+    font-size: 17px;
+  }
+  .restaurant-signup-benefits {
+    gap: 12px;
+    font-size: 15px;
+    margin-top: 24px;
+  }
+  .restaurant-signup-art {
+    position: relative;
+    display: block;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: 450px;
+    margin: -30px auto -12px;
+  }
+  .restaurant-signup-shell .restaurant-login-card {
+    padding: 26px 22px;
+  }
+  .restaurant-signup-shell .restaurant-login-card h2 {
+    font-size: 30px;
+  }
+  .restaurant-signup-shell .restaurant-login-card > h2 + p {
+    font-size: 17px;
+  }
+  .restaurant-signup-form {
+    margin-top: 24px;
+    gap: 20px;
+  }
+  .restaurant-signup-form input {
+    font-size: 16px;
+    padding-inline: 15px;
+  }
+  .restaurant-signup-form > .restaurant-login-note {
+    font-size: 13px;
+  }
+  .restaurant-signup-form .restaurant-login-submit {
+    font-size: 16px;
+  }
+}
+@media (max-width: 520px) {
   .restaurant-signup-form {
     grid-template-columns: 1fr;
   }
